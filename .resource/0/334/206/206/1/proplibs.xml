@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Passage" resource-id="b4a6c7" version="6"/>
+  <library name="Grass Tiles" resource-id="61cf84" version="1"/>
+  <library name="Com Build" resource-id="a27b0d" version="3"/>
+  <library name="zamin" resource-id="678439" version="4"/>
+  <library name="Concrete Tiles" resource-id="b358e6" version="2"/>
+  <library name="Cliffs" resource-id="35ed07" version="2"/>
+  <library name="Slopes Rises" resource-id="707ec0" version="2"/>
+  <library name="Defense" resource-id="34dcd5" version="3"/>
+  <library name="Terrain" resource-id="e77a11" version="1"/>
+  <library name="Waffle Fence" resource-id="aa0658" version="6"/>
+  <library name="Exterior" resource-id="919511" version="1"/>
+  <library name="Fence" resource-id="6ee6b6" version="1"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Stuffs" resource-id="bcdbf8" version="1"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+  <library name="Industrial Elements" resource-id="133cff" version="3"/>
+</proplibs>

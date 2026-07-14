@@ -8,9 +8,9 @@ const SUPPLY_TYPES = ["health", "armor", "double_damage", "n2o", "mine"] as cons
 /** Adds any supply to the caller's inventory (replaces the old /buymines): no garage trip, no cap. */
 export default class SupplyCommand implements ICommand {
     name = "supply";
-    description = "Adiciona suprimentos ao seu inventário, sem garagem e sem limite. Uso: /supply <tipo> <amount>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
-    usage = `[${SUPPLY_TYPES.join("/")}] <amount>`;
+    description = "Adds supplies to your inventory, with no garage trip and no cap. Usage: /supply <type> <amount>.";
+    permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
+    usage = "<health/armor/double_damage/n2o/mine> <amount>";
     example = "/supply n2o 100";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
@@ -20,12 +20,12 @@ export default class SupplyCommand implements ICommand {
 
         const type = (args[0] ?? "").toLowerCase();
         if (!(SUPPLY_TYPES as readonly string[]).includes(type)) {
-            context.reply(`Tipo inválido. Use um de: ${SUPPLY_TYPES.join(", ")}.`);
+            context.reply(`Invalid type. Use one of: ${SUPPLY_TYPES.join(", ")}.`);
             return;
         }
         const amount = parseInt(args[1], 10);
         if (isNaN(amount) || amount <= 0) {
-            context.reply("Uso: /supply <tipo> <amount> (número positivo).");
+            context.reply("Usage: /supply <type> <amount> (positive number).");
             return;
         }
 
@@ -35,7 +35,7 @@ export default class SupplyCommand implements ICommand {
         try {
             await User.updateOne({ _id: user._id }, { $inc: { [`supplies.${type}`]: amount } });
         } catch (error: any) {
-            context.reply(`Erro ao salvar: ${error.message}`);
+            context.reply(`Error saving: ${error.message}`);
             return;
         }
 

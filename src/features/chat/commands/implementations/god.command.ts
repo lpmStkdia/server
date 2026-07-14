@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  apply — disable those with /bounds off. Resets on leaving the battle. */
 export default class GodCommand implements ICommand {
     name = "god";
-    description = "Liga/desliga a invencibilidade de um tanque (vazio = você). Uso: /god [username].";
+    description = "Toggles a tank's invincibility (empty = yourself). Usage: /god [username].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "[username]";
     example = "/god";
@@ -14,7 +14,7 @@ export default class GodCommand implements ICommand {
         const client = context.executor;
         const { server } = context;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
@@ -22,13 +22,13 @@ export default class GodCommand implements ICommand {
         if (args.length >= 1) {
             const found = server.findClientByUsername(args[0]);
             if (!found?.user || found.currentBattle?.battleId !== client.currentBattle.battleId) {
-                context.reply(`Jogador "${args[0]}" não está nesta batalha.`);
+                context.reply(`Player "${args[0]}" is not in this match.`);
                 return;
             }
             target = found;
         }
 
         target.godMode = !target.godMode;
-        context.reply(`Invencibilidade de ${target.user?.username}: ${target.godMode ? "ATIVADA" : "desativada"}.`);
+        context.reply(`Invincibility for ${target.user?.username}: ${target.godMode ? "ENABLED" : "disabled"}.`);
     }
 }

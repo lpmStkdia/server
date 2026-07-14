@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Grass Tiles" resource-id="61cf84" version="1"/>
+  <library name="Concrete Tiles" resource-id="b358e6" version="2"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Village Builds" resource-id="766a25" version="2"/>
+  <library name="Slopes Rises" resource-id="707ec0" version="2"/>
+  <library name="Cliffs" resource-id="35ed07" version="2"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+  <library name="City Builds" resource-id="e38285" version="2"/>
+  <library name="Concrete Walls" resource-id="65b190" version="3"/>
+</proplibs>

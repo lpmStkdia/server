@@ -4,18 +4,18 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 
 const MAX_CRYSTALS = 99_999_999;
 
-/** Sets (not adds) the caller's crystal count — sandbox sibling of /addcry. */
+/** Sets (not adds) the caller's crystal count — sandbox sibling of /addcrystals. */
 export default class SetCrystalsCommand implements ICommand {
-    name = "setcry";
-    description = "Define (não soma) a quantidade de cristais da sua conta. Uso: /setcry <amount>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    name = "setcrystals";
+    description = "Sets (does not add) the amount of crystals in your account. Usage: /setcrystals <amount>";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<amount>";
-    example = "/setcry 1000000";
+    example = "/setcrystals 1000000";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const amount = parseInt(args[0], 10);
         if (isNaN(amount)) {
-            context.reply("Uso: /setcry <amount>.");
+            context.reply("Usage: /setcrystals <amount>.");
             return;
         }
         const user = context.executor.user;
@@ -26,9 +26,9 @@ export default class SetCrystalsCommand implements ICommand {
             const updated = await context.server.userService.updateResources(user.id, { crystals });
             context.executor.user = updated;
             context.executor.sendPacket(new UpdateCrystals({ crystals: updated.crystals }));
-            context.reply(`Cristais definidos para ${updated.crystals}.`);
+            context.reply(`Crystals set to ${updated.crystals}.`);
         } catch (error: any) {
-            context.reply(`Erro: ${error.message}`);
+            context.reply(`Error: ${error.message}`);
         }
     }
 }

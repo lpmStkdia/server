@@ -57,12 +57,12 @@ export class CommandService {
         const command = this.commands.get(commandName);
 
         if (!command) {
-            context.reply(`Comando "${commandName}" não encontrado.`);
+            context.reply(`Command "${commandName}" not found.`);
             return;
         }
 
         if (!hasModeratorPower(context.executor.user!.chatModeratorLevel, command.permissionLevel)) {
-            context.reply("Você não tem permissão para usar este comando.");
+            context.reply("You do not have permission to use this command.");
             return;
         }
 
@@ -70,7 +70,7 @@ export class CommandService {
             await command.execute(context, args);
         } catch (error: any) {
             logger.error(`Error executing command /${commandName}`, { error: error.message, user: context.executor.user?.username });
-            context.reply(`Ocorreu um erro ao executar o comando: ${error.message}`);
+            context.reply(`An error occurred while executing the command: ${error.message}`);
         }
     }
 }

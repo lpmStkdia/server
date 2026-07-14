@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Industrial Bridge" resource-id="7761eb" version="3"/>
+  <library name="Broken Walls" resource-id="3de9a7" version="2"/>
+  <library name="Land Tiles" resource-id="86b1b" version="2"/>
+  <library name="Outer Walls" resource-id="5ce8e8" version="5"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Waffle Fence" resource-id="aa0658" version="6"/>
+  <library name="Industrial Elements" resource-id="133cff" version="3"/>
+  <library name="Stuffs" resource-id="bcdbf8" version="1"/>
+  <library name="NuBu 9" resource-id="b7b436" version="2"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+  <library name="Land Rocks" resource-id="fcabd4" version="3"/>
+  <library name="Roadblock" resource-id="bfd5dc" version="3"/>
+  <library name="City Buildings" resource-id="54c5c7" version="2"/>
+  <library name="NuBu 6" resource-id="8a9a7" version="1"/>
+</proplibs>

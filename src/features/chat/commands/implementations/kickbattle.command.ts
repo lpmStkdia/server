@@ -7,14 +7,14 @@ import { ChatModeratorLevel, chatModeratorPower } from "@/shared/models/enums/ch
  *  connected). Mirrors the voluntary exit flow (ExitFromBattleHandler). */
 export default class KickBattleCommand implements ICommand {
     name = "kickbattle";
-    description = "Remove um jogador da partida (volta pro lobby, sem desconectar). Uso: /kickbattle <username>.";
+    description = "Removes a player from the match (returns to lobby without disconnecting). Usage: /kickbattle <username>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "<username>";
     example = "/kickbattle Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /kickbattle <username>.");
+            context.reply("Usage: /kickbattle <username>.");
             return;
         }
         const target = context.server.findClientByUsername(args[0]);
@@ -24,19 +24,19 @@ export default class KickBattleCommand implements ICommand {
             const battleId = await context.server.battleService.kickOfflineFromBattle(args[0]);
             context.reply(
                 battleId
-                    ? `${args[0]} (offline) foi removido da partida ${battleId}.`
-                    : `Jogador "${args[0]}" não está online nem preso em alguma partida.`
+                    ? `${args[0]} (offline) was removed from match ${battleId}.`
+                    : `Player "${args[0]}" is not online and not stuck in any match.`
             );
             return;
         }
         const battle = target.currentBattle;
         if (!battle) {
-            context.reply(`${target.user.username} não está em uma batalha.`);
+            context.reply(`${target.user.username} is not in a match.`);
             return;
         }
         if (target !== context.executor &&
             chatModeratorPower(target.user.chatModeratorLevel) >= chatModeratorPower(context.executor.user!.chatModeratorLevel)) {
-            context.reply(`Você não pode remover ${target.user.username} (cargo igual ou superior ao seu).`);
+            context.reply(`You cannot remove ${target.user.username} (role equal or higher than yours).`);
             return;
         }
 
@@ -53,6 +53,6 @@ export default class KickBattleCommand implements ICommand {
         target.stopTimeChecker();
         await LobbyWorkflow.returnToLobby(target, context.server, false);
 
-        context.reply(`${target.user.username} foi removido da partida ${battle.battleId}.`);
+        context.reply(`${target.user.username} was removed from match ${battle.battleId}.`);
     }
 }

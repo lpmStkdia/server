@@ -8,21 +8,21 @@ import { resetGarageInventory } from "./resetgarage.command";
  *  missions. Login/friends/clan/punishments are kept. */
 export default class ResetAccountCommand implements ICommand {
     name = "resetaccount";
-    description = "Reseta a conta de um usuário (rank, cristais, garagem, suprimentos, stats, missões). Uso: /resetaccount <username>.";
+    description = "Resets a user's account (rank, crystals, garage, supplies, stats, missions). Usage: /resetaccount <username>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.COMMUNITY_MANAGER;
     usage = "<username>";
     example = "/resetaccount Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /resetaccount <username>.");
+            context.reply("Usage: /resetaccount <username>.");
             return;
         }
         const { server } = context;
         const online = server.findClientByUsername(args[0]);
         const user = online?.user ?? (await server.userService.findUserByUsername(args[0]));
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
 
@@ -69,6 +69,6 @@ export default class ResetAccountCommand implements ICommand {
             GarageWorkflow.reloadGarage(online, server);
         }
 
-        context.reply(`Conta de ${user.username} resetada (rank ${user.rank}, 0 cristais, garagem padrão).`);
+        context.reply(`Account of ${user.username} reset (rank ${user.rank}, 0 crystals, default garage).`);
     }
 }

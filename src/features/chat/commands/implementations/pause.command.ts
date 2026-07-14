@@ -5,21 +5,21 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  still relays and the round clock keeps ticking. Undo with /resume. */
 export default class PauseCommand implements ICommand {
     name = "pause";
-    description = "Pausa o combate da partida atual (sem dano/kills/bandeira/minas). Uso: /pause.";
+    description = "Pauses combat in the current match (no damage/kills/flags/mines). Usage: /pause.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     example = "/pause";
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const battle = context.executor.currentBattle;
         if (!context.executor.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
         if (battle.paused) {
-            context.reply("A partida já está pausada. Use /resume para retomar.");
+            context.reply("Match is already paused. Use /resume to resume.");
             return;
         }
         battle.paused = true;
-        context.reply(`Partida ${battle.battleId} PAUSADA (combate congelado; movimento continua).`);
+        context.reply(`Match ${battle.battleId} PAUSED (combat frozen; movement continues).`);
     }
 }

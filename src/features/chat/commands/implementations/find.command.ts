@@ -4,27 +4,27 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Tells which battle a player is in and their current coordinates. */
 export default class FindCommand implements ICommand {
     name = "find";
-    description = "Mostra em qual batalha um jogador está e suas coordenadas. Uso: /find <username>.";
+    description = "Shows which battle a player is in and their coordinates. Usage: /find <username>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "<username>";
     example = "/find Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /find <username>.");
+            context.reply("Usage: /find <username>.");
             return;
         }
         const target = context.server.findClientByUsername(args[0]);
         if (!target?.user) {
-            context.reply(`Jogador "${args[0]}" não está online.`);
+            context.reply(`Player "${args[0]}" is not online.`);
             return;
         }
         if (!target.currentBattle) {
-            context.reply(`${target.user.username} está online, fora de batalha.`);
+            context.reply(`${target.user.username} is online, not in a match.`);
             return;
         }
         const pos = target.battlePosition;
-        const where = pos ? ` em x=${Math.round(pos.x)} y=${Math.round(pos.y)} z=${Math.round(pos.z)}` : " (fora de campo)";
-        context.reply(`${target.user.username} está na batalha ${target.currentBattle.battleId}${target.isSpectator ? " como espectador" : ""}${where}.`);
+        const where = pos ? ` at x=${Math.round(pos.x)} y=${Math.round(pos.y)} z=${Math.round(pos.z)}` : " (off the field)";
+        context.reply(`${target.user.username} is in match ${target.currentBattle.battleId}${target.isSpectator ? " as spectator" : ""}${where}.`);
     }
 }

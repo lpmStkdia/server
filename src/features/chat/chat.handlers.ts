@@ -9,7 +9,7 @@ import { CommandContext } from "./commands/command.types";
 
 /**
  * The client renders chat messages as HTML, so `<...>` in a command reply (e.g. usage strings like
- * "/mine <quantidade>") is swallowed as an unknown tag. Escape angle brackets/& so it shows literally.
+ * "/mine <amount>") is swallowed as an unknown tag. Escape angle brackets/& so it shows literally.
  */
 function escapeChatHtml(message: string): string {
     return message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -32,7 +32,7 @@ export class SendChatMessageHandler implements IPacketHandler<SendChatMessage> {
             const packetId = parseInt(packetIdStr, 10);
 
             if (isNaN(packetId)) {
-                sendFlowReply("ID de pacote inválido. Deve ser um número.");
+                sendFlowReply("Invalid packet ID. Must be a number.");
                 return;
             }
 
@@ -43,7 +43,7 @@ export class SendChatMessageHandler implements IPacketHandler<SendChatMessage> {
             try {
                 payload = Buffer.from(payloadHex, "hex");
             } catch (error) {
-                sendFlowReply("Erro: Payload hexadecimal inválido definido no fluxo.");
+                sendFlowReply("Error: Invalid hexadecimal payload set in the flow.");
                 return;
             }
 
@@ -52,14 +52,14 @@ export class SendChatMessageHandler implements IPacketHandler<SendChatMessage> {
 
             if (targetIdentifier.toLowerCase() === "all") {
                 server.broadcastToAll(packetToSend);
-                replyMessage = `Fluxo: Pacote ${packetId} enviado para todos os clientes.`;
+                replyMessage = `Flow: Packet ${packetId} sent to all clients.`;
             } else {
                 const targetClient = server.findClientByIp(targetIdentifier) || server.findClientByUsername(targetIdentifier);
                 if (targetClient) {
                     targetClient.sendPacket(packetToSend);
-                    replyMessage = `Fluxo: Pacote ${packetId} enviado para ${targetIdentifier}.`;
+                    replyMessage = `Flow: Packet ${packetId} sent to ${targetIdentifier}.`;
                 } else {
-                    replyMessage = `Fluxo: Erro: Cliente "${targetIdentifier}" não encontrado.`;
+                    replyMessage = `Flow: Error: Client "${targetIdentifier}" not found.`;
                 }
             }
 
@@ -92,7 +92,7 @@ export class SendChatMessageHandler implements IPacketHandler<SendChatMessage> {
         // Staff mute: silenced users can't post chat messages (commands above still work).
         if (client.user.mutedUntil && client.user.mutedUntil > new Date()) {
             const minutesLeft = Math.ceil((client.user.mutedUntil.getTime() - Date.now()) / 60000);
-            client.sendPacket(new ChatHistory({ messages: [{ message: `Você está silenciado por mais ${minutesLeft} minuto(s).`, isSystem: true, isWarning: true, source: null, target: null }] }));
+            client.sendPacket(new ChatHistory({ messages: [{ message: `You are muted for ${minutesLeft} more minute(s).`, isSystem: true, isWarning: true, source: null, target: null }] }));
             return;
         }
 

@@ -7,15 +7,15 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  currently in a battle get it on the battle chat (nickname-less general message). */
 export default class BroadcastCommand implements ICommand {
     name = "broadcast";
-    description = "Envia uma mensagem de sistema para todos os jogadores. Uso: /broadcast <mensagem>.";
+    description = "Sends a system message to all players. Usage: /broadcast <message>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "<mensagem>";
-    example = "/broadcast Manutenção em 10 minutos";
+    usage = "<message>";
+    example = "/broadcast Maintenance in 10 minutes";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const message = args.join(" ").trim();
         if (!message) {
-            context.reply("Uso: /broadcast <mensagem>.");
+            context.reply("Usage: /broadcast <message>.");
             return;
         }
 
@@ -27,6 +27,6 @@ export default class BroadcastCommand implements ICommand {
                 client.sendPacket(new BattleSystemMessagePacket({ message: message }));
             }
         }
-        context.reply("Mensagem enviada a todos.");
+        context.reply("Message sent to all players.");
     }
 }

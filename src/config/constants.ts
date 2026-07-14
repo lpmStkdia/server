@@ -10,7 +10,7 @@ export const DEFAULT_MAX_CLIENTS = 10;
  * x/y = -1 → the client centers the panel on the stage. Override URL with the WEBPANEL_URL env.
  */
 export const WEBPANEL = {
-  URL: process.env.WEBPANEL_URL || "http://127.0.0.1:9999/panel",
+  URL: process.env.WEBPANEL_URL || "http://185.213.25.94:9999/panel",
   WIDTH: 380,
   HEIGHT: 320,
   X: -1,

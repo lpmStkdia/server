@@ -7,7 +7,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  chat the target is currently looking at (battle chat when in a battle, lobby chat otherwise). */
 export default class MsgCommand implements ICommand {
     name = "msg";
-    description = "Envia uma mensagem de sistema privada para um jogador. Uso: /msg <username> <texto>.";
+    description = "Sends a private system message to a player. Usage: /msg <username> <text>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "<username> <texto>";
     example = "/msg Joao evite spam no chat";
@@ -15,12 +15,12 @@ export default class MsgCommand implements ICommand {
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const message = args.slice(1).join(" ").trim();
         if (args.length < 2 || !message) {
-            context.reply("Uso: /msg <username> <texto>.");
+            context.reply("Usage: /msg <username> <text>.");
             return;
         }
         const target = context.server.findClientByUsername(args[0]);
         if (!target?.user) {
-            context.reply(`Jogador "${args[0]}" não está online.`);
+            context.reply(`Player "${args[0]}" is not online.`);
             return;
         }
 
@@ -31,6 +31,6 @@ export default class MsgCommand implements ICommand {
         } else {
             target.sendPacket(new ChatHistory({ messages: [{ message: tagged, isSystem: true, isWarning: true, source: null, target: null }] }));
         }
-        context.reply(`Mensagem enviada para ${target.user.username}.`);
+        context.reply(`Message sent to ${target.user.username}.`);
     }
 }

@@ -135,7 +135,7 @@ export class UserService {
                 nextRankScore: initialRankData.nextRankScore,
                 isActive: true,
                 // Passe Iniciante concedido a toda conta nova (+50% XP + 100% cristais/batalha por 21 dias).
-                newbieExpiresAt: new Date(Date.now() + NEWBIE_DURATION_MS),
+                newbieExpiresAt: new Date(0),
                 referralHash: crypto.randomBytes(16).toString("hex"),
             });
 

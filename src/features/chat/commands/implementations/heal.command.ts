@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Starts a free full repair-kit regen on a tank — yours by default, or another player's in the same battle. */
 export default class HealCommand implements ICommand {
     name = "heal";
-    description = "Cura um tanque (regeneração de kit completa, grátis; vazio = você). Uso: /heal [username].";
+    description = "Heals a tank (full kit regeneration, free; empty = you). Usage: /heal [username].";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "[username]";
     example = "/heal Joao";
@@ -14,7 +14,7 @@ export default class HealCommand implements ICommand {
         const client = context.executor;
         const { server } = context;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
@@ -22,17 +22,17 @@ export default class HealCommand implements ICommand {
         if (args.length >= 1) {
             const found = server.findClientByUsername(args[0]);
             if (!found?.user || found.currentBattle?.battleId !== client.currentBattle.battleId) {
-                context.reply(`Jogador "${args[0]}" não está nesta batalha.`);
+                context.reply(`Player "${args[0]}" is not in this match.`);
                 return;
             }
             target = found;
         }
         if (target.battleState !== "active") {
-            context.reply(`${target.user?.username} não está com o tanque ativo em campo.`);
+            context.reply(`${target.user?.username} does not have an active tank on the field.`);
             return;
         }
 
         server.battleService.supply.startHealing(target, client.currentBattle, HEAL_MAX_GIVEN.INVENTORY);
-        context.reply(`Curando ${target.user?.username}.`);
+        context.reply(`Healing ${target.user?.username}.`);
     }
 }

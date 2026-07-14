@@ -4,20 +4,20 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Wipes a user's long-term stats (kills/deaths/streaks/records). Rank/crystals/garage untouched. */
 export default class ResetStatsCommand implements ICommand {
     name = "resetstats";
-    description = "Zera as estatísticas de longo prazo de um usuário. Uso: /resetstats <username>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    description = "Wipes a user's long-term statistics. Usage: /resetstats <username>.";
+    permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<username>";
     example = "/resetstats Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /resetstats <username>.");
+            context.reply("Usage: /resetstats <username>.");
             return;
         }
         const online = context.server.findClientByUsername(args[0]);
         const user = online?.user ?? (await context.server.userService.findUserByUsername(args[0]));
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
 
@@ -33,6 +33,6 @@ export default class ResetStatsCommand implements ICommand {
         user.stats.maxLossStreak = 0;
         user.markModified("stats");
         await user.save();
-        context.reply(`Estatísticas de ${user.username} zeradas.`);
+        context.reply(`${user.username}'s statistics were reset.`);
     }
 }

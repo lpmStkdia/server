@@ -6,20 +6,20 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  another owned item (re-adding the account default if nothing else is left). */
 export default class RemoveItemCommand implements ICommand {
     name = "removeitem";
-    description = "Remove um item específico (hull/turret/pintura/suprimento) de um usuário. Uso: /removeitem <username> <itemId>.";
+    description = "Removes a specific item (hull/turret/paint/supply) from a user. Usage: /removeitem <username> <itemId>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<username> <itemId>";
     example = "/removeitem Joao railgun";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 2) {
-            context.reply("Uso: /removeitem <username> <itemId>.");
+            context.reply("Usage: /removeitem <username> <itemId>.");
             return;
         }
         const online = context.server.findClientByUsername(args[0]);
         const user = online?.user ?? (await context.server.userService.findUserByUsername(args[0]));
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
         const itemId = args[1].toLowerCase();
@@ -48,18 +48,18 @@ export default class RemoveItemCommand implements ICommand {
                 if (!fallback) user.paints.push("holiday");
                 user.equippedPaint = fallback ?? "holiday";
             }
-            removed = "pintura";
+            removed = "paint";
         } else if ((user.supplies.get(itemId) ?? 0) > 0) {
             user.supplies.set(itemId, 0);
-            removed = "suprimento (zerado)";
+            removed = "supply (cleared)";
         }
 
         if (!removed) {
-            context.reply(`${user.username} não possui o item "${itemId}".`);
+            context.reply(`${user.username} does not own item "${itemId}".`);
             return;
         }
         await user.save();
         if (online) GarageWorkflow.reloadGarage(online, context.server);
-        context.reply(`Item "${itemId}" (${removed}) removido de ${user.username}.`);
+        context.reply(`Item "${itemId}" (${removed}) removed from ${user.username}.`);
     }
 }

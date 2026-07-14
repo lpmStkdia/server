@@ -4,12 +4,12 @@ import { UpdateRankPacket, UpdateScorePacket } from "@/features/profile/profile.
 import { ChatModeratorLevel, hasModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 
-/** Jumps straight to rank N by setting the experience to that rank's threshold. Self-use is public
- *  (sandbox server); targeting ANOTHER user requires Administrator (checked inside). */
+/** Jumps straight to rank N by setting the experience to that rank's threshold. Self-use requires
+ *  Moderator; targeting ANOTHER user requires Administrator (checked inside). */
 export default class SetRankCommand implements ICommand {
     name = "setrank";
-    description = "Pula direto para o rank N (em outro jogador: só administrador). Uso: /setrank [username] <rank>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    description = "Jumps straight to rank N (targeting another player requires Administrator). Usage: /setrank [username] <rank>.";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "[username] <rank>";
     example = "/setrank 15";
 
@@ -20,27 +20,28 @@ export default class SetRankCommand implements ICommand {
         if (args.length >= 2) { targetName = args[0]; rankArg = args[1]; }
         else if (args.length === 1) { rankArg = args[0]; }
         else {
-            context.reply("Uso: /setrank [username] <rank>.");
+            context.reply("Usage: /setrank [username] <rank>.");
             return;
         }
 
         const rank = parseInt(rankArg, 10);
         const rankInfo = isNaN(rank) ? null : server.rankService.getRankById(rank);
         if (!rankInfo) {
-            context.reply(`Rank inválido "${rankArg}".`);
+            context.reply(`Invalid rank "${rankArg}".`);
             return;
         }
 
-        // Targeting someone else is a staff action; self-use stays public.
+        // Targeting someone else needs a higher role than self-use (which the outer permission gate
+        // already restricts to Moderator+).
         if (targetName && !hasModeratorPower(context.executor.user!.chatModeratorLevel, ChatModeratorLevel.ADMINISTRATOR)) {
-            context.reply("Definir o rank de outro jogador exige cargo de Administrador.");
+            context.reply("Setting another player's rank requires Administrator role.");
             return;
         }
 
         const online = targetName ? server.findClientByUsername(targetName) : context.executor;
         const user = online?.user ?? (targetName ? await server.userService.findUserByUsername(targetName) : context.executor.user);
         if (!user) {
-            context.reply(`Usuário "${targetName}" não encontrado.`);
+            context.reply(`User "${targetName}" not found.`);
             return;
         }
 
@@ -60,11 +61,11 @@ export default class SetRankCommand implements ICommand {
                 // Rank-dependent garage lists don't rebuild in place — reload if they have it open.
                 GarageWorkflow.reloadGarage(online, server);
             }
-            // Atualiza o rank visual do alvo para todos os demais online.
+            // Updates the target's visual rank for everyone else online.
             broadcastPlayerRankToOthers(server, updated);
-            context.reply(`${updated.username} agora é rank ${updated.rank} (${rankInfo.name ?? ""}).`);
+            context.reply(`${updated.username} is now rank ${updated.rank} (${rankInfo.name ?? ""}).`);
         } catch (error: any) {
-            context.reply(`Erro: ${error.message}`);
+            context.reply(`Error: ${error.message}`);
         }
     }
 }

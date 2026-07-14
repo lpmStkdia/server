@@ -1,6 +1,6 @@
 {
   "needInviteCode": "false",
-  "maxClients": "10",
+  "maxClients": "1000",
   "captchaLocations": "[]",
   "socialAuthLinks": "{\"google\":\"https://www.google.com\",\"facebook\":\"https://www.facebook.com\",\"vkontakte\":\"https://vk.com\"}",
   "chatEnabled": "true",

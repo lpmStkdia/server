@@ -31,6 +31,28 @@ export class RequestGarageHandler implements IPacketHandler<GaragePackets.Reques
     }
 }
 
+export class OpenGarageAtItemHandler implements IPacketHandler<GaragePackets.OpenGarageAtItemPacket> {
+    public readonly packetId = GaragePackets.OpenGarageAtItemPacket.getId();
+
+    public async execute(client: GameClient, server: GameServer, packet: GaragePackets.OpenGarageAtItemPacket): Promise<void> {
+        const state = client.getState();
+
+        if (client.currentBattle) {
+            if (state === "battle") {
+                GarageWorkflow.enterBattleGarageView(client, server);
+            } else if (state === "battle_garage") {
+                GarageWorkflow.returnToBattleView(client, server);
+            } else if (state === "battle_lobby") {
+                GarageWorkflow.transitionFromLobbyToGarage(client, server);
+            }
+        } else {
+            if (state === "chat_lobby") {
+                await GarageWorkflow.enterGarage(client, server);
+            }
+        }
+    }
+}
+
 export class BuyItemHandler implements IPacketHandler<GaragePackets.BuyItemPacket> {
     public readonly packetId = GaragePackets.BuyItemPacket.getId();
 

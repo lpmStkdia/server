@@ -15,7 +15,7 @@ export class ItemUtils {
         if (PREMIUM_PAINT_IDS.has(user.equippedPaint) && !isPremiumActive(user)) {
             user.equippedPaint = "green";
             await user.save();
-            logger.info(`Premium expirado: pintura premium de ${user.username} revertida para green.`);
+            logger.info(`Premium expired: ${user.username}'s premium paint reverted to green.`);
         }
         return user;
     }
@@ -28,12 +28,12 @@ export class ItemUtils {
         const modId = inventory.get(baseId) ?? 0;
         const blueprint = blueprintList.find((bp) => bp.id === baseId);
         if (!blueprint) {
-            throw new Error(`Blueprint não encontrado para ${itemType}: ${baseId}`);
+            throw new Error(`Blueprint not found for ${itemType}: ${baseId}`);
         }
 
         const modification = blueprint.modifications.find((m) => m.modificationID === modId);
         if (!modification) {
-            throw new Error(`Modificação M${modId} não encontrada para ${itemType}: ${baseId}`);
+            throw new Error(`Modification M${modId} not found for ${itemType}: ${baseId}`);
         }
 
         return modification;

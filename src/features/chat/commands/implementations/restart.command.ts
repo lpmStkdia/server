@@ -4,17 +4,17 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Restarts the current battle's round on the spot (scores/flags/fund reset, sides swap, everyone respawns). */
 export default class RestartCommand implements ICommand {
     name = "restart";
-    description = "Reinicia o round da partida atual (placar zera, todos respawnam). Uso: /restart.";
+    description = "Restarts the current match round (score resets, everyone respawns). Usage: /restart.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     example = "/restart";
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const battle = context.executor.currentBattle;
         if (!context.executor.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
         context.server.battleService.restartBattle(battle);
-        context.reply(`Round da partida ${battle.battleId} reiniciado.`);
+        context.reply(`Match ${battle.battleId} round restarted.`);
     }
 }

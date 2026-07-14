@@ -4,21 +4,21 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Resumes a battle frozen by /pause. */
 export default class ResumeCommand implements ICommand {
     name = "resume";
-    description = "Retoma uma partida pausada com /pause. Uso: /resume.";
+    description = "Resumes a match paused with /pause. Usage: /resume.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     example = "/resume";
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const battle = context.executor.currentBattle;
         if (!context.executor.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
         if (!battle.paused) {
-            context.reply("A partida não está pausada.");
+            context.reply("Match is not paused.");
             return;
         }
         battle.paused = false;
-        context.reply(`Partida ${battle.battleId} retomada.`);
+        context.reply(`Match ${battle.battleId} resumed.`);
     }
 }

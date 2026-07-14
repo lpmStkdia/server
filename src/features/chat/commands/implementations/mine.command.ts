@@ -7,10 +7,10 @@ const PLACE_CHUNK = 50;                            // mines placed per tick (thr
 const PLACE_DELAY_MS = 100;                        // ~500 mines/s — chunked so it doesn't spike clients
 
 /** Debug: drops N mines spread in a disc around you. Throttled so a big count doesn't blast everyone's client
- *  with one broadcast burst. Uso: /mine <amount> [radius]. */
+ *  with one broadcast burst. Usage: /mine <amount> [radius]. */
 export default class MineAroundCommand implements ICommand {
     name = "mine";
-    description = "Coloca N minas em volta de você. Uso: /mine <amount> [radius].";
+    description = "Places N mines around you. Usage: /mine <amount> [radius].";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "<amount> [radius]";
     example = "/mine 50 400";
@@ -20,22 +20,22 @@ export default class MineAroundCommand implements ICommand {
         const battle = client.currentBattle;
         const center = client.battlePosition;
         if (!client.user || !battle || !center) {
-            context.reply("Você precisa estar em uma batalha, em campo.");
+            context.reply("You must be in a match, on the field.");
             return;
         }
         if (battle.settings.withoutMines) {
-            context.reply("Esta batalha está com minas desativadas.");
+            context.reply("This match has mines disabled.");
             return;
         }
 
         const count = parseInt(args[0], 10);
         if (isNaN(count) || count <= 0) {
-            context.reply("Uso: /mine <amount> [radius].");
+            context.reply("Usage: /mine <amount> [radius].");
             return;
         }
         const radius = args[1] !== undefined ? Number(args[1]) : DEFAULT_RADIUS;
         if (isNaN(radius) || radius < 0) {
-            context.reply("Raio inválido.");
+            context.reply("Invalid radius.");
             return;
         }
 
@@ -56,6 +56,6 @@ export default class MineAroundCommand implements ICommand {
         };
         placeChunk();
 
-        context.reply(`Colocando ${count} mina(s) em volta de você (raio ${radius}).`);
+        context.reply(`Placing ${count} mine(s) around you (radius ${radius}).`);
     }
 }

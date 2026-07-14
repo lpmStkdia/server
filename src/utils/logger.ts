@@ -22,7 +22,7 @@ function ensureLogsDirectory(): void {
     fs.accessSync(LOGS_DIR, fs.constants.W_OK);
   } catch (error) {
     console.error(`Failed to create or access logs directory: ${error}`);
-    throw new Error(`Erro ao criar ou acessar o diretório de logs: ${error}`);
+    throw new Error(`Failed to create or access logs directory: ${error}`);
   }
 }
 

@@ -12,8 +12,15 @@ export interface PopulatedChatMessage {
     isWarning: boolean;
 }
 
-// Máximo de mensagens mantidas no histórico persistido (bate com o `chatHistoryLimit` do config, que
-// limita a CARGA). Ao passar disso, o excedente mais antigo é apagado a cada nova mensagem.
+export interface ClearAllMessagesResult {
+    deletedCount: number;
+    /** Distinct senders whose messages were removed — the client can only clear one sender's messages
+     *  at a time (see RemoveUserChatMessagesPacket), so the caller broadcasts one packet per username. */
+    usernames: string[];
+}
+
+// Maximum number of messages kept in the persisted history (matches the config's `chatHistoryLimit`,
+// which limits the LOAD). Once past that, the oldest overflow is deleted on every new message.
 const CHAT_HISTORY_LIMIT = 70;
 
 export class ChatService {
@@ -84,7 +91,7 @@ export class ChatService {
         };
     }
 
-    /** Mantém só as `CHAT_HISTORY_LIMIT` mensagens mais recentes; apaga o excedente mais antigo. */
+    /** Keeps only the `CHAT_HISTORY_LIMIT` most recent messages; deletes the oldest overflow. */
     private async _trimHistory(): Promise<void> {
         try {
             const overflow = await ChatMessage.find().sort({ timestamp: -1 }).skip(CHAT_HISTORY_LIMIT).limit(1).select("timestamp").lean();
@@ -96,7 +103,7 @@ export class ChatService {
         }
     }
 
-    /** Remove do histórico TODAS as mensagens enviadas por um usuário. Retorna quantas foram apagadas. */
+    /** Removes ALL messages sent by a user from history. Returns how many were deleted. */
     public async removeUserMessages(user: UserDocument): Promise<number> {
         try {
             const res = await ChatMessage.deleteMany({ sourceUser: user._id });
@@ -104,6 +111,35 @@ export class ChatService {
         } catch (error) {
             logger.error(`Failed to remove chat messages of ${user.username}`, { error });
             return 0;
+        }
+    }
+
+    /**
+     * Wipes the ENTIRE chat history (every message from every user). Also resolves the distinct list of
+     * senders that were removed, since the client-side clear packet only knows how to clear one sender's
+     * messages at a time — the caller (e.g. /clearmsgs) broadcasts a RemoveUserChatMessagesPacket per
+     * username returned here to actually blank every client's chat window.
+     */
+    public async removeAllMessages(): Promise<ClearAllMessagesResult> {
+        try {
+            const messages = await ChatMessage.find({ sourceUser: { $ne: null } })
+                .populate<{ sourceUser: UserDocument | null }>("sourceUser", "username")
+                .select("sourceUser")
+                .lean();
+
+            const usernames = Array.from(
+                new Set(
+                    messages
+                        .map((m) => (m.sourceUser as unknown as UserDocument | null)?.username)
+                        .filter((u): u is string => !!u)
+                )
+            );
+
+            const res = await ChatMessage.deleteMany({});
+            return { deletedCount: res.deletedCount ?? 0, usernames };
+        } catch (error) {
+            logger.error("Failed to clear the entire chat history", { error });
+            return { deletedCount: 0, usernames: [] };
         }
     }
 }

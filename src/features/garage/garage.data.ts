@@ -49,8 +49,8 @@ export const itemBlueprints = {
     paints: [
         {
             id: "green",
-            name: "Verde",
-            description: "Um tributo à tradição do tanque clássico, esta cor simples, tão amada por designers de todo o mundo, tornou-se uma tinta padrão para modelos de fábrica.",
+            name: "Green",
+            description: "",
             isInventory: false,
             index: 1100,
             next_price: 0,
@@ -70,8 +70,8 @@ export const itemBlueprints = {
         },
         {
             id: "holiday",
-            name: "Feriado",
-            description: "Uma tinta única e «inteligente» que pode mudar sua aparência dependendo da ocasião. Em um dia normal, é simplesmente uma textura quadriculada em preto e branco. Mas quando chega um feriado, sua aparência muda drasticamente.",
+            name: "Holiday",
+            description: "",
             isInventory: false,
             index: 1200,
             next_price: 0,
@@ -94,8 +94,8 @@ export const itemBlueprints = {
             // usuário tem assinatura premium ATIVA. ALL_RESISTANCE 15 = -15% de dano de QUALQUER arma
             // (somado no ItemUtils.getPaintResistancePercent). Dados oficiais (index 702, resources 3370/3371).
             id: "premium",
-            name: "Pintura premium",
-            description: "A tinta especial com design único é uma excelente escolha para quem quer alcançar o máximo no jogo a qualquer custo.",
+            name: "Premium",
+            description: "",
             isInventory: false,
             index: 702,
             next_price: 0,
@@ -116,8 +116,8 @@ export const itemBlueprints = {
         {
             // Pintura ANIMADA (cicla-cor): coloring type 11 / image.tara (tira 1000x1, 1000 frames, 15fps).
             id: "spectrum",
-            name: "Espectro",
-            description: "Esta pintura foi desenvolvida com as mais recentes tecnologias de pesquisa quântica, que permitem aplicar efeitos de probabilidade ao macromundo. A primeira ideia dos criadores foi finalmente realizar o experimento do gato de Schrödinger, mas foi barrada pelos ativistas dos direitos dos animais. Então, em vez disso, fizeram esta pintura. Se você não se importa com toda a matemática complexa e a pesquisa científica, é só uma pintura monocromática de cor verde... espera, azu... espera... vermelha. Ah, pelo amor de...! Amarela! AAA! Roxa! Chega, desisto, escreva você mesmo esta descrição.",
+            name: "Spectrum",
+            description: "",
             isInventory: false,
             index: 1201,
             next_price: 0,
@@ -139,7 +139,7 @@ export const itemBlueprints = {
             // Pintura ANIMADA: coloring type 11 / image.tara (8x8 de 128px, 64 frames, 24fps).
             id: "first_kiss",
             name: "First Kiss",
-            description: "Mwa, mwa, mwa, mwa, mwa, mwa, mwa, mwa, mwa, mwa. The memories of a first love last forever.",
+            description: "",
             isInventory: false,
             index: 1202,
             next_price: 0,
@@ -160,7 +160,7 @@ export const itemBlueprints = {
         {
             id: "glow",
             name: "Glow",
-            description: "A paint with an animated pattern that serves as an aesthetic coating for your tank. Its color scheme might potentially offer some camouflage benefits, but besides that, the paint does not offer any functional gameplay advantages.",
+            description: "",
             isInventory: false,
             index: 1203,
             next_price: 0,
@@ -181,7 +181,7 @@ export const itemBlueprints = {
         {
             id: "monochrome",
             name: "Monochrome",
-            description: "Contrary to what most people think, \"Monochrome\" does not mean \"Black and White\". Actually, it means \"various shades of a single color\". Then again, probably the only thing you care about is that the paint looks cool, right?",
+            description: "",
             isInventory: false,
             index: 1204,
             next_price: 0,
@@ -202,7 +202,7 @@ export const itemBlueprints = {
         {
             id: "turbo",
             name: "Turbo",
-            description: "Speed through the arena like a blazing ball of fire. Let your enemies know that you're way too hot to handle.",
+            description: "",
             isInventory: false,
             index: 1205,
             next_price: 0,
@@ -223,7 +223,7 @@ export const itemBlueprints = {
         {
             id: "tankoin_tank",
             name: "Tankoin Tank",
-            description: "A paint with an animated pattern that serves as an aesthetic coating for your tank. Its color scheme might potentially offer some camouflage benefits, but besides that, the paint does not offer any functional gameplay advantages.",
+            description: "",
             isInventory: false,
             index: 1206,
             next_price: 0,
@@ -244,7 +244,7 @@ export const itemBlueprints = {
         {
             id: "cryo",
             name: "Cryo",
-            description: "This coating was originally intended to protect against the effects of Firebird by using a periodic cooling mechanism. Unfortunately, when actually tested in a real battle, the mechanism malfunctioned and kept freezing the tank every few seconds, turning it into a very cold sitting duck. That said, the paint still looks cool, so its creators decided to dump the cooling mechanism and keep the paint exclusively for cosmetic purposes.",
+            description: "",
             isInventory: false,
             index: 1207,
             next_price: 0,
@@ -265,7 +265,7 @@ export const itemBlueprints = {
         {
             id: "nightmare",
             name: "Nightmare",
-            description: "Few dare to approach these tanks, but those who conquer the chilling horror of a thousand faces screaming in eternal agony will know no fear. You will become a Nightmare incarnate. Rumors say that every kill made with paint will add one more howling soul.",
+            description: "",
             isInventory: false,
             index: 1208,
             next_price: 0,
@@ -286,7 +286,7 @@ export const itemBlueprints = {
         {
             id: "arachnid",
             name: "Arachnid",
-            description: "A paint inspired by the intricate nets of death that the spider creates to capture its next meal. And with the fear of spiders being so common, this paint gives you the added advantage of psychological warfare.",
+            description: "",
             isInventory: false,
             index: 1209,
             next_price: 0,
@@ -307,7 +307,7 @@ export const itemBlueprints = {
         {
             id: "tarantula",
             name: "Tarantula",
-            description: "Spider tank Spidertank Does whatever a tanker can Shoot a tank any size Have a friendship with all you guys Look out, here comes the Spidetank",
+            description: "",
             isInventory: false,
             index: 1210,
             next_price: 0,
@@ -327,8 +327,8 @@ export const itemBlueprints = {
         },
         {
             id: "red",
-            name: "Vermelha",
-            description: "A cor vermelha - a personificação da raiva e da coragem. Também tem a aplicação prática de poder esconder qualquer vestígio de sangue inimigo.",
+            name: "Red",
+            description: "",
             isInventory: false,
             index: 2850,
             next_price: 100,
@@ -348,8 +348,8 @@ export const itemBlueprints = {
         },
         {
             id: "blue",
-            name: "Azul",
-            description: "Esta pintura foi adicionada à lista oficial em memória de um projeto fracassado - o desenvolvimento de um tanque anfíbio codinome «Catfish». Os designers estavam planejando dar ao <Catfish> a capacidade de se mover sob as águas de rios rasos, permitindo que ele tomar posição atrás das linhas inimigas. A cor azul seria perfeita para camuflagem.",
+            name: "Blue",
+            description: "",
             isInventory: false,
             index: 2900,
             next_price: 100,
@@ -369,8 +369,8 @@ export const itemBlueprints = {
         },
         {
             id: "black",
-            name: "Preta",
-            description: "Esta cor tornou-se o padrão não oficial para a divisão de tanques sabotadores, cuja principal tarefa é penetrar no território inimigo durante a noite. Dentro dos círculos militares, essas divisões de elite foram apelidadas de «Os pontos negros da morte».",
+            name: "Black",
+            description: "",
             isInventory: false,
             index: 2950,
             next_price: 100,
@@ -390,8 +390,8 @@ export const itemBlueprints = {
         },
         {
             id: "white",
-            name: "Branca",
-            description: "Esta tinta foi desenvolvida especificamente para operações terrestres em países com clima frio. Em áreas com neve, pode reduzir significativamente a probabilidade de detecção. Para aumentar as vendas, alguns fabricantes incluíram na embalagem um casaco quente e botas.",
+            name: "White",
+            description: "",
             isInventory: false,
             index: 3000,
             next_price: 100,
@@ -411,8 +411,8 @@ export const itemBlueprints = {
         },
         {
             id: "orange",
-            name: "Laranja",
-            description: "Originalmente, não havia planos para incluir essa cor na lista oficial, pois não tinha nenhum valor prático, exceto talvez uma camuflagem decente em áreas desérticas. No entanto, psicólogos do exército provaram que esse tom específico de laranja tem um efeito terapêutico positivo. em tanques em estado de choque.",
+            name: "Orange",
+            description: "",
             isInventory: false,
             index: 3050,
             next_price: 100,
@@ -433,7 +433,7 @@ export const itemBlueprints = {
         {
             id: "flora",
             name: "Flora",
-            description: "Esta é uma das duas tintas projetadas especificamente para operações terrestres em um clima de latitude média. De acordo com relatórios da organização independente «True Camouflage», um tanque usando essa combinação específica de amarelo, verde e marrom tem menos probabilidade de ser detectado em tais regiões.",
+            description: "",
             isInventory: false,
             index: 3100,
             next_price: 500,
@@ -453,8 +453,8 @@ export const itemBlueprints = {
         },
         {
             id: "marine",
-            name: "Marinha",
-            description: "Devido à sua alta resistência ao contato prolongado com água salgada, os navios-tanque inteligentes usam essa cor para pintar seus tanques por dentro, usando-o como um grande barril para salgar pepinos durante o inverno.",
+            name: "Navy",
+            description: "",
             isInventory: false,
             index: 3150,
             next_price: 500,
@@ -474,8 +474,8 @@ export const itemBlueprints = {
         },
         {
             id: "swamp",
-            name: "Pântano",
-            description: "Esta pintura foi criada depois que um líder de batalhão de tanques acidentalmente adormeceu e levou seus companheiros para um pântano, onde uma operação secreta para treinar sapos sabotadores estava sendo conduzida.",
+            name: "Swamp",
+            description: "",
             isInventory: false,
             index: 3200,
             next_price: 900,
@@ -495,8 +495,8 @@ export const itemBlueprints = {
         },
         {
             id: "forester",
-            name: "Florestal",
-            description: "Esta é uma das duas tintas projetadas especificamente para operações terrestres em um clima de latitude média. De acordo com relatórios da organização independente «True Camouflage», é menos provável que um tanque usando essa combinação específica de verde claro e escuro seja detectado em tal regiões.",
+            name: "Forester",
+            description: "",
             isInventory: false,
             index: 3250,
             next_price: 1350,
@@ -517,7 +517,7 @@ export const itemBlueprints = {
         {
             id: "safari",
             name: "Safari",
-            description: "Projetado por quem ama a emoção do safári, esta pintura mascara o tanque como uma zebra inócua, o que o torna perfeito para caçar predadores africanos, bem como petroleiros ingênuos.",
+            description: "",
             isInventory: false,
             index: 3350,
             next_price: 1750,
@@ -537,8 +537,8 @@ export const itemBlueprints = {
         },
         {
             id: "invader",
-            name: "Invasora",
-            description: "Essa pintura foi desenvolvida em colaboração com uma comunidade de especialistas na era dos consoles de jogos de oito bits. Ela usa um exército de alienígenas de oito bits para mascarar o seu tanque e o marcará como um verdadeiro conhecedor de videogames.",
+            name: "Invader",
+            description: "",
             isInventory: false,
             index: 3400,
             next_price: 1750,
@@ -558,8 +558,8 @@ export const itemBlueprints = {
         },
         {
             id: "metallic",
-            name: "Metálica",
-            description: "Existe o equívoco de que esta tinta se destina a substituir o envernizamento de superfícies. Na realidade, a natureza reflexiva desta tinta destina-se a interferir com dispositivos de rastreamento e radar.",
+            name: "Metallic",
+            description: "",
             isInventory: false,
             index: 3450,
             next_price: 2100,
@@ -580,7 +580,7 @@ export const itemBlueprints = {
         {
             id: "lava",
             name: "Lava",
-            description: "Uma cor experimental, testada pela primeira vez durante o conflito local na África Oriental. De acordo com psicólogos militares, esse padrão específico semelhante a um fogo divino desencadeará uma sensação de pânico nos inimigos.",
+            description: "",
             isInventory: false,
             index: 3500,
             next_price: 2100,
@@ -600,8 +600,8 @@ export const itemBlueprints = {
         },
         {
             id: "lead",
-            name: "Chumbo",
-            description: "O chumbo é conhecido há muito tempo por sua proteção contra a radiação. Essa tinta com infusão de chumbo aproveita essas propriedades.",
+            name: "Lead",
+            description: "",
             isInventory: false,
             index: 3600,
             next_price: 3000,
@@ -622,7 +622,7 @@ export const itemBlueprints = {
         {
             id: "mary",
             name: "Mary",
-            description: "Coberta com manchas vermelhas sangrentas, esta tinta foi feita para infligir horror ao inimigo. No entanto, os tanqueiros altamente experientes provavelmente perceberão que o que parece sangue é na verdade suco de tomate. Não é de admirar que a tinta seja chamada «Mary».",
+            description: "",
             isInventory: false,
             index: 3650,
             next_price: 6500,
@@ -642,8 +642,8 @@ export const itemBlueprints = {
         },
         {
             id: "carbon",
-            name: "Carbono",
-            description: "Uma combinação de fibra de carbono de alta tecnologia e tinta de alta resistência. Inclui uma substância especial destinada a interromper os sistemas de mira inimigos, embora isso seja proibido pela Diretoria de Inspeção de Movimento de Tanques.",
+            name: "Carbon",
+            description: "",
             isInventory: false,
             index: 3750,
             next_price: 6500,
@@ -663,8 +663,8 @@ export const itemBlueprints = {
         },
         {
             id: "roger",
-            name: "Caveira",
-            description: "O temível motivo de caveira e ossos popularizado pelos piratas sedentos de sangue dos sete mares.",
+            name: "Skull",
+            description: "",
             isInventory: false,
             index: 3800,
             next_price: 12500,
@@ -684,8 +684,8 @@ export const itemBlueprints = {
         },
         {
             id: "fracture",
-            name: "Fratura",
-            description: "Uma camuflagem experimental desenvolvida para combate em climas tropicais.",
+            name: "Fracture",
+            description: "",
             isInventory: false,
             index: 3850,
             next_price: 12500,
@@ -705,8 +705,8 @@ export const itemBlueprints = {
         },
         {
             id: "vortex",
-            name: "Redemoinho",
-            description: "Lamentavelmente, os detalhes sobre a inspiração por trás dessa tinta são escassos. O designer simplesmente desapareceu um dia enquanto passeava tranquilamente à beira-mar. Os teóricos culpam os monstros marinhos.",
+            name: "Vortex",
+            description: "",
             isInventory: false,
             index: 3900,
             next_price: 12500,
@@ -726,8 +726,8 @@ export const itemBlueprints = {
         },
         {
             id: "chainmail",
-            name: "Malha",
-            description: "A cobertura única, estilizada e inspirada no correio em cadeia foi projetada para recriar as batalhas medievais em tanques. De acordo com a idéia do autor, as máquinas de aço com armadura de cavaleiro deveriam lutar por sua honra e pelo coração de uma bela garota tanque. Estamos absolutamente certos de que ninguém, ao criar esta tinta, jamais questionou se existiam tanques na Idade Média.",
+            name: "Chainmail",
+            description: "",
             isInventory: false,
             index: 3950,
             next_price: 18500,
@@ -747,8 +747,8 @@ export const itemBlueprints = {
         },
         {
             id: "corrosion",
-            name: "Corrosão",
-            description: "Para o petroleiro que quer ir além do uso de balas e se aventurar no reino da guerra química movida a tétano, a tinta «Corrosion» é a companhia perfeita.",
+            name: "Corrosion",
+            description: "",
             isInventory: false,
             index: 4000,
             next_price: 18500,
@@ -769,7 +769,7 @@ export const itemBlueprints = {
         {
             id: "tundra",
             name: "Tundra",
-            description: "Dá ao seu tanque um visual intimidador e endurecido pela batalha. Ninguém ousará mexer com você.",
+            description: "",
             isInventory: false,
             index: 4050,
             next_price: 18500,
@@ -789,8 +789,8 @@ export const itemBlueprints = {
         },
         {
             id: "alien",
-            name: "Alienígena",
-            description: "Há rumores de que esta camuflagem é uma réplica da cobertura de uma nave alienígena que foi derrubada no século passado pelas forças de «AVISO: Esta informação é confidencial — Mais investigações sobre o assunto serão recebidas com força mortal.»",
+            name: "Alien",
+            description: "",
             isInventory: false,
             index: 4100,
             next_price: 24500,
@@ -810,8 +810,8 @@ export const itemBlueprints = {
         },
         {
             id: "swash",
-            name: "Marinho",
-            description: "A fórmula da capa «Marinho» foi roubada de um laboratório secreto de codinome «Aqua», especializado em experimentos genéticos em peixes. Graças às suas propriedades especiais de reflexão de calor, esta tinta dá ao ar dentro do tanque um frescor refrescante à beira-mar.",
+            name: "Marine",
+            description: "",
             isInventory: false,
             index: 4150,
             next_price: 24500,
@@ -832,7 +832,7 @@ export const itemBlueprints = {
         {
             id: "pixel",
             name: "Pixel",
-            description: "Camuflagem florestal feita com tecnologia experimental de pixels. Irrita ainda mais os entusiastas de alta resolução do que os pixels quebrados na tela.",
+            description: "",
             isInventory: false,
             index: 4200,
             next_price: 30500,
@@ -852,8 +852,8 @@ export const itemBlueprints = {
         },
         {
             id: "guerrilla",
-            name: "Guerrilha",
-            description: "Essa tinta é montada a partir de uma variedade de materiais de sucata, fornecendo a cobertura perfeita para o petroleiro guerrilheiro que deseja tirar proveito do elemento surpresa.",
+            name: "Guerrilla",
+            description: "",
             isInventory: false,
             index: 4250,
             next_price: 30500,
@@ -873,8 +873,8 @@ export const itemBlueprints = {
         },
         {
             id: "cedar",
-            name: "Cedro",
-            description: "Esta tinta é composta de flocos de pinha triturados. É ecologicamente correta e vem com dois sacos de pinhões descascados a cada segunda lata de tinta comprada.",
+            name: "Cedar",
+            description: "",
             isInventory: false,
             index: 4300,
             next_price: 30500,
@@ -894,8 +894,8 @@ export const itemBlueprints = {
         },
         {
             id: "in_love",
-            name: "Apaixonado",
-            description: "Projetado para os sofisticados e românticos, esta pintura irá satisfazer seu desejo por atributos militares esteticamente agradáveis. Também lhe renderá alguns segundos valiosos ao fascinar seu inimigo com a aparência extravagante de seu tanque, coberto de corações vermelhos.",
+            name: "In Love",
+            description: "",
             isInventory: false,
             index: 4350,
             next_price: 30500,
@@ -915,8 +915,8 @@ export const itemBlueprints = {
         },
         {
             id: "desert",
-            name: "Deserto",
-            description: "Uma tinta especial ideal para operações no deserto. É criada pela pulverização de pó cristalino extraído dos dentes de um verme da areia. Para manter sua textura única, esta tinta não deve ser lavada.",
+            name: "Desert",
+            description: "",
             isInventory: false,
             index: 4400,
             next_price: 36500,
@@ -936,8 +936,8 @@ export const itemBlueprints = {
         },
         {
             id: "dirty",
-            name: "Lama",
-            description: "Esta foi originalmente concebida como a terceira tinta projetada para operações terrestres em um clima de latitude média. No entanto, os militares decidiram mais tarde não incluí-la no pacote padrão, após repetidas tentativas de funcionários de limpeza para remover a textura de lama pintada da tampa.",
+            name: "Mud",
+            description: "",
             isInventory: false,
             index: 4450,
             next_price: 42500,
@@ -957,8 +957,8 @@ export const itemBlueprints = {
         },
         {
             id: "loam",
-            name: "Argila",
-            description: "Ninguém presta muita atenção em veículos sujos. A tinta «Argila» usa esse elemento psicológico para a vantagem do seu tanque, disfarçando-o como uma máquina suja. E quando seu inimigo vira as costas para você, é quando você ataca!",
+            name: "Loam",
+            description: "",
             isInventory: false,
             index: 4600,
             next_price: 50500,
@@ -979,7 +979,7 @@ export const itemBlueprints = {
         {
             id: "sakura",
             name: "Sakura",
-            description: "A pintura de desfile da divisão de tanques samurai. Ela traz harmonia interior e tranquilidade infinita. Nem mesmo as sirenes podem perturbar o estado de espírito do petroleiro cujo tanque está usando essa pintura.",
+            description: "",
             isInventory: false,
             index: 4650,
             next_price: 50500,
@@ -999,8 +999,8 @@ export const itemBlueprints = {
         },
         {
             id: "urban",
-            name: "Urbana",
-            description: "A melhor tinta para a batalha em ambientes urbanos. Funciona especialmente bem com arbustos de beira de estrada.",
+            name: "Urban",
+            description: "",
             isInventory: false,
             index: 4700,
             next_price: 63500,
@@ -1020,8 +1020,8 @@ export const itemBlueprints = {
         },
         {
             id: "atom",
-            name: "Átomo",
-            description: "Um revestimento de proteção para tanques de cobertura em centros de pesquisa nuclear. O revestimento é tão de alta tecnologia que pode resistir a um impacto direto de uma carga nuclear, mas apenas ao custo de vaporizar instantaneamente o tanque sob o revestimento.",
+            name: "Atom",
+            description: "",
             isInventory: false,
             index: 4750,
             next_price: 76600,
@@ -1042,7 +1042,7 @@ export const itemBlueprints = {
         {
             id: "digital",
             name: "Digital",
-            description: "Além de ter propriedades de camuflagem excepcionais, esta tinta é extremamente durável e contém nanobots especiais para limpeza automática da pintura em combate.",
+            description: "",
             isInventory: false,
             index: 4800,
             next_price: 76600,
@@ -1062,8 +1062,8 @@ export const itemBlueprints = {
         },
         {
             id: "hohloma",
-            name: "Hohloma",
-            description: "Uma criação cuja beleza lembra a habilidade dos artesãos russos, trabalhando em pequenas oficinas com paciência e dedicação.",
+            name: "Khokhloma",
+            description: "",
             isInventory: false,
             index: 4850,
             next_price: 76600,
@@ -1084,7 +1084,7 @@ export const itemBlueprints = {
         {
             id: "electra",
             name: "Electra",
-            description: "Uma pintura incrivelmente bonita que captura a elegância de um arco de eletricidade voando pelo ar.",
+            description: "",
             isInventory: false,
             index: 4950,
             next_price: 90000,
@@ -1104,8 +1104,8 @@ export const itemBlueprints = {
         },
         {
             id: "cherry",
-            name: "Cereja",
-            description: "Uma camuflagem altamente especializada para tanques florestais encarregados de proteger bosques de mogno raro contra caçadores ilegais.",
+            name: "Cherry",
+            description: "",
             isInventory: false,
             index: 5000,
             next_price: 103000,
@@ -1125,8 +1125,8 @@ export const itemBlueprints = {
         },
         {
             id: "blacksmith",
-            name: "Ferreiro",
-            description: "Um tributo aos mestres artesãos que moldam o aço em obras de arte mortais no calor abrasador da forja.",
+            name: "Blacksmith",
+            description: "",
             isInventory: false,
             index: 5050,
             next_price: 103000,
@@ -1146,8 +1146,8 @@ export const itemBlueprints = {
         },
         {
             id: "rustle",
-            name: "Farfalha",
-            description: "As folhas de outono podem farfalhar sob os rastros do seu tanque, mas seus oponentes ainda não poderão detectá-lo graças à mistura única de tons desta tinta.",
+            name: "Rustle",
+            description: "",
             isInventory: false,
             index: 5100,
             next_price: 103000,
@@ -1167,8 +1167,8 @@ export const itemBlueprints = {
         },
         {
             id: "python",
-            name: "Píton",
-            description: "Esta tinta é uma réplica exata da pele de uma píton gigante. Ela também replica as propriedades de extrema elasticidade da cobra, bem como sua textura escamosa.",
+            name: "Python",
+            description: "",
             isInventory: false,
             index: 5150,
             next_price: 103000,
@@ -1188,8 +1188,8 @@ export const itemBlueprints = {
         },
         {
             id: "sandstone",
-            name: "Arenito",
-            description: "A tinta combina as propriedades de mascaramento da areia, com a pedra temperada pelo vento. O conjunto «Sandstone» vem com calção de banho ou biquíni de escolha, óculos escuros e guarda-sol.",
+            name: "Sandstone",
+            description: "",
             isInventory: false,
             index: 5200,
             next_price: 116000,
@@ -1209,8 +1209,8 @@ export const itemBlueprints = {
         },
         {
             id: "spark",
-            name: "Faísca",
-            description: "Luzes de fadas, luzes de palco, música das esferas - esta pintura pode ser descrita com muitas palavras, mas nenhuma delas pode descrevê-la completamente. A pintura «Spark» é escolhida por aqueles tanqueiros para quem o tanque não é apenas uma batalha máquina, mas também um meio de expressão.",
+            name: "Spark",
+            description: "",
             isInventory: false,
             index: 5250,
             next_price: 116000,
@@ -1230,8 +1230,8 @@ export const itemBlueprints = {
         },
         {
             id: "winter",
-            name: "Inverno",
-            description: "Esta tinta foi desenvolvida especialmente para batalhas em terrenos cobertos de neve. Originalmente, pretendia incluir uma pá de neve, mas o departamento financeiro não aprovou o custo extra.",
+            name: "Winter",
+            description: "",
             isInventory: false,
             index: 5300,
             next_price: 129000,
@@ -1251,8 +1251,8 @@ export const itemBlueprints = {
         },
         {
             id: "needle",
-            name: "Agulha",
-            description: "Usando abeto de áreas sustentáveis, a tinta «Needle» é preparada usando 25 metros quadrados de abeto, cortado e triturado em agulhas de madeira em miniatura e unidas usando um tipo especial de resina.",
+            name: "Needle",
+            description: "",
             isInventory: false,
             index: 5350,
             next_price: 180000,
@@ -1273,7 +1273,7 @@ export const itemBlueprints = {
         {
             id: "zeus",
             name: "Zeus",
-            description: "Formada em homenagem ao deus grego conhecido por seu amor por raios, esta pintura sinalizará aos seus inimigos que você é uma força que não deve ser tomada de ânimo leve.",
+            description: "",
             isInventory: false,
             index: 5400,
             next_price: 180000,
@@ -1293,8 +1293,8 @@ export const itemBlueprints = {
         },
         {
             id: "hive",
-            name: "Colmeia",
-            description: "Originalmente planejada como uma tinta com propriedades ofensivas ativas, a «Hive» deveria ser enriquecida com abelhas especiais antitanque. No entanto, esse plano foi abandonado devido aos inúmeros protestos de organizações que defendem os animais. Como resultado, a tinta agora só mantém sua cor e textura.",
+            name: "Hive",
+            description: "",
             isInventory: false,
             index: 5450,
             next_price: 192000,
@@ -1314,8 +1314,8 @@ export const itemBlueprints = {
         },
         {
             id: "rock",
-            name: "Rocha",
-            description: "As placas blindadas chamadas «The Rock» são extraídas de enormes formações rochosas, usando uma tecnologia egípcia antiga. Estacas secas são marteladas na rocha, depois encharcadas com água até incharem, quebrando a rocha em blocos lisos de pedra. Esta camuflagem é a definição de «feito à mão».",
+            name: "Rock",
+            description: "",
             isInventory: false,
             index: 5500,
             next_price: 192000,
@@ -1335,8 +1335,8 @@ export const itemBlueprints = {
         },
         {
             id: "mars",
-            name: "Marte",
-            description: "Diz-se que este revestimento estava sendo desenvolvido para uma divisão espacial para garantir a rápida liberação de Marte dos invasores alienígenas. A tinta foi colocada à venda somente para levantar fundos para transferir uma divisão de tanques para Marte.",
+            name: "Mars",
+            description: "",
             isInventory: false,
             index: 5550,
             next_price: 204000,
@@ -1356,8 +1356,8 @@ export const itemBlueprints = {
         },
         {
             id: "prodigi",
-            name: "Prodígio",
-            description: "Uma pintura digital aprimorada com um padrão que se destina a distrair e desorientar seu inimigo, tornando-o mais propenso a errar ao atirar em você.",
+            name: "Prodigy",
+            description: "",
             isInventory: false,
             index: 5600,
             next_price: 204000,
@@ -1377,8 +1377,8 @@ export const itemBlueprints = {
         },
         {
             id: "graffiti",
-            name: "Grafite",
-            description: "Uma abordagem interessante para a camuflagem urbana. Fingindo ser uma vítima de hooligans de rua, seu tanque se funde perfeitamente com as áreas residenciais das selvas de concreto.",
+            name: "Graffiti",
+            description: "",
             isInventory: false,
             index: 5650,
             next_price: 216000,
@@ -1398,8 +1398,8 @@ export const itemBlueprints = {
         },
         {
             id: "mirage",
-            name: "Miragem",
-            description: "A camuflagem de última geração. Além de sua incrível capacidade de se misturar a praticamente qualquer plano de fundo, ela gera interferência de radar que torna muito mais difícil para o inimigo mirar a longa distância, e sua capacidade de calor extremamente alta permite que ela absorva parte da energia em caso de superaquecimento.",
+            name: "Mirage",
+            description: "",
             isInventory: false,
             index: 5653,
             next_price: 216000,
@@ -1420,7 +1420,7 @@ export const itemBlueprints = {
         {
             id: "irbis",
             name: "Irbis",
-            description: "Um dos felinos mais misteriosos, o Irbis também é conhecido como o «leopardo-das-neves». Após uma série de expedições de alto risco e quinze acidentes, nossos pesquisadores conseguiram conter um leopardo-das-neves por tempo suficiente para copiar sua pelagem e criar o «Irbis» pintar.",
+            description: "",
             isInventory: false,
             index: 5700,
             next_price: 216000,
@@ -1440,8 +1440,8 @@ export const itemBlueprints = {
         },
         {
             id: "emerald",
-            name: "Esmeralda",
-            description: "Os pesquisadores do laboratório de tintas «Style and Grill» trabalham há muito tempo em uma tinta que retenha o tom verde clássico de um tanque, ao mesmo tempo em que enfatiza o alto status de seu proprietário. O resultado é a tinta «Emerald», que parece ser iluminado por dentro.",
+            name: "Emerald",
+            description: "",
             isInventory: false,
             index: 5750,
             next_price: 228000,
@@ -1462,7 +1462,7 @@ export const itemBlueprints = {
         {
             id: "inferno",
             name: "Inferno",
-            description: "A tinta «Inferno» é entregue por meios obscuros ao mercado negro das oficinas de sopro de vidro da China. Segundo os próprios produtores, sua aparência desafiadora simboliza força, coragem, sorte e longevidade. Uma tinta excelente para um atacante feroz.",
+            description: "",
             isInventory: false,
             index: 5800,
             next_price: 228000,
@@ -1483,7 +1483,7 @@ export const itemBlueprints = {
         {
             id: "nano",
             name: "Nano",
-            description: "Uma camada espessa de nanoporonal é colocada no tanque a partir de uma lata pequena com uma escova ainda menor. O processo é longo, mas o resultado é agradável aos olhos. Do ponto de vista militar, esta é uma das mais dignas tentativas de adaptar a nanotecnologia aos tanques.",
+            description: "",
             isInventory: false,
             index: 5850,
             next_price: 240000,
@@ -1503,8 +1503,8 @@ export const itemBlueprints = {
         },
         {
             id: "raccoon",
-            name: "Guaxinim",
-            description: "Essa pintura é um dos três itens obrigatórios para todos os membros do Worldwide Raccoon Club. O paletó e a gravata só são concedidos depois que o iniciado atinge o status de «Guaxinim Fofo». O negócio é sério.",
+            name: "Raccoon",
+            description: "",
             isInventory: false,
             index: 5900,
             next_price: 240000,
@@ -1524,8 +1524,8 @@ export const itemBlueprints = {
         },
         {
             id: "clay",
-            name: "Barro",
-            description: "Esta tinta foi projetada para operações de sabotagem no pântano. Os tanques que usavam essa tinta estavam tão bem camuflados que nem as sanguessugas os notaram.",
+            name: "Clay",
+            description: "",
             isInventory: false,
             index: 5950,
             next_price: 240000,
@@ -1546,7 +1546,7 @@ export const itemBlueprints = {
         {
             id: "taiga",
             name: "Taiga",
-            description: "A pintura de camuflagem «Taiga» mascara o tanque tão bem na vegetação densa, que você provavelmente poderia se aproximar de um alce com seu tanque...",
+            description: "",
             isInventory: false,
             index: 6000,
             next_price: 240000,
@@ -1566,8 +1566,8 @@ export const itemBlueprints = {
         },
         {
             id: "tiger",
-            name: "Tigre",
-            description: "Este revestimento não só parece uma pele de tigre, mas também torna seu tanque macio e fofo ao toque. Olhando para seu tanque neste revestimento, você pode treinar seu olho de tigre, o que lhe permitirá imobilizar os adversários assustados.",
+            name: "Tiger",
+            description: "",
             isInventory: false,
             index: 6050,
             next_price: 250000,
@@ -1588,7 +1588,7 @@ export const itemBlueprints = {
         {
             id: "jade",
             name: "Jade",
-            description: "Um spray de um raro jade marrom. Bonito, perfeito para camuflagem e ecologicamente correto.",
+            description: "",
             isInventory: false,
             index: 6100,
             next_price: 250000,
@@ -1609,7 +1609,7 @@ export const itemBlueprints = {
         {
             id: "picasso",
             name: "Picasso",
-            description: "Picasso recebeu o nome de Pablo Picasso, o famoso artista cubista. Finos fragmentos poligonais da armadura formam um padrão abstrato verdadeiramente único,  que difunde até os golpes mais poderosos. Esta pintura é a escolha dos verdadeiros críticos de arte!",
+            description: "",
             isInventory: false,
             index: 6150,
             next_price: 250000,
@@ -1629,8 +1629,8 @@ export const itemBlueprints = {
         },
         {
             id: "lumberjack",
-            name: "Lenhador",
-            description: "A camisa de um lenhador representa força e resistência às dificuldades do trabalho manual. Essa tinta se baseia nesse padrão para imbuir os mesmos valores no tanque que a veste.",
+            name: "Lumberjack",
+            description: "",
             isInventory: false,
             index: 6200,
             next_price: 250000,
@@ -1651,7 +1651,7 @@ export const itemBlueprints = {
         {
             id: "africa",
             name: "Africa",
-            description: "Essa tinta apresenta padrões tradicionais africanos usados pelos xamãs africanos, que acreditam que ela pode proteger os tanques contra danos.",
+            description: "",
             isInventory: false,
             index: 6250,
             next_price: 250000,
@@ -1672,7 +1672,7 @@ export const itemBlueprints = {
         {
             id: "acid",
             name: "Acid",
-            description: "A corrosive, acid-toned coat that seems to dissolve everything around it.",
+            description: "",
             isInventory: false,
             index: 6300,
             next_price: 10000,
@@ -1693,7 +1693,7 @@ export const itemBlueprints = {
         {
             id: "champion",
             name: "Champion",
-            description: "Reserved for the true champions of the battlefield.",
+            description: "",
             isInventory: false,
             index: 6350,
             next_price: 10000,
@@ -1714,7 +1714,7 @@ export const itemBlueprints = {
         {
             id: "impulse",
             name: "Impulse",
-            description: "Energetic lines that convey pure speed and momentum.",
+            description: "",
             isInventory: false,
             index: 6400,
             next_price: 10000,
@@ -1735,7 +1735,7 @@ export const itemBlueprints = {
         {
             id: "frost",
             name: "Frost",
-            description: "A frozen finish covered in crystals of ice.",
+            description: "",
             isInventory: false,
             index: 6450,
             next_price: 10000,
@@ -1756,7 +1756,7 @@ export const itemBlueprints = {
         {
             id: "star",
             name: "Star",
-            description: "Shines like a star amid the darkness of combat.",
+            description: "",
             isInventory: false,
             index: 6500,
             next_price: 10000,
@@ -1777,7 +1777,7 @@ export const itemBlueprints = {
         {
             id: "bronze",
             name: "Bronze",
-            description: "A metallic bronze finish weathered by battle.",
+            description: "",
             isInventory: false,
             index: 6550,
             next_price: 10000,
@@ -1798,7 +1798,7 @@ export const itemBlueprints = {
         {
             id: "silver",
             name: "Silver",
-            description: "An elegant, imposing silver shine.",
+            description: "",
             isInventory: false,
             index: 6600,
             next_price: 10000,
@@ -1819,7 +1819,7 @@ export const itemBlueprints = {
         {
             id: "veteran",
             name: "Veteran",
-            description: "The mark of one who has survived countless battles.",
+            description: "",
             isInventory: false,
             index: 6650,
             next_price: 10000,
@@ -1840,7 +1840,7 @@ export const itemBlueprints = {
         {
             id: "gladiator",
             name: "Gladiator",
-            description: "Forged in the arena for the most relentless warriors.",
+            description: "",
             isInventory: false,
             index: 6700,
             next_price: 10000,
@@ -1861,7 +1861,7 @@ export const itemBlueprints = {
         {
             id: "helper",
             name: "Helper",
-            description: "Granted to those who help the community grow.",
+            description: "",
             isInventory: false,
             index: 6800,
             next_price: 10000,
@@ -1882,7 +1882,7 @@ export const itemBlueprints = {
         {
             id: "visual_disruptor",
             name: "Visual Disruptor",
-            description: "An animated pattern that distorts the perception of anyone who faces it.",
+            description: "",
             isInventory: false,
             index: 6850,
             next_price: 10000,
@@ -1903,7 +1903,7 @@ export const itemBlueprints = {
         {
             id: "tesseract_camo",
             name: "Tesseract Camo",
-            description: "A shifting four-dimensional camouflage that never stays the same.",
+            description: "",
             isInventory: false,
             index: 6900,
             next_price: 10000,
@@ -1924,7 +1924,7 @@ export const itemBlueprints = {
         {
             id: "symbiote",
             name: "Symbiote",
-            description: "A living coat that writhes and pulses across the armor.",
+            description: "",
             isInventory: false,
             index: 6950,
             next_price: 10000,
@@ -1945,7 +1945,7 @@ export const itemBlueprints = {
         {
             id: "spinner",
             name: "Spinner",
-            description: "A hypnotic spinning pattern that keeps the eye off balance.",
+            description: "",
             isInventory: false,
             index: 7000,
             next_price: 10000,
@@ -1966,7 +1966,7 @@ export const itemBlueprints = {
         {
             id: "galaxy",
             name: "Galaxy",
-            description: "A swirling animated galaxy that drifts across the armor.",
+            description: "",
             isInventory: false,
             index: 7050,
             next_price: 10000,
@@ -1990,24 +1990,24 @@ export const itemBlueprints = {
     // consumables are owned in quantity (shown in the depot with a `count`); "1000_scores" is
     // consumed instantly on purchase and grants experience (rank points) instead of stacking.
     supplies: [
-        { id: "health", name: "Kit de Reparação", description: "Restaura gradualmente a «saúde» do tanque até a cura completa.", index: 7600, type: 4, rank: 3, price: 150 },
-        { id: "armor", name: "Blindagem Dupla", description: "Dobra a resistência do tanque por um curto período.", index: 7650, type: 4, rank: 4, price: 50 },
-        { id: "double_damage", name: "Destruição Dupla", description: "Dobra o dano causado pelo tanque por um curto período.", index: 7700, type: 4, rank: 4, price: 50 },
-        { id: "n2o", name: "Aumento de Velocidade", description: "Aumenta a velocidade e a aceleração do tanque por um curto período.", index: 7750, type: 4, rank: 4, price: 50 },
-        { id: "mine", name: "Mina", description: "Coloca uma mina invisível que explode quando um inimigo se aproxima.", index: 7800, type: 4, rank: 5, price: 50 },
-        { id: "1000_scores", name: "1000 experiência", description: "Concede 1000 pontos de experiência. É usado automaticamente logo após a compra.", index: 7550, type: 4, rank: 11, price: 2000, instantScore: 1000 },
+        { id: "health", name: "Repair Kit", description: "", index: 7600, type: 4, rank: 3, price: 150 },
+        { id: "armor", name: "Double Armor", description: "", index: 7650, type: 4, rank: 4, price: 50 },
+        { id: "double_damage", name: "Double Damage", description: "", index: 7700, type: 4, rank: 4, price: 50 },
+        { id: "n2o", name: "Speed Boost", description: "", index: 7750, type: 4, rank: 4, price: 50 },
+        { id: "mine", name: "Mine", description: "", index: 7800, type: 4, rank: 5, price: 50 },
+        { id: "1000_scores", name: "1000 Experience", description: "", index: 7550, type: 4, rank: 11, price: 2000, instantScore: 1000 },
     ],
     // Passes/assinaturas (category "special", type 5). baseItemId/previewResourceId = ícones internos do
     // client (números pequenos fixos, como os supplies). Comprar ESTENDE a expiração do passe no user
     // (`expiresField`), não empilha item. `newbie` (price -1) é concedido na criação de conta e aparece no
     // depósito enquanto ativo; `up_score` é comprável no mercado.
     passes: [
-        { id: "newbie", name: "Passe Iniciante", description: "Com o passe de iniciante, o jogador ganha 50% a mais de experiência e 100% a cada batalha disputada.", index: 7900, type: 5, rank: 1, price: -1, category: "special", durationMs: NEWBIE_DURATION_MS, expiresField: "newbieExpiresAt" },
-        { id: "up_score", name: "Passe Multiplicador de Pontos", description: "Aumenta em 30% o XP recebido.\n\nDura 1 mês.\n\nAtenção, a assinatura não dá vantagem em batalhas de equipe!", index: 8000, type: 5, rank: 1, price: 12500, category: "special", durationMs: UP_SCORE_DURATION_MS, expiresField: "upScoreExpiresAt" },
-        { id: "pro_battle", name: "Passe de Batalha PRO", description: "A duração é de 1 mês. Permite que você crie suas próprias batalhas e escolha suas configurações, além de participar de «Batalhas PRO» um número ilimitado de vezes dentro de 31 dias a partir da data da compra.", index: 8200, type: 5, rank: 1, price: 139, category: "special", durationMs: PRO_BATTLE_DURATION_MS, expiresField: "proBattleExpiresAt", priceByRank: PRO_BATTLE_PRICE_BY_RANK },
+        { id: "newbie", name: "Newbie Pass", description: "", index: 7900, type: 5, rank: 1, price: -1, category: "special", durationMs: NEWBIE_DURATION_MS, expiresField: "newbieExpiresAt" },
+        { id: "up_score", name: "Score Multiplier Pass", description: "", index: 8000, type: 5, rank: 1, price: 12500, category: "special", durationMs: UP_SCORE_DURATION_MS, expiresField: "upScoreExpiresAt" },
+        { id: "pro_battle", name: "PRO Battle Pass", description: "", index: 8200, type: 5, rank: 1, price: 139, category: "special", durationMs: PRO_BATTLE_DURATION_MS, expiresField: "proBattleExpiresAt", priceByRank: PRO_BATTLE_PRICE_BY_RANK },
         // Card "Dobro de cristais" (double_crystalls): NÃO comprável na garagem (price -1) — só aparece no
         // depósito, com o tempo de validade, enquanto ativo (dura 24h). Dobra os cristais de DOAÇÕES no
         // shop (não os ganhos em jogo). id/index/preview/descrição espelham o oficial (captura s6-54824).
-        { id: "double_crystalls", name: "Dobro de cristais", description: "O nome deste cartão é auto-explicativo. Comprando cristais com dinheiro real você ganha o dobro deles do que o normal. Qualquer quantidade de cristais que você comprou será multiplicada por dois! Mas cuidado! Este cartão permanece ativo por apenas 24 horas. Certifique-se de usá-lo enquanto pode para aproveitar ao máximo suas compras!", index: 8150, type: 5, rank: 1, price: -1, category: "special", durationMs: 0, expiresField: "crystalAbonementExpiresAt" },
+        { id: "double_crystalls", name: "Double Crystals", description: "", index: 8150, type: 5, rank: 1, price: -1, category: "special", durationMs: 0, expiresField: "crystalAbonementExpiresAt" },
     ],
 };

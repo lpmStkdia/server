@@ -16,43 +16,43 @@ const GROUP_ORDER: ChatModeratorLevel[] = [
 
 const GROUP_LABEL: Record<ChatModeratorLevel, string> = {
     [ChatModeratorLevel.COMMUNITY_MANAGER]: "COMMUNITY MANAGER",
-    [ChatModeratorLevel.ADMINISTRATOR]: "ADMINISTRADOR",
-    [ChatModeratorLevel.MODERATOR]: "MODERADOR",
-    [ChatModeratorLevel.CANDIDATE]: "CANDIDATO",
-    [ChatModeratorLevel.NONE]: "PÚBLICO (todos os jogadores)",
+    [ChatModeratorLevel.ADMINISTRATOR]: "ADMINISTRATOR",
+    [ChatModeratorLevel.MODERATOR]: "MODERATOR",
+    [ChatModeratorLevel.CANDIDATE]: "CANDIDATE",
+    [ChatModeratorLevel.NONE]: "PUBLIC (all players)",
 };
 
-/** The usage lives in `usage`, so drop any "Uso: ..." tail from the description to avoid duplication. */
+/** The usage lives in `usage`, so drop any "Usage: ..." tail from the description to avoid duplication. */
 function whatItDoes(description: string): string {
-    return description.replace(/\s*Uso:.*$/i, "").trim();
+    return description.replace(/\s*Usage:.*$/i, "").trim();
 }
 
-/** Full list line, e.g. "/role <username> [none/candidate/...] — Define o cargo de staff de um usuário." */
+/** Full list line, e.g. "/role <username> [none/candidate/...] — Sets the staff role of a user." */
 function listLine(cmd: ICommand): string {
     const params = cmd.usage ? " " + cmd.usage : "";
     return `/${cmd.name}${params} — ${whatItDoes(cmd.description)}`;
 }
 
 /**
- * /help — COMPACT list: one line per cargo group with just the command names the caller can use.
- * /help * — the FULL wall: every accessible command grouped by cargo with parameters + description.
- * /help <comando> — the detail (parameters with hardcoded options as [a/b/c], description, example, cargo).
+ * /help — COMPACT list: one line per role group with just the command names the caller can use.
+ * /help * — the FULL wall: every accessible command grouped by role with parameters + description.
+ * /help <command> — the detail (parameters with hardcoded options as [a/b/c], description, example, role).
  */
 export default class HelpCommand implements ICommand {
     name = "help";
-    description = "Lista os comandos disponíveis (* = lista completa com descrições). Uso: /help [comando/*].";
+    description = "Lists available commands (* = full list with descriptions). Usage: /help [command/*].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
-    usage = "[comando/*]";
+    usage = "[command/*]";
     example = "/help role";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const level = context.executor.user!.chatModeratorLevel;
         const service = context.server.commandService;
 
-        // /help * — o "paredão": lista completa agrupada por cargo com parâmetros + descrição.
+        // /help * — the "wall": full list grouped by role with parameters + description.
         if (args[0] === "*") {
             const accessible = service.getCommands().filter((c) => hasModeratorPower(level, c.permissionLevel));
-            context.reply("=== Comandos disponíveis — use /help <comando> para ver um exemplo ===");
+            context.reply("=== Available commands — use /help <command> to see an example ===");
             for (const group of GROUP_ORDER) {
                 const inGroup = accessible
                     .filter((c) => c.permissionLevel === group)
@@ -64,35 +64,35 @@ export default class HelpCommand implements ICommand {
             return;
         }
 
-        // /help <comando> — detalhe de um comando específico.
+        // /help <command> — detail of a specific command.
         if (args.length >= 1) {
             const name = args[0].replace(/^\//, "").toLowerCase();
             const cmd = service.getCommand(name);
             if (!cmd) {
-                context.reply(`Comando "/${name}" não encontrado. Use /help para ver a lista.`);
+                context.reply(`Command "/${name}" not found. Use /help to see the list.`);
                 return;
             }
             if (!hasModeratorPower(level, cmd.permissionLevel)) {
-                context.reply(`Você não tem permissão para usar /${cmd.name}.`);
+                context.reply(`You do not have permission to use /${cmd.name}.`);
                 return;
             }
             context.reply(`/${cmd.name}${cmd.usage ? " " + cmd.usage : ""}`);
             context.reply(whatItDoes(cmd.description));
             if (cmd.example) {
-                context.reply(`Exemplo: ${cmd.example}`);
+                context.reply(`Example: ${cmd.example}`);
             }
             context.reply(
                 cmd.permissionLevel === ChatModeratorLevel.NONE
-                    ? "Acesso: todos os jogadores."
-                    : `Cargo mínimo: ${chatModeratorLevelName(cmd.permissionLevel)}.`
+                    ? "Access: all players."
+                    : `Minimum role: ${chatModeratorLevelName(cmd.permissionLevel)}.`
             );
             return;
         }
 
-        // /help — lista COMPACTA: uma linha por cargo, só os nomes (detalhe fica no /help <comando>).
+        // /help — COMPACT list: one line per role, just the names (detail lives in /help <command>).
         const accessible = service.getCommands().filter((c) => hasModeratorPower(level, c.permissionLevel));
 
-        context.reply("=== Comandos — use /help <comando> para descrição e modo de uso ===");
+        context.reply("=== Commands — use /help <command> for description and usage ===");
         for (const group of GROUP_ORDER) {
             const names = accessible
                 .filter((c) => c.permissionLevel === group)

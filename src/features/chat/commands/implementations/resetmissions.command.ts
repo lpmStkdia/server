@@ -5,14 +5,14 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Debug: regenerates the caller's 3 daily missions (fresh/uncompleted) and reopens the window. */
 export default class ResetMissionsCommand implements ICommand {
     name: string = "resetmissions";
-    description: string = "Reseta as suas missões diárias (teste). Uso: /resetmissions.";
+    description: string = "Resets your daily missions (test). Usage: /resetmissions.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     example = "/resetmissions";
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const user = context.executor.user;
         if (!user) {
-            context.reply("Erro: usuário não encontrado.");
+            context.reply("Error: user not found.");
             return;
         }
 
@@ -23,6 +23,6 @@ export default class ResetMissionsCommand implements ICommand {
         context.executor.sendPacket(
             data.quests.length === 0 ? new QuestPackets.QuestSummaryWindow(data) : new QuestPackets.ShowQuestsWindow(data)
         );
-        context.reply("Missões diárias resetadas.");
+        context.reply("Daily missions reset.");
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Tiles Winter" resource-id="f30b28" version="3"/>
+  <library name="Land Rocks Winter" resource-id="b2e494" version="3"/>
+  <library name="zamin Winter" resource-id="fc5d9d" version="4"/>
+  <library name="City Buildings Winter" resource-id="61f764" version="1"/>
+  <library name="Desert Houses Winter" resource-id="f27b85" version="1"/>
+  <library name="NuBu 9 Winter" resource-id="142cd1" version="1"/>
+</proplibs>

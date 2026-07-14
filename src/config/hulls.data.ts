@@ -21,8 +21,8 @@ export interface HullConfig {
 
 export const hullsData: HullConfig[] = [
     {
-        id: "wasp", name: "Vespa", category: "armor", index: 700, type: 2,
-        description: "Leve, econômico, fácil de operar — Vespa é uma carroceria perfeito para iniciantes. Vespa atualizado pode atingir uma alta velocidade, que em combinação com tamanho pequeno dá liberdade de ação no campo de batalha. Devido ao baixo peso, Vespa pode ser facilmente enrolado pelo tiro de um inimigo.",
+        id: "wasp", name: "Wasp", category: "armor", index: 700, type: 2,
+        description: "Light, economical and easy to handle — Wasp is a perfect hull for beginners. The upgraded Wasp can reach high speeds, and its small size gives great mobility on the battlefield. Due to its low weight, Wasp is more vulnerable to being tossed by enemy shells.",
         mods: [
             { rank: 2, price: 200, nextPrice: 7650, nextRank: 9, armor: 94, speed: 10.8, turnSpeed: 93.9, acceleration: 9.4, mass: 1100, reverseAcceleration: 12, sideAcceleration: 15, turnAcceleration: 2.79, reverseTurnAcceleration: 4.54, dampingCoeff: 900 },
             { rank: 9, price: 7650, nextPrice: 62450, nextRank: 16, armor: 121, speed: 11, turnSpeed: 100.84, acceleration: 9.87, mass: 1483, reverseAcceleration: 13.74, sideAcceleration: 18.12, turnAcceleration: 3.04, reverseTurnAcceleration: 5.21, dampingCoeff: 900 },
@@ -31,8 +31,8 @@ export const hullsData: HullConfig[] = [
         ],
     },
     {
-        id: "hornet", name: "Zangão", category: "armor", index: 750, type: 2,
-        description: "Esta carrocería compacta utilização de materiais compósitos de última geração, o que o torna leve, rápido e garante alta capacidade de sobrevivência mesmo após um golpe direto. Zangão é perfeito para ataques rápidos.",
+        id: "hornet", name: "Hornet", category: "armor", index: 750, type: 2,
+        description: "This compact hull uses state-of-the-art composite materials, making it light and fast while providing high survivability even after a direct hit. Hornet is perfect for hit-and-run attacks.",
         mods: [
             { rank: 5, price: 500, nextPrice: 21000, nextRank: 12, armor: 122, speed: 10, turnSpeed: 90.8, acceleration: 10.4, mass: 1409, reverseAcceleration: 16.38, sideAcceleration: 12.8, turnAcceleration: 2.82, reverseTurnAcceleration: 3.85, dampingCoeff: 1250 },
             { rank: 12, price: 21000, nextPrice: 86600, nextRank: 19, armor: 154, speed: 10.7, turnSpeed: 105.2, acceleration: 11.7, mass: 1774, reverseAcceleration: 18.83, sideAcceleration: 15.09, turnAcceleration: 2.88, reverseTurnAcceleration: 4.49, dampingCoeff: 1250 },
@@ -41,8 +41,8 @@ export const hullsData: HullConfig[] = [
         ],
     },
     {
-        id: "hunter", name: "Caçador", category: "armor", index: 800, type: 2,
-        description: "Caçador é a carroceria mais versátil do jogo. Graças ao equilíbrio entre placas de armadura de aço reforçadas e baixo consumo de energia, esta armadura é para todos os fins. É boa para todos, de velocistas a atiradores. Sendo tão versátil, você nunca fique sem emprego em um campo de guerra.",
+        id: "hunter", name: "Hunter", category: "armor", index: 800, type: 2,
+        description: "Hunter is the most versatile hull in the game. Thanks to the balance between reinforced steel armor plates and low energy consumption, this hull suits many roles — from speedsters to marksmen. Its versatility keeps you effective in any battlefield situation.",
         mods: [
             { rank: 1, price: 0, nextPrice: 3200, nextRank: 8, armor: 144, speed: 8, turnSpeed: 75.8, acceleration: 9.6, mass: 1700, reverseAcceleration: 10, sideAcceleration: 8.5, turnAcceleration: 2.09, reverseTurnAcceleration: 3.32, dampingCoeff: 1500 },
             { rank: 8, price: 3200, nextPrice: 54400, nextRank: 15, armor: 187, speed: 8.6, turnSpeed: 95.3, acceleration: 11, mass: 2096, reverseAcceleration: 12.43, sideAcceleration: 10.78, turnAcceleration: 2.31, reverseTurnAcceleration: 3.79, dampingCoeff: 1500 },
@@ -51,8 +51,8 @@ export const hullsData: HullConfig[] = [
         ],
     },
     {
-        id: "dictator", name: "Ditador", category: "armor", index: 850, type: 2,
-        description: "Devido ao sistema de defesa ativo aprimorado e ao uso dos mais novos materiais compostos, esta blindagem absorve efetivamente a energia de um impacto de quase qualquer arma de calibre. Com o Dictator, você pode lutar na linha de frente de qualquer batalha. Sendo um dos cascos mais rápidos e protegidos no jogo, o Ditador é grande, o que o torna um alvo fácil.",
+        id: "dictator", name: "Dictator", category: "armor", index: 850, type: 2,
+        description: "Thanks to an enhanced active defense system and modern composite materials, this hull effectively absorbs impact energy from most calibers. With the Dictator, you can fight on the front line. As one of the larger, well-protected hulls, it trades speed for survivability and can be an easy target.",
         mods: [
             { rank: 4, price: 400, nextPrice: 16550, nextRank: 11, armor: 188, speed: 7, turnSpeed: 89, acceleration: 10.9, mass: 2170, reverseAcceleration: 12.04, sideAcceleration: 9.04, turnAcceleration: 1.81, reverseTurnAcceleration: 3.41, dampingCoeff: 2500 },
             { rank: 11, price: 16550, nextPrice: 78550, nextRank: 18, armor: 243, speed: 7.3, turnSpeed: 103.3, acceleration: 12.3, mass: 2722 },
@@ -62,7 +62,7 @@ export const hullsData: HullConfig[] = [
     },
     {
         id: "viking", name: "Viking", category: "armor", index: 900, type: 2,
-        description: "Esta blindagem incorpora todas as tecnologias militares modernas. A blindagem reforçada e o motor «Tipo 2» fazem do Viking uma das carrocerias mais versáteis. Ataque o inimigo ou cubra seus companheiros de equipe – esta carroceria provará ser bom e confiável em qualquer situação.",
+        description: "This hull incorporates modern military technologies. Reinforced armor and the Type-2 engine make Viking a highly versatile hull. Attack enemies or cover teammates — Viking performs reliably in almost any situation.",
         mods: [
             { rank: 7, price: 700, nextPrice: 29900, nextRank: 14, armor: 195, speed: 7.8, turnSpeed: 80.6, acceleration: 11.5, mass: 2039, reverseAcceleration: 14.09, sideAcceleration: 10.61, turnAcceleration: 2.28, reverseTurnAcceleration: 3.16, dampingCoeff: 2000 },
             { rank: 14, price: 29900, nextPrice: 102700, nextRank: 21, armor: 244, speed: 8.3, turnSpeed: 92.7, acceleration: 12.6, mass: 2435, reverseAcceleration: 16.52, sideAcceleration: 13.65, turnAcceleration: 2.49, reverseTurnAcceleration: 3.58, dampingCoeff: 2000 },
@@ -71,8 +71,8 @@ export const hullsData: HullConfig[] = [
         ],
     },
     {
-        id: "titan", name: "Titã", category: "armor", index: 950, type: 2,
-        description: "Placas de armadura de liga Titan combinadas com geometria especial tornam esta carroceria altamente eficaz mesmo contra armas de grande calibre. Com o Titan, você pode mergulhar no meio de uma batalha sem qualquer hesitação. Observe que, devido à baixa velocidade, esta carroceria não é adequado para ataques rápidos atrás das linhas inimigas.",
+        id: "titan", name: "Titan", category: "armor", index: 950, type: 2,
+        description: "Titan alloy armor plates combined with special geometry make this hull highly effective even against large-caliber weapons. With Titan you can dive into the thick of battle without hesitation. Note that its low speed makes it less suitable for fast flanking maneuvers.",
         mods: [
             { rank: 3, price: 300, nextPrice: 12100, nextRank: 10, armor: 224, speed: 5.3, turnSpeed: 55.7, acceleration: 11.7, mass: 3571 },
             { rank: 10, price: 12100, nextPrice: 70500, nextRank: 17, armor: 289, speed: 5.5, turnSpeed: 67.1, acceleration: 13.1, mass: 3783, reverseAcceleration: 12.13, sideAcceleration: 13.91, turnAcceleration: 1.39, reverseTurnAcceleration: 3.34, dampingCoeff: 2100 },
@@ -81,8 +81,8 @@ export const hullsData: HullConfig[] = [
         ],
     },
     {
-        id: "mammoth", name: "Mamute", category: "armor", index: 1000, type: 2,
-        description: "Este não é um tanque - é uma fortaleza sobre trilhos. Mamute é o carro-chefe entre outras carrocerias. Extremamente pesado, reforçado com superconcreto este casco é lento, o que não impede o Mamute de lutar com sucesso contra vários tanques inimigos.",
+        id: "mammoth", name: "Mammoth", category: "armor", index: 1000, type: 2,
+        description: "This is not a tank — it is a fortress on tracks. Mammoth is the flagship hull: extremely heavy and reinforced with superconcrete. Its slowness does not prevent the Mammoth from dominating engagements against multiple enemy tanks.",
         mods: [
             { rank: 6, price: 600, nextPrice: 25450, nextRank: 13, armor: 297, speed: 4.4, turnSpeed: 54, acceleration: 11.3, mass: 3935, reverseAcceleration: 8.09, sideAcceleration: 17.17, turnAcceleration: 1.36, reverseTurnAcceleration: 2.81, dampingCoeff: 2000 },
             { rank: 13, price: 25450, nextPrice: 94650, nextRank: 20, armor: 376, speed: 4.6, turnSpeed: 64.1, acceleration: 12.7, mass: 4543, reverseAcceleration: 9.61, sideAcceleration: 20.22, turnAcceleration: 1.49, reverseTurnAcceleration: 3.07, dampingCoeff: 2000 },
@@ -109,12 +109,12 @@ function xtHullVariant(baseId: string, name: string, index: number, description:
 }
 
 hullsData.push(
-    xtHullVariant("mammoth", "Mamute XT", 610, "O Mamute XT de elite é uma fortaleza com acabamento de cerimônia. As placas de superconcreto escurecidas mostram que este flagship já venceu incontáveis batalhas."),
-    xtHullVariant("hornet", "Zangão XT", 620, "O zangão XT de elite tem uma aparência única. Placas de armadura espetaculares, estilizadas como asas, enfatizam sua rapidez e elegância."),
-    xtHullVariant("viking", "Viking XT", 630, "O exclusivo Viking XT se destaca pelo seu visual. O padrão característico da armadura é feito no estilo nórdico severo."),
-    xtHullVariant("wasp", "Vespa XT", 640, "A exclusiva Vespa XT mantém toda a agilidade do modelo original, com uma carenagem única reservada aos pilotos mais rápidos do campo de batalha."),
-    xtHullVariant("titan", "Titã XT", 650, "O Titã XT de elite veste uma blindagem com padrão exclusivo. Debaixo dela, a mesma liga lendária que segura o meio de qualquer batalha."),
-    xtHullVariant("hunter", "Caçador XT", 660, "O exclusivo Caçador XT mantém o equilíbrio lendário do original sob uma blindagem dourada de elite — reservada a quem já provou seu valor no campo de batalha."),
+    xtHullVariant("mammoth", "Mammoth XT", 610, "The elite Mammoth XT is a ceremonial fortress. Darkened superconcrete plates show that this flagship has prevailed in countless battles."),
+    xtHullVariant("hornet", "Hornet XT", 620, "The elite Hornet XT features a unique look. Spectacular armor plates styled like wings emphasize its speed and elegance."),
+    xtHullVariant("viking", "Viking XT", 630, "The distinctive Viking XT stands out for its appearance. The characteristic armor pattern is crafted in a stern Nordic style."),
+    xtHullVariant("wasp", "Wasp XT", 640, "The exclusive Wasp XT retains the agility of the original model with a unique fairing reserved for the fastest pilots on the battlefield."),
+    xtHullVariant("titan", "Titan XT", 650, "The elite Titan XT wears armor with an exclusive pattern. Beneath it, the same legendary alloy that holds the line in any battle."),
+    xtHullVariant("hunter", "Hunter XT", 660, "The exclusive Hunter XT preserves the original's legendary balance under elite golden armor — reserved for those who have proven their worth on the battlefield."),
 );
 
 const byId = new Map(hullsData.map((h) => [h.id, h]));

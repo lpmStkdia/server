@@ -3,19 +3,19 @@ import { sendWebPanel } from "@/features/webpanel/webpanel.service";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
 /**
- * /ranked — abre o painel de Partida Competitiva (webview opaco). SPIKE da Fase 0: valida que o
- * HTMLLoader opaco renderiza e recebe input sobre o Stage3D. A busca real (fila/pareamento) entra
- * na Fase 1; a ponte JS↔AS na Fase 0b.
+ * /ranked — opens the Ranked Match panel (opaque webview). Phase 0 SPIKE: validates that the opaque
+ * HTMLLoader renders and receives input over the Stage3D. Real search (queue/matchmaking) lands in
+ * Phase 1; the JS<->AS bridge in Phase 0b.
  */
 export default class RankedCommand implements ICommand {
     name = "ranked";
-    description = "Abre o painel de Partida Competitiva (ranqueada).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    description = "Opens the Ranked Match panel.";
+    permissionLevel = ChatModeratorLevel.MODERATOR;
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
-        // Se já está buscando/em partida encontrada, reabre no tamanho pequeno (widget), não fullscreen.
+        // If already searching/in a found match, reopen at the small (widget) size, not fullscreen.
         const size = context.server.rankedService?.panelSizeFor(context.executor.user!.id) ?? { width: 0, height: 0 };
         sendWebPanel(context.executor, size, "ranked-command");
-        context.reply("Abrindo painel de Partida Competitiva…");
+        context.reply("Opening Ranked Match panel…");
     }
 }

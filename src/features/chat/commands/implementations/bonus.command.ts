@@ -2,27 +2,27 @@ import { CommandContext, ICommand } from "@/features/chat/commands/command.types
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
 // Bonus types defined in getBonusData() — the spawn id prefix must match one of these.
-const BONUS_TYPES = ["crystall", "gold", "health", "nitro", "damage", "armor", "special", "moon", "pumpkin"];
+const BONUS_TYPES = ["crystal", "gold", "health", "nitro", "damage", "armor", "special", "moon", "pumpkin"];
 
 /** Test command: drops bonuses of <type> — N at random map areas, or one at your position/coords.
- *  Uso: /bonus <type> [quantidade] | /bonus <type> pos [x y z]. */
+ *  Usage: /bonus <type> [amount] (random around the map areas) or /bonus <type> pos [x y z] (at your position/coordinates). */
 export default class BonusCommand implements ICommand {
     name = "bonus";
-    description = `Spawna drops. Uso: /bonus <${BONUS_TYPES.join("|")}> [quantidade] (aleatório pelas áreas do mapa) ou /bonus <type> pos [x y z] (na sua posição/coordenadas).`;
+    description = `Spawns drops. Usage: /bonus <${BONUS_TYPES.join("|")}> [amount] (random around the map areas) or /bonus <type> pos [x y z] (at your position/coordinates).`;
     permissionLevel = ChatModeratorLevel.MODERATOR;
-    usage = `[${BONUS_TYPES.join("/")}] [quantidade | pos [x y z]]`;
+    usage = `[${BONUS_TYPES.join("/")}] [amount | pos [x y z]]`;
     example = "/bonus gold 5";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const client = context.executor;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
         const type = (args[0] ?? "").toLowerCase();
         if (!BONUS_TYPES.includes(type)) {
-            context.reply(`Tipo inválido. Use um de: ${BONUS_TYPES.join(", ")}.`);
+            context.reply(`Invalid type. Use one of: ${BONUS_TYPES.join(", ")}.`);
             return;
         }
 
@@ -32,31 +32,31 @@ export default class BonusCommand implements ICommand {
             if (args.length >= 5) {
                 const x = Number(args[2]); const y = Number(args[3]); const z = Number(args[4]);
                 if ([x, y, z].some((n) => Number.isNaN(n))) {
-                    context.reply("Coordenadas inválidas. Uso: /bonus <type> pos [x y z].");
+                    context.reply("Invalid coordinates. Usage: /bonus <type> pos [x y z].");
                     return;
                 }
                 position = { x, y, z };
             }
             if (!position) {
-                context.reply("Você não está em campo (sem posição).");
+                context.reply("You are not on the field (no position).");
                 return;
             }
             const id = context.server.battleService.bonus.spawnBonus(client.currentBattle, type, position);
-            context.reply(`Drop "${id}" criado.`);
+            context.reply(`Drop "${id}" created.`);
             return;
         }
 
-        // "/bonus <type> [quantidade]" — N drops at random points inside the map's bonus areas.
+        // "/bonus <type> [amount]" — N drops at random points inside the map's bonus areas.
         const count = args[1] !== undefined ? Number(args[1]) : 1;
         if (!Number.isInteger(count) || count < 1 || count > 100) {
-            context.reply("Quantidade inválida (1 a 100). Uso: /bonus <type> [quantidade].");
+            context.reply("Invalid amount (1 to 100). Usage: /bonus <type> [amount].");
             return;
         }
         const dropped = context.server.battleService.bonus.spawnRandom(client.currentBattle, type, count);
         if (dropped === 0) {
-            context.reply("Este mapa não tem áreas de drop para o modo atual.");
+            context.reply("This map has no drop areas for the current mode.");
             return;
         }
-        context.reply(`${dropped} drop(s) de "${type}" criado(s) em áreas aleatórias do mapa.`);
+        context.reply(`${dropped} drop(s) of "${type}" created in random map areas.`);
     }
 }

@@ -4,29 +4,29 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Lifts a user's punishment so they can log in again. */
 export default class UnbanCommand implements ICommand {
     name = "unban";
-    description = "Remove a punição de um usuário. Uso: /unban <username>.";
+    description = "Removes a user's ban. Usage: /unban <username>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<username>";
     example = "/unban Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /unban <username>.");
+            context.reply("Usage: /unban <username>.");
             return;
         }
         const user = await context.server.userService.findUserByUsername(args[0]);
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
         if (!user.isPunished) {
-            context.reply(`${user.username} não está punido.`);
+            context.reply(`${user.username} is not banned.`);
             return;
         }
         user.isPunished = false;
         user.punishmentExpiresAt = null;
         user.punishmentReason = null;
         await user.save();
-        context.reply(`Punição de ${user.username} removida.`);
+        context.reply(`Ban removed for ${user.username}.`);
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Bush Winter" resource-id="7a4252" version="5"/>
+  <library name="Cliffs Winter" resource-id="fe8ec1" version="1"/>
+  <library name="Grass Tiles Winter" resource-id="1eea65" version="1"/>
+  <library name="Village Builds Winter" resource-id="c6264c" version="1"/>
+  <library name="Promotion Winter" resource-id="b814be" version="55"/>
+  <library name="Roadblock Winter" resource-id="2a2aa1" version="1"/>
+</proplibs>

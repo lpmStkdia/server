@@ -3,10 +3,10 @@ import { teleportTank } from "@/features/battle/teleport.util";
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** Teleports the caller to a CTF flag's current position. Uso: /tpflag <red|blue>. */
+/** Teleports the caller to a CTF flag's current position. Usage: /tpflag <red|blue>. */
 export default class TpFlagCommand implements ICommand {
     name = "tpflag";
-    description = "Teleporta você até a posição da bandeira. Uso: /tpflag <red|blue>.";
+    description = "Teleports you to the flag position. Usage: /tpflag <red|blue>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "[red/blue]";
     example = "/tpflag red";
@@ -15,12 +15,12 @@ export default class TpFlagCommand implements ICommand {
         const client = context.executor;
         const battle = client.currentBattle;
         if (!client.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
         if (battle.settings.battleMode !== BattleMode.CTF) {
-            context.reply("Esta batalha não é Capture the Flag.");
+            context.reply("This match is not Capture the Flag.");
             return;
         }
 
@@ -28,18 +28,18 @@ export default class TpFlagCommand implements ICommand {
         const isRed = which === "red" || which === "r";
         const isBlue = which === "blue" || which === "b";
         if (!isRed && !isBlue) {
-            context.reply("Uso: /tpflag <red|blue>.");
+            context.reply("Usage: /tpflag <red|blue>.");
             return;
         }
 
         const flagPosition = isRed ? battle.flagPositionRed : battle.flagPositionBlue;
-        const flagName = isRed ? "vermelha" : "azul";
+        const flagName = isRed ? "red" : "blue";
         if (!flagPosition) {
-            context.reply(`A bandeira ${flagName} está sendo carregada.`);
+            context.reply(`The ${flagName} flag is being carried.`);
             return;
         }
 
         teleportTank(client, flagPosition);
-        context.reply(`Teleportando até a bandeira ${flagName}...`);
+        context.reply(`Teleporting to the ${flagName} flag...`);
     }
 }

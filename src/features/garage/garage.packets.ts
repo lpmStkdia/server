@@ -23,6 +23,9 @@ export type FitItemPacket = InstanceType<typeof FitItemPacket>;
 export const RequestGaragePacket = packetClass(defs.garage.RequestGarage);
 export type RequestGaragePacket = InstanceType<typeof RequestGaragePacket>;
 
+export const OpenGarageAtItemPacket = packetClass(defs.garage.OpenGarageAtItem);
+export type OpenGarageAtItemPacket = InstanceType<typeof OpenGarageAtItemPacket>;
+
 export const ShopItemsPacket = packetClass(defs.garage.ShopItems);
 export type ShopItemsPacket = InstanceType<typeof ShopItemsPacket>;
 

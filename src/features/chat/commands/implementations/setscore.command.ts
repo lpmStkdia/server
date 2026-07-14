@@ -5,25 +5,25 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Sets the team scores of the current battle (team modes; RED=0, BLUE=1 on the wire). */
 export default class SetScoreCommand implements ICommand {
     name = "setscore";
-    description = "Define o placar dos times da partida atual (modos de time). Uso: /setscore <red> <blue>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    description = "Sets the team scores of the current battle (team modes). Usage: /setscore <red> <blue>.";
+    permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<red> <blue>";
     example = "/setscore 5 3";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const battle = context.executor.currentBattle;
         if (!context.executor.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a battle.");
             return;
         }
         if (!battle.isTeamMode()) {
-            context.reply("Esta batalha não é de times.");
+            context.reply("This battle is not a team mode.");
             return;
         }
         const red = parseInt(args[0], 10);
         const blue = parseInt(args[1], 10);
         if (isNaN(red) || isNaN(blue) || red < 0 || blue < 0) {
-            context.reply("Uso: /setscore <red> <blue> (números >= 0).");
+            context.reply("Usage: /setscore <red> <blue> (numbers >= 0).");
             return;
         }
 
@@ -31,6 +31,6 @@ export default class SetScoreCommand implements ICommand {
         battle.scoreBlue = blue;
         battle.broadcast(new SetCtfScorePacket({ team: 0, score: red }));
         battle.broadcast(new SetCtfScorePacket({ team: 1, score: blue }));
-        context.reply(`Placar definido: vermelho ${red} × ${blue} azul.`);
+        context.reply(`Score set: red ${red} × ${blue} blue.`);
     }
 }

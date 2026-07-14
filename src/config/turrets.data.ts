@@ -19,8 +19,8 @@ export interface TurretConfig {
 
 export const turretsData: TurretConfig[] = [
     {
-        id: "smoky", name: "Canhão-fumegante", category: "weapon", index: 100, type: 1,
-        description: "Canhão de tanque de médio calibre que geralmente é usado em tanques leves e de treinamento. A chave para sua popularidade é o baixo preço e a facilidade de manutenção. Coloque-o em um casco leve e use uma estratégia de desgaste contra tanques pesados e desajeitados de seus oponentes. Vários upgrades podem aumentar significativamente o dano causado por este bebezinho. Lembre-se que a eficácia do canhão-fumegante diminui com a distância.",
+      id: "smoky", name: "Smoky", category: "weapon", index: 100, type: 1,
+      description: "A medium-caliber tank cannon commonly mounted on light and training hulls. Its popularity comes from low cost and easy maintenance. Mount it on a light hull and use attrition tactics against heavy, clumsy opponents. Several upgrades increase its damage significantly. Effectiveness decreases at longer ranges.",
         mods: [
             { rank: 1, price: 0, nextPrice: 7100, nextRank: 8, kickback: 1.1, turretTurnAcceleration: 2,
               properts: [{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"16","subproperties":null},{"property":"DAMAGE_TO","value":"20","subproperties":null}]},{"property":"IMPACT_FORCE","value":"150","subproperties":null},{"property":"TURRET_TURN_SPEED","value":"57.3","subproperties":null},{"property":"CRITICAL_HIT_CHANCE","value":"5","subproperties":null},{"property":"CRITICAL_HIT_DAMAGE","value":"36","subproperties":null}] },
@@ -33,8 +33,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "flamethrower", name: "Lança-chamas", category: "weapon", index: 150, type: 1,
-        description: "Quando as batalhas acontecem de perto, não há arma melhor do que um pássaro de fogo. Esta é uma arma de aniquilação em massa que pode e vai derreter qualquer tanque e sua tripulação em pouco tempo. É altamente eficaz em espaços confinados contra movimentos lentos Firebird é relativamente lento quando se trata de recarregar, mas você também pode atirar com uma arma parcialmente recarregada.",
+      id: "flamethrower", name: "Flamethrower", category: "weapon", index: 150, type: 1,
+      description: "When battles occur up close, few weapons are better than the flamethrower. This area-of-effect weapon can melt enemy tanks and crews quickly. Highly effective in tight spaces against slow targets. The weapon has a relatively slow reload, but partial charges can still be fired.",
         mods: [
             { rank: 1, price: 150, nextPrice: 7100, nextRank: 8, kickback: 0, turretTurnAcceleration: 2.63,
               properts: [{"property":"DAMAGE_PER_SECOND","value":null,"subproperties":[{"property":"DAMAGE_PER_PERIOD","value":"32","subproperties":null}]},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"12.99","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"75.6","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"17","subproperties":null}]},{"property":"FIRE_DAMAGE","value":null,"subproperties":[{"property":"FLAME_TEMPERATURE_LIMIT","value":"6.2","subproperties":null}]}] },
@@ -47,8 +47,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "twins", name: "Gêmeos", category: "weapon", index: 200, type: 1,
-        description: "Esta arma de plasma de dois canos de disparo rápido derreterá o inimigo em segundos. Levando em conta o fato de que, ao atingir outros tanques com Twins, você derruba a mira, a arma é ideal quando se trata de tiroteio dinâmico a distâncias médias.",
+      id: "twins", name: "Twins", category: "weapon", index: 200, type: 1,
+      description: "A fast-firing dual-barrel plasma weapon that can overwhelm enemies in seconds. Note that hits from Twins can disrupt the aiming reticle, making it ideal for dynamic medium-range skirmishes.",
         mods: [
             { rank: 2, price: 350, nextPrice: 12350, nextRank: 9, kickback: 0.31, turretTurnAcceleration: 2.56,
               properts: [{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"6.5","subproperties":null},{"property":"DAMAGE_TO","value":"7.6","subproperties":null}]},{"property":"IMPACT_FORCE","value":"83","subproperties":null},{"property":"TURRET_TURN_SPEED","value":"77.3","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"60.9","subproperties":null}]},{"property":"WEAPON_MIN_DAMAGE_PERCENT","value":"1.8","subproperties":null}] },
@@ -61,8 +61,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "railgun", name: "Canhão-elétrico", category: "weapon", index: 250, type: 1,
-        description: "Se armas de calibre médio não são suficientes para sua auto-expressão, esta arma é certa para você. Arma de grande calibre com enorme velocidade de boca e projéteis usando urânio empobrecido. Projéteis cinéticos extremamente poderosos e precisos podem atravessar o tanque do inimigo ou acerte vários alvos na linha de fogo com um único tiro. Uma escolha ideal para guerra de trincheiras de longo alcance e sniping. Lembre-se de que leva muito tempo para recarregar a arma e garantir que seus oponentes não tirem vantagem disso.",
+      id: "railgun", name: "Railgun", category: "weapon", index: 250, type: 1,
+      description: "If medium-caliber weapons aren't enough, this heavy-hitting railgun is for you. A large-caliber weapon with extreme muzzle velocity. Powerful, precise kinetic projectiles can pierce enemy tanks and hit multiple targets lined up. Ideal for long-range trench warfare and sniping. Note the long reload time — manage engagements carefully.",
         mods: [
             { rank: 3, price: 800, nextPrice: 17600, nextRank: 10, kickback: 1.9, turretTurnAcceleration: 1.11,
               properts: [{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"50","subproperties":null},{"property":"DAMAGE_TO","value":"81","subproperties":null}]},{"property":"IMPACT_FORCE","value":"280","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"6.23","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"45.3","subproperties":null},{"property":"WEAPON_WEAKENING_COEFF","value":"18.00","subproperties":null}] },
@@ -75,8 +75,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "isida", name: "Isida", category: "weapon", index: 300, type: 1,
-        description: "A ideia desta arma única surgiu nos tempos da guerra fria, mas só ganhou vida com o desenvolvimento da física quântica e das nanotecnologias. O coração desta máquina-maravilha é gerador de nanorrobôs capazes de reproduzir ou destruir a estrutura de qualquer material não biológico. A arma é equipada com emissor de impulso que permite transportar nanomassa no canal magnético a uma distância de cerca de vinte metros. Material molecular, derivado quando nanorrobôs estão funcionando no modo de destruição de alvos, é usado para fixar o próprio chassi do atirador . Assim, Isida causa dano a inimigos e cura aliados, o que a torna inestimável em batalhas de equipe.",
+      id: "isida", name: "Isida", category: "weapon", index: 300, type: 1,
+      description: "This unique weapon concept originated during the Cold War and came to life with quantum physics and nanotechnology. At its heart is a generator of nanorobots capable of repairing or destroying non-biological materials. Equipped with a pulse emitter that transports nanomass across a short channel, Isida deals damage to enemies while healing allies, making it invaluable in team battles.",
         mods: [
             { rank: 4, price: 1250, nextPrice: 22850, nextRank: 11, kickback: 0, turretTurnAcceleration: 2.64,
               properts: [{"property":"ISIS_HEALING_PER_SECOND","value":null,"subproperties":[{"property":"ISIS_HEALING_PER_PERIOD","value":"15","subproperties":null}]},{"property":"ISIS_DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_PER_PERIOD","value":"30","subproperties":null}]},{"property":"ISIS_SELF_HEALING_PERCENT","value":"33.00","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"10.75","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"82.5","subproperties":null}] },
@@ -89,8 +89,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "thunder", name: "Trovão", category: "weapon", index: 350, type: 1,
-        description: "sta arma de calibre médio de segunda geração é a melhor escolha para batalhas dinâmicas. Dano de respingo (certifique-se de não se acertar!) permite que você ataque um grupo de veículos inimigos. Recarga rápida lhe dará uma vantagem distinta sobre tanques pesados do inimigo. Equipado com armadura leve, o trovão é uma das armas mais perigosas no campo de batalha.",
+      id: "thunder", name: "Thunder", category: "weapon", index: 350, type: 1,
+      description: "This second-generation medium-caliber weapon is an excellent choice for dynamic battles. Splash damage (watch your positioning!) lets you hit groups of enemy vehicles. Fast reload gives you an edge over heavy enemy tanks. With light armor, Thunder is one of the most dangerous weapons on the field.",
         mods: [
             { rank: 5, price: 1450, nextPrice: 28100, nextRank: 12, kickback: 1.56, turretTurnAcceleration: 1.71,
               properts: [{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"32","subproperties":null},{"property":"DAMAGE_TO","value":"55","subproperties":null}]},{"property":"IMPACT_FORCE","value":"135","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"3.33","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"63","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"53.5","subproperties":null}]}] },
@@ -103,8 +103,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "shotgun", name: "Martelo", category: "weapon", index: 400, type: 1,
-        description: "A equipe por trás do desenvolvimento desta torreta anti-tanque, realmente penso fora da caixa. Em vez de usar armadura-perfurando escudos regulares, esta torreta dispara estilhaços, carregados com pentes de tungstênio. Estes são carregador para dentro da torreta usando um sistema de carregamento cilíndrico robótico. O resultado é uma torreta que praticamente martela tanques inimidos. Devido à sua mecânica única, esta é uma torreta que é melhor usada para combates de curto e médio alcance, porque perde o seu \"soco\" conforme aumenta a distância.",
+      id: "shotgun", name: "Hammer", category: "weapon", index: 400, type: 1,
+      description: "The team behind this anti-tank turret really thought outside the box. Instead of using conventional armor-piercing shields, this turret fires tungsten-packed shrapnel cartridges loaded by a robotic cylindrical feeder. The result is a turret that practically hammers enemy tanks. Due to its mechanics, it excels at short to medium range as it loses punch with distance.",
         mods: [
             { rank: 3, price: 800, nextPrice: 17600, nextRank: 10, kickback: 1.8, turretTurnAcceleration: 2.1,
               properts: [{"property":"DAMAGE_PER_SECOND","value":null,"subproperties":[{"property":"DAMAGE_PER_PERIOD","value":"44.1","subproperties":null}]},{"property":"IMPACT_FORCE","value":"18","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"2.26","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"75.1","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"46.7","subproperties":null}]}] },
@@ -117,8 +117,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "freeze", name: "Lança-gelo", category: "weapon", index: 450, type: 1,
-        description: "A ideia do sistema de armas Freeze nasceu em uma aldeia russa desolada. Usando uma velha geladeira quebrada «Sever» e um aspirador de pó «Buran», o inventor local fez o «atirador de gelo». Um engenheiro profissional que estava pescando perto da aldeia notou isso a invenção e a trouxe para o Instituto de Pesquisa Zhukov. Lá, o desajeitado \"atirador de gelo\" tornou-se a formidável arma de congelamento. Ela inunda o inimigo com a composição química baseada em freon. As vítimas sofrem danos e todos os seus movimentos e processos se tornam mais lentos. Embora um fluxo de fogo pode descongelar o alvo.",
+      id: "freeze", name: "Freeze", category: "weapon", index: 450, type: 1,
+      description: "The Freeze weapon concept started from a humble inventor and evolved into a formidable freezing system. It floods the enemy with a freon-based chemical composition. Victims take damage and suffer slowed movement and systems. A stream of fire can thaw frozen targets.",
         mods: [
             { rank: 5, price: 1450, nextPrice: 28100, nextRank: 12,
               properts: [{"property":"DAMAGE_PER_SECOND","value":null,"subproperties":[{"property":"DAMAGE_PER_PERIOD","value":"39","subproperties":null}]},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"12.50","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"108.3","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"18.4","subproperties":null}]}] },
@@ -131,8 +131,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "ricochet", name: "Ricochete", category: "weapon", index: 500, type: 1,
-        description: "A arma de plasma ricochete é um novo projeto secreto de cientistas siberianos. Para produzir esta equipe de armas de 22 profissionais de alta classe, trabalham no bunker subterrâneo há mais de três anos sem permissão para sair na superfície. E eles criaram uma arma única . Ele lança cargas de plasma camufladas com um campo negativo inteligente. Quando tal carga atinge o tanque, ela explode, mas salta de qualquer outra superfície. Então, com Ricochete, você pode aquecer alvos fora do seu alcance de visibilidade. Mas tenha cuidado! Não fique no como uma carga liberada, pois você não pode causar danos a si mesmo.",
+      id: "ricochet", name: "Ricochet", category: "weapon", index: 500, type: 1,
+      description: "The Ricochet plasma weapon is a secret project developed by scientists. It launches plasma charges cloaked by a negative field that explode on impact but bounce off other surfaces. With Ricochet you can hit targets outside direct line of sight. Be careful not to stand in the path of a released charge — you can damage yourself.",
         mods: [
             { rank: 6, price: 1700, nextPrice: 33350, nextRank: 13, kickback: 1.45, turretTurnAcceleration: 1.26,
               properts: [{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"16","subproperties":null},{"property":"DAMAGE_TO","value":"19","subproperties":null}]},{"property":"IMPACT_FORCE","value":"146","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"0.59","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"79.6","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"64.3","subproperties":null}]}] },
@@ -145,8 +145,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "machinegun", name: "Vulcão", category: "weapon", index: 550, type: 1,
-        description: "Um canhão de disparo rápido, perfeito para combates de médio e longo alcance. Ele tem um sistema de controle exclusivo que impede que o sistema de mira seja derrubado mesmo sob fogo inimigo pesado. Lembre-se de que o disparo prolongado pode causar superaquecimento e danificar seu tanque!",
+      id: "machinegun", name: "Vulcan", category: "weapon", index: 550, type: 1,
+      description: "A rapid-fire cannon ideal for medium and long-range engagements. It features a unique control system that prevents aim disruption under heavy enemy fire. Note that prolonged firing can overheat and damage your tank.",
         mods: [
             { rank: 4, price: 1250, nextPrice: 22850, nextRank: 11,
               properts: [{"property":"DAMAGE_PER_SECOND","value":null,"subproperties":[{"property":"DAMAGE_PER_PERIOD","value":"27","subproperties":null}]},{"property":"IMPACT_FORCE","value":"55","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"4.39","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"76.2","subproperties":null},{"property":"SHOT_RANGE","value":null,"subproperties":[{"property":"WEAPON_MIN_DAMAGE_RADIUS","value":"130.4","subproperties":null}]}] },
@@ -159,8 +159,8 @@ export const turretsData: TurretConfig[] = [
         ],
     },
     {
-        id: "shaft", name: "Shaft", category: "weapon", index: 600, type: 1,
-        description: "A arma Shaft foi projetada por cientistas que deram suas enormes possibilidades. Ela pode fazer café, entregar pizzas, pagar contas, mas sua principal característica é o modo sniper, que permite que você fique um passo à frente de seus oponentes. Tenha uma oportunidade única para lutar a longas e curtas distâncias, pois você pode disparar do Shaft sem usar sua mira de atirador.",
+      id: "shaft", name: "Shaft", category: "weapon", index: 600, type: 1,
+      description: "The Shaft was designed by visionary scientists and offers many capabilities. Its defining feature is the sniper mode, allowing you to gain the upper hand on opponents. It provides unique opportunities at both long and short ranges since Shaft can fire effectively without using a traditional sniper sight.",
         mods: [
             { rank: 7, price: 1900, nextPrice: 38600, nextRank: 14, kickback: 2.11, turretTurnAcceleration: 1.46,
               properts: [{"property":"AIMING_MODE_DAMAGE","value":null,"subproperties":[{"property":"SHAFT_AIMING_MODE_MAX_DAMAGE","value":"153","subproperties":null}]},{"property":"DAMAGE","value":null,"subproperties":[{"property":"DAMAGE_FROM","value":"44","subproperties":null},{"property":"DAMAGE_TO","value":"54","subproperties":null}]},{"property":"IMPACT_FORCE","value":"167","subproperties":null},{"property":"WEAPON_CHARGE_RATE","value":null,"subproperties":[{"property":"WEAPON_RELOAD_TIME","value":"3.74","subproperties":null}]},{"property":"TURRET_TURN_SPEED","value":"67","subproperties":null}] },
@@ -190,12 +190,12 @@ function xtTurretVariant(baseId: string, name: string, index: number, descriptio
 }
 
 turretsData.push(
-    xtTurretVariant("machinegun", "Vulcão XT", 60, "O Vulcão XT de elite. Os canos com acabamento exclusivo denunciam um veterano — e giram tão implacavelmente quanto os do modelo original."),
-    xtTurretVariant("flamethrower", "Lança-chamas XT", 70, "O exclusivo Lança-chamas XT. O acabamento especial das placas resiste ao calor extremo e dá à arma um brilho inconfundível no campo de batalha."),
-    xtTurretVariant("railgun", "Canhão-elétrico XT", 80, "A versão XT de elite do Canhão-elétrico, com pintura exclusiva reservada aos atiradores que dispensam apresentações."),
-    xtTurretVariant("thunder", "Trovão XT", 90, "O exclusivo Trovão XT. A pintura de cerimônia esconde um canhão idêntico ao original — a diferença está no medo que ele inspira."),
-    xtTurretVariant("ricochet", "Ricochete XT", 95, "O exclusivo Ricochete XT. O acabamento prateado de elite reveste um emissor de plasma idêntico ao original — a assinatura é só de quem já dominou o quique."),
-    xtTurretVariant("isida", "Isida XT", 100, "A exclusiva Isida XT. O acabamento de elite reveste o mesmo gerador de nanorrobôs do original — cura aliados e destrói inimigos com a assinatura de quem domina o campo."),
+  xtTurretVariant("machinegun", "Vulcan XT", 60, "The elite Vulcan XT. Its finished barrels mark a veteran — and they spin as relentlessly as the original model."),
+  xtTurretVariant("flamethrower", "Flamethrower XT", 70, "The exclusive Flamethrower XT. Special heat-resistant plating gives the weapon a distinctive battlefield glow."),
+  xtTurretVariant("railgun", "Railgun XT", 80, "The elite Railgun XT variant, with exclusive paint reserved for marksmen who need no introduction."),
+  xtTurretVariant("thunder", "Thunder XT", 90, "The exclusive Thunder XT. The ceremonial paint hides a cannon identical to the original — the difference is the fear it inspires."),
+  xtTurretVariant("ricochet", "Ricochet XT", 95, "The exclusive Ricochet XT. Elite silver finish coats a plasma emitter identical to the original — a signature for those who mastered the bounce."),
+  xtTurretVariant("isida", "Isida XT", 100, "The exclusive Isida XT. Elite finish wraps the same nanorobot generator as the original — healing allies and destroying foes with the mark of a master."),
 );
 
 const byId = new Map(turretsData.map((t) => [t.id, t]));

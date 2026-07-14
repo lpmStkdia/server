@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Tiles" resource-id="86b1b" version="2"/>
+  <library name="Land Rocks" resource-id="fcabd4" version="3"/>
+  <library name="zamin" resource-id="678439" version="4"/>
+  <library name="City Buildings" resource-id="54c5c7" version="2"/>
+  <library name="Desert Houses" resource-id="333c43" version="1"/>
+  <library name="NuBu 9" resource-id="b7b436" version="2"/>
+</proplibs>

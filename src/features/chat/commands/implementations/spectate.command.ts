@@ -8,20 +8,19 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  clicking "spectate" manually, minus the lobby round-trip. */
 export default class SpectateCommand implements ICommand {
     name = "spectate";
-    description = "Vira espectador da partida em que você está jogando. Uso: /spectate.";
+    description = "Becomes a spectator of the match you're currently playing. Usage: /spectate.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
-    example = "/spectate";
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const client = context.executor;
         const { server } = context;
         const battle = client.currentBattle;
         if (!client.user || !battle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
         if (client.isSpectator) {
-            context.reply("Você já é espectador.");
+            context.reply("You are already a spectator.");
             return;
         }
 
@@ -41,9 +40,9 @@ export default class SpectateCommand implements ICommand {
             client.isSpectator = true;
             server.battleService.broadcastSpectatorListUpdate(rejoined, client);
             await BattleWorkflow.enterBattle(client, server, rejoined, true);
-            context.reply("Agora você é espectador. Use /finish ou saia normalmente para voltar.");
+            context.reply("You are now a spectator. Use /finish or leave normally to return.");
         } catch (error: any) {
-            context.reply(`Erro ao entrar como espectador: ${error.message}`);
+            context.reply(`Error entering as spectator: ${error.message}`);
         }
     }
 }

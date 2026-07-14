@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Tiles" resource-id="86b1b" version="2"/>
+  <library name="Outer Walls" resource-id="5ce8e8" version="5"/>
+  <library name="Land Rocks" resource-id="fcabd4" version="3"/>
+  <library name="Industrial Bridge" resource-id="7761eb" version="3"/>
+  <library name="Broken Walls" resource-id="3de9a7" version="2"/>
+  <library name="Waffle Fence" resource-id="aa0658" version="6"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Desert Houses" resource-id="333c43" version="1"/>
+  <library name="Hangars" resource-id="efb4d0" version="1"/>
+  <library name="Industrial Elements" resource-id="133cff" version="3"/>
+  <library name="Stuffs" resource-id="bcdbf8" version="1"/>
+  <library name="City Builds" resource-id="e38285" version="2"/>
+  <library name="City Buildings" resource-id="54c5c7" version="2"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+  <library name="Trees" resource-id="5bb044" version="1"/>
+  <library name="Village Builds" resource-id="766a25" version="2"/>
+</proplibs>

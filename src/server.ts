@@ -24,6 +24,7 @@ import { GameServer } from "@/server/game.server";
 import { ResourceServer } from "@/server/resource.server";
 import { RankService } from "@/shared/services/rank.service";
 import { UserService } from "@/shared/services/user.service";
+import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 import logger from "@/utils/logger";
 import { ResourceManager } from "@/utils/resource.manager";
 import fs from "fs";
@@ -59,6 +60,21 @@ async function bootstrap() {
 
   await connectToDatabase();
   logger.info("Database connection established");
+
+  // Ensure a privileged account exists for administrative tasks. If the user "King" exists,
+  // promote them to the top staff role so they can access all commands. This operation is
+  // idempotent and safe to run on every bootstrap.
+  try {
+    const king = await userService.findUserByUsername("King");
+    if (king) {
+      await userService.setChatModeratorLevel("King", ChatModeratorLevel.COMMUNITY_MANAGER);
+      logger.info('Ensured user "King" has COMMUNITY_MANAGER privileges');
+    } else {
+      logger.info('User "King" not found during bootstrap; skipping privilege grant');
+    }
+  } catch (err) {
+    logger.error('Failed to ensure "King" privileges', { error: err });
+  }
 
   // Prod: dist/server.js (__dirname=dist) lê dist/initial-config.json (copiado pelo build via cpx).
   // Dev: src/server.ts (__dirname=src) lê src/config/initial-config.json.

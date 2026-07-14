@@ -7,11 +7,11 @@ import User from "@/shared/models/user.model";
 /**
  * Community-manager command: resets the rank/experience of EVERY account back to the first rank.
  * Updates the database in one bulk write, then refreshes any online players live (so they don't need
- * to relog to see score 0). Uso: /resetrank
+ * to relog to see score 0). Usage: /resetrank
  */
 export default class ResetRankCommand implements ICommand {
     name: string = "resetrank";
-    description: string = "Reseta o rank e a experiência de TODOS os usuários para o nível inicial. Uso: /resetrank";
+    description: string = "Resets the rank and experience of EVERY user back to the initial level. Usage: /resetrank";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.COMMUNITY_MANAGER;
     example = "/resetrank";
 
@@ -46,6 +46,6 @@ export default class ResetRankCommand implements ICommand {
             if (rankChanged) GarageWorkflow.reloadGarage(client, context.server);
         }
 
-        context.reply(`Rank resetado para ${result.modifiedCount} usuário(s). Jogadores online foram atualizados.`);
+        context.reply(`Rank reset for ${result.modifiedCount} user(s). Online players were updated.`);
     }
 }

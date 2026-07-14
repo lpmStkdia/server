@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Rise" resource-id="ff319b" version="1"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Land Rocks" resource-id="fcabd4" version="3"/>
+  <library name="Land Tiles" resource-id="86b1b" version="2"/>
+  <library name="Outer Walls" resource-id="5ce8e8" version="5"/>
+  <library name="Land Hills" resource-id="daaad1" version="1"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+</proplibs>

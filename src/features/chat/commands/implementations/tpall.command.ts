@@ -5,16 +5,15 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Teleports every active player in the battle to the caller's position. */
 export default class TpAllCommand implements ICommand {
     name = "tpall";
-    description = "Teleporta todos os jogadores da batalha até você. Uso: /tpall.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    example = "/tpall";
+    description = "Teleports every player in the match to you. Usage: /tpall.";
+    permissionLevel = ChatModeratorLevel.MODERATOR;
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const client = context.executor;
         const battle = client.currentBattle;
         const pos = client.battlePosition;
         if (!client.user || !battle || !pos) {
-            context.reply("Você precisa estar em uma batalha, em campo.");
+            context.reply("You must be in a match, on the field.");
             return;
         }
 
@@ -24,6 +23,6 @@ export default class TpAllCommand implements ICommand {
             teleportTank(other, pos);
             moved++;
         }
-        context.reply(moved > 0 ? `${moved} jogador(es) teleportado(s) até você.` : "Nenhum outro jogador ativo na batalha.");
+        context.reply(moved > 0 ? `${moved} player(s) teleported to you.` : "No other active players in the match.");
     }
 }

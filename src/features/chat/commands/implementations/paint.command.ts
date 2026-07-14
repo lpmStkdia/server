@@ -15,7 +15,7 @@ import { ResourceManager } from "@/utils/resource.manager";
  */
 export default class PaintCommand implements ICommand {
     name = "paint";
-    description = "Equipa uma pintura de teste (padrão 'holiday') e aplica na batalha atual. Uso: /paint [paintId].";
+    description = "Equips a test paint (default 'holiday') and applies it in the current match. Usage: /paint [paintId].";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "[paintId]";
     example = "/paint spectrum";
@@ -25,7 +25,7 @@ export default class PaintCommand implements ICommand {
         const server = context.server;
         const user = client.user;
         if (!user) {
-            context.reply("Erro: usuário não encontrado.");
+            context.reply("Error: user not found.");
             return;
         }
 
@@ -39,12 +39,12 @@ export default class PaintCommand implements ICommand {
         try {
             await server.garageService.equipItem(user, `${paintId}_m0`);
         } catch (error: any) {
-            context.reply(`Erro ao equipar a pintura "${paintId}": ${error.message}`);
+            context.reply(`Error equipping paint "${paintId}": ${error.message}`);
             return;
         }
 
         if (!client.currentBattle) {
-            context.reply(`Pintura "${paintId}" equipada. Entre em uma batalha para vê-la.`);
+            context.reply(`Paint "${paintId}" equipped. Enter a match to see it.`);
             return;
         }
 
@@ -59,6 +59,6 @@ export default class PaintCommand implements ICommand {
         });
         client.sendPacket(new LoadDependencies({ resources: ResourceManager.getBulkResources([textureId]) }, callbackId));
 
-        context.reply(`Pintura "${paintId}" equipada — carregando textura e respawnando para aplicar.`);
+        context.reply(`Paint "${paintId}" equipped — loading texture and respawning to apply.`);
     }
 }

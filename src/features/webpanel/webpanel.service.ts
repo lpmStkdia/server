@@ -22,9 +22,7 @@ function withToken(client: PanelClient, cfg: Partial<IWebPanelConfig>): Partial<
  * log (button click, battle entry, ...).
  */
 export function sendWebPanel(client: PanelClient, overrides: Partial<IWebPanelConfig> = {}, reason = "manual"): void {
-  const packet = OpenWebPanel.default(withToken(client, overrides));
-  logger.info(`[webpanel] sending panel (${reason}) to ${client.user?.username ?? "?"}: ${packet.url}`);
-  client.sendPacket(packet);
+  logger.info(`[webpanel] suppressed opening panel (${reason}) for ${client.user?.username ?? "?"}`);
 }
 
 /**
@@ -34,7 +32,7 @@ export function sendWebPanel(client: PanelClient, overrides: Partial<IWebPanelCo
  * de uma URL sem token que daria 401. Envie {width,height,x,y} conforme desejado.
  */
 export function repositionWebPanel(client: PanelClient, cfg: Partial<IWebPanelConfig>): void {
-  client.sendPacket(OpenWebPanel.default(withToken(client, cfg)));
+  logger.info(`[webpanel] suppressed repositioning panel for ${client.user?.username ?? "?"}`);
 }
 
 /**

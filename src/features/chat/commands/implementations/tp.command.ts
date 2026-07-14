@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Teleports the caller's own tank to (x,y,z) — all three coordinates required. */
 export default class TpCommand implements ICommand {
     name = "tp";
-    description = "Teleporta seu tanque para (x,y,z). Uso: /tp <x> <y> <z>.";
+    description = "Teleports your tank to (x,y,z). Usage: /tp <x> <y> <z>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "<x> <y> <z>";
     example = "/tp 100 0 200";
@@ -13,12 +13,12 @@ export default class TpCommand implements ICommand {
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const client = context.executor;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
         if (args.length < 3) {
-            context.reply("Uso: /tp <x> <y> <z>.");
+            context.reply("Usage: /tp <x> <y> <z>.");
             return;
         }
 
@@ -26,11 +26,11 @@ export default class TpCommand implements ICommand {
         const y = Number(args[1]);
         const z = Number(args[2]);
         if ([x, y, z].some((n) => Number.isNaN(n))) {
-            context.reply("Coordenadas inválidas. Uso: /tp <x> <y> <z>.");
+            context.reply("Invalid coordinates. Usage: /tp <x> <y> <z>.");
             return;
         }
 
         teleportTank(client, { x, y, z });
-        context.reply(`Teleportando para (${x}, ${y}, ${z})...`);
+        context.reply(`Teleporting to (${x}, ${y}, ${z})...`);
     }
 }

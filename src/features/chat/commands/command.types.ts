@@ -15,7 +15,7 @@ export interface ICommand {
 
     /**
      * Parameter spec shown by /help, e.g. "<username> [none/moderator/administrator/cm]". Convention:
-     * <obrigatório>, [opcional], and choice lists as [opt1/opt2/...]. Omit for no-parameter commands.
+     * <required>, [optional], and choice lists as [opt1/opt2/...]. Omit for no-parameter commands.
      */
     usage?: string;
     /** A concrete example invocation shown by /help, e.g. "/role Joao moderator". */

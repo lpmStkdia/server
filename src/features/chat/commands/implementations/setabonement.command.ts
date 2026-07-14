@@ -3,15 +3,16 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 import { isCrystalAbonementActive } from "@/shared/models/passes";
 
 /**
- * Ativa (ou desativa) o abonement de Dobro de Cristais na PRÓPRIA conta — para testar a UI (card no
- * depósito + indicador de dobro no shop). Seta `crystalAbonementExpiresAt`. O efeito aparece ao REABRIR
- * a garagem/loja (não há pacote incremental para isso). Dobra só cristais de DOAÇÃO, não ganhos em jogo.
+ * Activates (or deactivates) the Double Crystals abonement on YOUR OWN account — for testing the UI
+ * (deposit card + double indicator in the shop). Sets `crystalAbonementExpiresAt`. The effect appears
+ * when REOPENING the garage/shop (there is no incremental packet for it). Only doubles DONATION
+ * crystals, not crystals earned in-game.
  */
 export default class SetAbonementCommand implements ICommand {
     name = "setabonement";
-    description = "Ativa o Dobro de Cristais na sua conta por N horas (padrão 24; 0 desativa). Uso: /setabonement [horas].";
+    description = "Sets Double Crystals on your account for N hours (default 24; 0 disables). Usage: /setabonement [hours].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "[horas]";
+    usage = "[hours]";
     example = "/setabonement 24";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
@@ -20,7 +21,7 @@ export default class SetAbonementCommand implements ICommand {
 
         const hours = args[0] !== undefined ? parseInt(args[0], 10) : 24;
         if (isNaN(hours)) {
-            context.reply("Uso: /setabonement [horas] (padrão 24; 0 desativa).");
+            context.reply("Usage: /setabonement [hours] (default 24; 0 disables).");
             return;
         }
 
@@ -28,14 +29,14 @@ export default class SetAbonementCommand implements ICommand {
             if (hours <= 0) {
                 user.crystalAbonementExpiresAt = null;
                 await user.save();
-                context.reply("Dobro de Cristais desativado. Reabra a garagem/loja para atualizar.");
+                context.reply("Double Crystals disabled. Reopen garage/shop to refresh.");
                 return;
             }
             user.crystalAbonementExpiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
             await user.save();
-            context.reply(`Dobro de Cristais ativado por ${hours}h (ativo=${isCrystalAbonementActive(user)}). Reabra a garagem/loja para atualizar.`);
+            context.reply(`Double Crystals enabled for ${hours}h (active=${isCrystalAbonementActive(user)}). Reopen garage/shop to refresh.`);
         } catch (error: any) {
-            context.reply(`Erro: ${error.message}`);
+            context.reply(`Error: ${error.message}`);
         }
     }
 }

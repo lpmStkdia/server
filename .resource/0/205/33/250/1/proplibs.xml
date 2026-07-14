@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Slopes Rises" resource-id="707ec0" version="2"/>
+  <library name="Concrete Tiles" resource-id="b358e6" version="2"/>
+  <library name="Grass Tiles" resource-id="61cf84" version="1"/>
+  <library name="Village Builds" resource-id="766a25" version="2"/>
+  <library name="Cliffs" resource-id="35ed07" version="2"/>
+  <library name="Concrete Walls" resource-id="65b190" version="3"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Fort" resource-id="fe7f2d" version="1"/>
+  <library name="Small Bridge" resource-id="fe1e40" version="5"/>
+  <library name="Fachwerk House 1" resource-id="d885ca" version="2"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+  <library name="City Builds" resource-id="e38285" version="2"/>
+  <library name="Fachwerk House 2" resource-id="d1d470" version="2"/>
+  <library name="NuBu 10" resource-id="ec7704" version="1"/>
+  <library name="NuBu 9" resource-id="b7b436" version="2"/>
+</proplibs>

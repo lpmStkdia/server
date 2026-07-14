@@ -5,11 +5,11 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /**
  * Admin command: broadcasts the "server is restarting in N seconds" warning (HaltServerPacket) to
  * everyone and opens the restart window on the server. While the window is open, creating or joining
- * a battle is refused (handled in the create/enter battle handlers). Uso: /update [seconds]
+ * a battle is refused (handled in the create/enter battle handlers). Usage: /update [seconds]
  */
 export default class UpdateCommand implements ICommand {
     name: string = "update";
-    description: string = "Anuncia o reinício do servidor e bloqueia entrar/criar partidas. Uso: /update [seconds]";
+    description: string = "Announces a server restart and prevents joining/creating matches. Usage: /update [seconds]";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "[seconds]";
     example = "/update 60";
@@ -25,6 +25,6 @@ export default class UpdateCommand implements ICommand {
         // RoundService.restartRound evacuates everyone to the battle list instead of recommencing.
         context.server.battleService.endAllBattlesForRestart();
 
-        context.reply(`Reinício anunciado: ${seconds}s. Partidas encerradas; jogadores voltam à lista de batalhas em ~10s. Entrar/criar bloqueado.`);
+        context.reply(`Restart announced: ${seconds}s. Matches ending; players return to battle list in ~10s. Join/create blocked.`);
     }
 }

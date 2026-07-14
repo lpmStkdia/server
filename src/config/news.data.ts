@@ -16,8 +16,8 @@ export interface NewsItem {
 export const newsData: NewsItem[] = [
     {
         id: "welcome",
-        imageUrl: "http://146.59.110.103/icons/xt.png",
-        date: "11.07.2026",
-        textHtml: "<div><b>Bem-vindo ao LeTanki!</b><br/>Divirta-se nas batalhas.</div>",
+        imageUrl: "https://i.8upload.com/image/b3343f9b5cabc9ec/welcome.png",
+        date: "13.07.2026",
+        textHtml: "<div><b>Welcome to SkidTanks</b><br/>Dont forget to join our discord server!<br/>https://discord.gg/Tp7U6EyJkT</div>",
     },
 ];

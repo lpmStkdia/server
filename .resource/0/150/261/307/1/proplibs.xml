@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Rise Winter" resource-id="3ab634" version="1"/>
+  <library name="Bush Winter" resource-id="7a4252" version="5"/>
+  <library name="Land Rocks Winter" resource-id="b2e494" version="3"/>
+  <library name="Land Tiles Winter" resource-id="f30b28" version="3"/>
+  <library name="Outer Walls Winter" resource-id="caf48f" version="4"/>
+  <library name="Land Hills Winter" resource-id="421d0e" version="1"/>
+  <library name="Promotion Winter" resource-id="b814be" version="55"/>
+</proplibs>

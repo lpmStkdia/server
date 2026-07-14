@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  refused — use /destroy to blow it up (it respawns on its own). */
 export default class SpawnCommand implements ICommand {
     name = "spawn";
-    description = "Força o respawn de um jogador travado (morto/aguardando; vazio = você). Uso: /spawn [username].";
+    description = "Forces a respawn for a stuck player (dead/waiting; empty = you). Usage: /spawn [username].";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "[username]";
     example = "/spawn Joao";
@@ -14,7 +14,7 @@ export default class SpawnCommand implements ICommand {
         const client = context.executor;
         const { server } = context;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
@@ -22,21 +22,21 @@ export default class SpawnCommand implements ICommand {
         if (args.length >= 1) {
             const found = server.findClientByUsername(args[0]);
             if (!found?.user || found.currentBattle?.battleId !== client.currentBattle.battleId) {
-                context.reply(`Jogador "${args[0]}" não está nesta batalha.`);
+                context.reply(`Player "${args[0]}" is not in this match.`);
                 return;
             }
             target = found;
         }
         if (target.isSpectator) {
-            context.reply(`${target.user?.username} é espectador.`);
+            context.reply(`${target.user?.username} is a spectator.`);
             return;
         }
         if (target.battleState === "active") {
-            context.reply(`${target.user?.username} já está em campo — use /destroy para destruir e respawnar.`);
+            context.reply(`${target.user?.username} is already on the field — use /destroy to destroy and respawn.`);
             return;
         }
 
         server.battleService.prepareRespawn(target);
-        context.reply(`Respawn forçado para ${target.user?.username}.`);
+        context.reply(`Forced respawn for ${target.user?.username}.`);
     }
 }

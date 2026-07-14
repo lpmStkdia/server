@@ -7,6 +7,5 @@ export interface PromoReward {
 }
 
 export const promoCodesData: Record<string, PromoReward> = {
-    BEMVINDO: { crystals: 1000 },
-    LETANKI: { crystals: 5000, premiumDays: 1 },
+    SKIDTANKS: { crystals: 5000, premiumDays: 1 },
 };

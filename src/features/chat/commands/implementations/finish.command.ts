@@ -7,7 +7,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  */
 export default class FinishBattleCommand implements ICommand {
     name = "finish";
-    description = "Finaliza a partida (a atual/que você assiste, ou a de um id). Uso: /finish [id].";
+    description = "Ends a match (the current one/the one you're watching, or a specific id). Usage: /finish [id].";
     permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "[id]";
     example = "/finish";
@@ -19,18 +19,18 @@ export default class FinishBattleCommand implements ICommand {
         if (args.length >= 1) {
             battle = server.lobbyService.getBattleById(args[0]) ?? null;
             if (!battle) {
-                context.reply(`Batalha "${args[0]}" não encontrada.`);
+                context.reply(`Match "${args[0]}" not found.`);
                 return;
             }
         }
         if (!battle) {
-            context.reply("Você precisa estar em uma batalha ou informar o id. Uso: /finish [id].");
+            context.reply("You must be in a match or provide an id. Usage: /finish [id].");
             return;
         }
 
         const ended = server.battleService.finishBattle(battle);
         context.reply(
-            ended ? `Partida ${battle.battleId} finalizada.` : `A partida ${battle.battleId} já está finalizando.`
+            ended ? `Match ${battle.battleId} finished.` : `Match ${battle.battleId} is already finishing.`
         );
     }
 }

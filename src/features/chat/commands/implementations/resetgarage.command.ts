@@ -15,26 +15,26 @@ export function resetGarageInventory(user: UserDocument): void {
 
 export default class ResetGarageCommand implements ICommand {
     name = "resetgarage";
-    description = "Reseta a garagem de um usuário para o padrão de conta nova. Uso: /resetgarage <username>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    description = "Resets a user's garage to the default new-account loadout. Usage: /resetgarage <username>.";
+    permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<username>";
     example = "/resetgarage Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /resetgarage <username>.");
+            context.reply("Usage: /resetgarage <username>.");
             return;
         }
         const online = context.server.findClientByUsername(args[0]);
         const user = online?.user ?? (await context.server.userService.findUserByUsername(args[0]));
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
 
         resetGarageInventory(user);
         await user.save();
         if (online) GarageWorkflow.reloadGarage(online, context.server);
-        context.reply(`Garagem de ${user.username} resetada para o padrão (wasp/smoky/holiday).`);
+        context.reply(`${user.username}'s garage was reset to default (wasp/smoky/holiday).`);
     }
 }

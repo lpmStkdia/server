@@ -1,5 +1,4 @@
 import mongoose, { Schema, model, Document } from "mongoose";
-
 export interface IChatMessage extends Document {
     sourceUser: mongoose.Types.ObjectId | null;
     targetUser: mongoose.Types.ObjectId | null;
@@ -8,7 +7,6 @@ export interface IChatMessage extends Document {
     isWarning: boolean;
     timestamp: Date;
 }
-
 const ChatMessageSchema = new Schema<IChatMessage>({
     sourceUser: {
         type: Schema.Types.ObjectId,
@@ -35,10 +33,8 @@ const ChatMessageSchema = new Schema<IChatMessage>({
     timestamp: {
         type: Date,
         default: Date.now,
-        index: true, // usado no sort/skip do corte de histórico (mantém só as N mais recentes)
+        index: true, // used by the history-trim sort/skip (keeps only the N most recent)
     },
 });
-
 const ChatMessage = model<IChatMessage>("ChatMessage", ChatMessageSchema);
-
 export default ChatMessage;

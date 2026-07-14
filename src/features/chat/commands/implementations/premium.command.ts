@@ -5,24 +5,24 @@ import { secondsLeft } from "@/shared/models/passes";
 import { ItemUtils } from "@/utils/item.utils";
 
 /**
- * Consulta e DEFINE o premium de um jogador por HORAS (valor absoluto, não incremental):
- *   /premium <usuário>        → mostra quanto de premium a pessoa tem
- *   /premium <usuário> <horas> → define as horas de premium (0 = sem premium)
- * O usuário é SEMPRE obrigatório — para dar a si mesmo, o admin informa o próprio nick. No alvo ONLINE
- * envia o `UpdatePremiumTime` em tempo real; ao definir 0, a reconciliação reverte a pintura premium
- * equipada para green (ver ItemUtils.reconcilePremiumEquipment). Persiste também para alvos offline.
+ * Checks and SETS a player's premium in HOURS (absolute value, not incremental):
+ *   /premium <username>        → shows how much premium the person has
+ *   /premium <username> <hours> → sets the premium hours (0 = no premium)
+ * The username is ALWAYS required — to give it to themselves, an admin provides their own nick. If the
+ * target is ONLINE, sends `UpdatePremiumTime` live; setting 0 reconciles the equipped premium paint back
+ * to green (see ItemUtils.reconcilePremiumEquipment). Also persists for offline targets.
  */
 export default class PremiumCommand implements ICommand {
     name = "premium";
-    description = "Consulta/define o premium de um jogador em horas (0 = sem premium). Uso: /premium <usuário> [horas].";
+    description = "Checks/sets a player's premium in hours (0 = no premium). Usage: /premium <username> [hours].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "<usuário> [horas]";
+    usage = "<username> [hours]";
     example = "/premium Danlino 24";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const { server } = context;
         if (args.length < 1) {
-            context.reply("Uso: /premium <usuário> [horas] (sem horas = consulta; 0 = sem premium).");
+            context.reply("Usage: /premium <username> [hours] (no hours = check; 0 = no premium).");
             return;
         }
 
@@ -30,27 +30,27 @@ export default class PremiumCommand implements ICommand {
         const online = server.findClientByUsername(targetName);
         const user = online?.user ?? await server.userService.findUserByUsername(targetName);
         if (!user) {
-            context.reply(`Usuário "${targetName}" não encontrado.`);
+            context.reply(`User "${targetName}" not found.`);
             return;
         }
 
-        // Sem horas → consulta.
+        // No hours → check.
         if (args[1] === undefined) {
             const secs = secondsLeft(user.premiumExpiresAt);
             if (secs <= 0) {
-                context.reply(`${user.username} não tem premium ativo.`);
+                context.reply(`${user.username} has no active premium.`);
             } else {
                 const h = Math.floor(secs / 3600);
                 const m = Math.floor((secs % 3600) / 60);
-                context.reply(`${user.username} tem ${h}h${m > 0 ? ` ${m}min` : ""} de premium.`);
+                context.reply(`${user.username} has ${h}h${m > 0 ? ` ${m}min` : ""} of premium.`);
             }
             return;
         }
 
-        // Com horas → define (absoluto; mínimo 0).
+        // With hours → set (absolute; minimum 0).
         const hours = parseInt(args[1], 10);
         if (isNaN(hours) || hours < 0) {
-            context.reply("Erro: as horas devem ser um número >= 0 (0 = sem premium).");
+            context.reply("Error: hours must be a number >= 0 (0 = no premium).");
             return;
         }
 
@@ -58,20 +58,20 @@ export default class PremiumCommand implements ICommand {
             user.premiumExpiresAt = hours > 0 ? new Date(Date.now() + hours * 60 * 60 * 1000) : null;
             await user.save();
 
-            // Definiu 0 → reverte a pintura premium equipada para green (persiste se mudou).
+            // Set to 0 → reverts the equipped premium paint to green (persists if changed).
             await ItemUtils.reconcilePremiumEquipment(user);
 
-            // Alvo online: atualiza o tempo de premium em tempo real (sem relogar).
+            // Online target: updates the premium time live (no relog needed).
             if (online?.user) {
                 online.user = user;
                 online.sendPacket(new UpdatePremiumTimePacket({ timeLeft: secondsLeft(user.premiumExpiresAt) }));
             }
 
             context.reply(hours > 0
-                ? `Premium de ${user.username} definido para ${hours}h.`
-                : `Premium de ${user.username} removido (0h).`);
+                ? `Premium of ${user.username} set to ${hours}h.`
+                : `Premium of ${user.username} removed (0h).`);
         } catch (error: any) {
-            context.reply(`Erro: ${error.message}`);
+            context.reply(`Error: ${error.message}`);
         }
     }
 }

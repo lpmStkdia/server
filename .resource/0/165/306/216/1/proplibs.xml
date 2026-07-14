@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Grass Tiles" resource-id="61cf84" version="1"/>
+  <library name="Broken Bottom" resource-id="210466" version="2"/>
+  <library name="Concrete Walls" resource-id="65b190" version="3"/>
+  <library name="Broken Walls" resource-id="3de9a7" version="2"/>
+  <library name="Halloween" resource-id="702e5c" version="1"/>
+  <library name="Cliffs" resource-id="35ed07" version="2"/>
+  <library name="Small Bridge" resource-id="fe1e40" version="5"/>
+  <library name="Village Builds" resource-id="766a25" version="2"/>
+  <library name="Roadblock" resource-id="bfd5dc" version="3"/>
+  <library name="Broken Roof" resource-id="ff9385" version="2"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+</proplibs>

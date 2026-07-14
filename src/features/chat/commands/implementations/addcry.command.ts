@@ -3,28 +3,41 @@ import { UpdateCrystals } from "@/features/profile/profile.packets";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
 export default class AddCrystalsCommand implements ICommand {
-    name: string = "addcry";
-    description: string = "Adiciona ou remove cristais da sua conta. Uso: /addcry <amount> (negativo remove).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
-    usage = "<amount>";
-    example = "/addcry 50000";
+    name: string = "addcrystals";
+    description: string = "Adds or removes crystals. Usage: /addcrystals <amount> [username] (negative removes).";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    usage = "<amount> [username]";
+    example = "/addcrystals 50000 Giann";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /addcry <amount>");
+            context.reply("Usage: /addcrystals <amount> [username]");
             return;
         }
 
         const amount = parseInt(args[0], 10);
-
         if (isNaN(amount)) {
-            context.reply("Erro: A quantidade deve ser um número.");
+            context.reply("Error: Amount must be a number.");
             return;
         }
 
-        const user = context.executor.user;
+        // Default target is the administrator executing the command
+        let targetClient = context.executor;
+        const targetUsername = args[1];
+
+        if (targetUsername) {
+            // Find the online player by username using your server's exact method
+            const foundClient = context.server.findClientByUsername(targetUsername);
+            if (!foundClient) {
+                context.reply(`Error: User "${targetUsername}" is not online.`);
+                return;
+            }
+            targetClient = foundClient;
+        }
+
+        const user = targetClient.user;
         if (!user) {
-            context.reply("Erro: Usuário não encontrado.");
+            context.reply("Error: Target user data not found.");
             return;
         }
 
@@ -40,12 +53,15 @@ export default class AddCrystalsCommand implements ICommand {
                 crystals: newCrystals,
             });
 
-            context.executor.user = updatedUser;
+            // Update user document on their live connection instance
+            targetClient.user = updatedUser;
 
-            context.executor.sendPacket(new UpdateCrystals({ crystals: updatedUser.crystals }));
-            context.reply(`Cristais atualizados para: ${updatedUser.crystals}.`);
+            // Send packet directly to the targeted user's client
+            targetClient.sendPacket(new UpdateCrystals({ crystals: updatedUser.crystals }));
+            
+            context.reply(`Crystals for ${updatedUser.username} updated to: ${updatedUser.crystals}.`);
         } catch (error: any) {
-            context.reply(`Erro ao atualizar os cristais: ${error.message}`);
+            context.reply(`Error updating crystals: ${error.message}`);
         }
     }
 }

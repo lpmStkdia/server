@@ -4,7 +4,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Destroys a tank in the current battle — your own by default, or another player's when a nick is given. */
 export default class DestroyTankCommand implements ICommand {
     name = "destroy";
-    description = "Destrói o tanque de um jogador (vazio = você). Uso: /destroy [username].";
+    description = "Destroys a player's tank (empty = you). Usage: /destroy [username].";
     permissionLevel = ChatModeratorLevel.MODERATOR;
     usage = "[username]";
     example = "/destroy Joao";
@@ -13,7 +13,7 @@ export default class DestroyTankCommand implements ICommand {
         const client = context.executor;
         const { server } = context;
         if (!client.user || !client.currentBattle) {
-            context.reply("Você precisa estar em uma batalha.");
+            context.reply("You must be in a match.");
             return;
         }
 
@@ -21,7 +21,7 @@ export default class DestroyTankCommand implements ICommand {
         if (args.length >= 1) {
             const found = server.findClientByUsername(args[0]);
             if (!found || found.currentBattle?.battleId !== client.currentBattle.battleId) {
-                context.reply(`Jogador "${args[0]}" não está nesta batalha.`);
+                context.reply(`Player "${args[0]}" is not in this match.`);
                 return;
             }
             target = found;
@@ -30,8 +30,8 @@ export default class DestroyTankCommand implements ICommand {
         const destroyed = server.battleService.forceDestroyTank(target);
         context.reply(
             destroyed
-                ? `Tanque de ${target.user?.username} destruído.`
-                : `Não foi possível destruir: ${target.user?.username} não está com o tanque ativo em campo.`
+                ? `${target.user?.username}'s tank was destroyed.`
+                : `Could not destroy: ${target.user?.username} does not have an active tank on the field.`
         );
     }
 }

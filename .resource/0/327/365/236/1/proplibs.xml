@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Bush Winter" resource-id="7a4252" version="5"/>
+  <library name="Grass Tiles Winter" resource-id="1eea65" version="1"/>
+  <library name="Concrete Walls Winter" resource-id="8fe148" version="1"/>
+  <library name="Cliffs Winter" resource-id="fe8ec1" version="1"/>
+  <library name="zamin" resource-id="678439" version="4"/>
+  <library name="Fort Winter" resource-id="4010d6" version="1"/>
+  <library name="Fachwerk House 2 Winter" resource-id="d37143" version="2"/>
+  <library name="Concrete Tiles Winter" resource-id="7164a6" version="2"/>
+  <library name="Small Bridge Winter" resource-id="8d2625" version="4"/>
+  <library name="Promotion Winter" resource-id="b814be" version="55"/>
+  <library name="NY" resource-id="93d399" version="1"/>
+  <library name="Fachwerk House 1 Winter" resource-id="5c76a0" version="2"/>
+  <library name="Village Builds Winter" resource-id="c6264c" version="1"/>
+  <library name="Stuffs Winter" resource-id="1e515" version="1"/>
+  <library name="City Builds Winter" resource-id="61212" version="1"/>
+</proplibs>

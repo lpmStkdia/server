@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Passage" resource-id="b4a6c7" version="6"/>
+  <library name="Exterior" resource-id="919511" version="1"/>
+  <library name="Bush" resource-id="37a3d2" version="6"/>
+  <library name="Defense" resource-id="34dcd5" version="3"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+</proplibs>

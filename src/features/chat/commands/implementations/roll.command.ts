@@ -4,7 +4,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Fun: rolls a random number 1..max (default 100). */
 export default class RollCommand implements ICommand {
     name = "roll";
-    description = "Sorteia um número de 1 a max (padrão 100). Uso: /roll [max].";
+    description = "Rolls a number from 1 to max (default 100). Usage: /roll [max].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
     usage = "[max]";
     example = "/roll 6";
@@ -12,6 +12,6 @@ export default class RollCommand implements ICommand {
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const max = Math.max(2, Math.floor(Number(args[0]) || 100));
         const value = 1 + Math.floor(Math.random() * max);
-        context.reply(`${context.executor.user?.username} rolou ${value} (1-${max}).`);
+        context.reply(`${context.executor.user?.username} rolled ${value} (1-${max}).`);
     }
 }

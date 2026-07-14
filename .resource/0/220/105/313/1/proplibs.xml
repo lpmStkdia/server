@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Land Tiles Winter" resource-id="f30b28" version="3"/>
+  <library name="Land Rocks Winter" resource-id="b2e494" version="3"/>
+  <library name="Bush Winter" resource-id="7a4252" version="5"/>
+  <library name="Stuffs Winter" resource-id="1e515" version="1"/>
+  <library name="Industrial Bridge Winter" resource-id="eb6268" version="2"/>
+  <library name="Waffle Fence Winter" resource-id="430255" version="8"/>
+  <library name="City Buildings Winter" resource-id="61f764" version="1"/>
+  <library name="Trees Winter" resource-id="84bb53" version="1"/>
+  <library name="Industrial Elements Winter" resource-id="f28a8" version="2"/>
+  <library name="Outer Walls Winter" resource-id="caf48f" version="4"/>
+  <library name="Promotion Winter" resource-id="b814be" version="55"/>
+  <library name="Desert Houses Winter" resource-id="f27b85" version="1"/>
+</proplibs>

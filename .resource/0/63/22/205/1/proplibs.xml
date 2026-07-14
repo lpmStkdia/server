@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Concrete Tiles" resource-id="b358e6" version="2"/>
+  <library name="Slopes Rises" resource-id="707ec0" version="2"/>
+  <library name="Concrete Walls" resource-id="65b190" version="3"/>
+  <library name="Promotion" resource-id="a88fc5" version="55"/>
+</proplibs>

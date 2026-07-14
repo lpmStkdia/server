@@ -7,27 +7,40 @@ import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 
 export default class AddScoreCommand implements ICommand {
     name: string = "addscore";
-    description: string = "Adiciona ou remove experiência da sua conta. Uso: /addscore <amount> (negativo remove).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
-    usage = "<amount>";
-    example = "/addscore 100000";
+    description: string = "Adds or removes experience. Usage: /addscore <amount> [username] (negative removes).";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    usage = "<amount> [username]";
+    example = "/addscore 100000 Giann";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Uso: /addscore <amount>");
+            context.reply("Usage: /addscore <amount> [username]");
             return;
         }
 
         const amount = parseInt(args[0], 10);
-
         if (isNaN(amount)) {
-            context.reply("Erro: A quantidade deve ser um número.");
+            context.reply("Error: Amount must be a number.");
             return;
         }
 
-        const user = context.executor.user;
+        // Default target is the administrator executing the command
+        let targetClient = context.executor;
+        const targetUsername = args[1];
+
+        if (targetUsername) {
+            // Find the online player by username using your server's exact method
+            const foundClient = context.server.findClientByUsername(targetUsername);
+            if (!foundClient) {
+                context.reply(`Error: User "${targetUsername}" is not online.`);
+                return;
+            }
+            targetClient = foundClient;
+        }
+
+        const user = targetClient.user;
         if (!user) {
-            context.reply("Erro: Usuário não encontrado.");
+            context.reply("Error: Target user data not found.");
             return;
         }
 
@@ -43,10 +56,12 @@ export default class AddScoreCommand implements ICommand {
                 experience: newScore,
             });
 
-            context.executor.user = updatedUser;
+            // Update user document on their live connection instance
+            targetClient.user = updatedUser;
 
-            context.executor.sendPacket(new UpdateScorePacket({ score: updatedUser.experience }));
-            context.reply(`Pontuação atualizada para: ${updatedUser.experience}.`);
+            // Send score packet directly to the targeted client
+            targetClient.sendPacket(new UpdateScorePacket({ score: updatedUser.experience }));
+            context.reply(`Score for ${updatedUser.username} updated to: ${updatedUser.experience}.`);
 
             if (updatedUser.rank !== originalRank) {
                 const newRankInfo = context.server.rankService.getRankById(updatedUser.rank);
@@ -58,17 +73,15 @@ export default class AddScoreCommand implements ICommand {
                         nextRankScore: updatedUser.nextRankScore,
                         reward: 0,
                     });
-                    context.executor.sendPacket(rankPacket);
-                    context.reply(`Parabéns! Você alcançou o rank: ${newRankInfo.name}.`);
+                    
+                    targetClient.sendPacket(rankPacket);
                 }
-                // The garage item lists are rank-dependent: a rank change (up OR down) with the garage
-                // open must fully reload it, or the client renders duplicated items.
-                GarageWorkflow.reloadGarage(context.executor, context.server);
-                // Atualiza o rank visual desse jogador para todos os demais online.
+                
+                GarageWorkflow.reloadGarage(targetClient, context.server);
                 broadcastPlayerRankToOthers(context.server, updatedUser);
             }
         } catch (error: any) {
-            context.reply(`Erro ao atualizar a pontuação: ${error.message}`);
+            context.reply(`Error updating score: ${error.message}`);
         }
     }
 }

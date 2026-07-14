@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Grass Tiles Winter" resource-id="1eea65" version="1"/>
+  <library name="Concrete Tiles Winter" resource-id="7164a6" version="2"/>
+  <library name="Bush Winter" resource-id="7a4252" version="5"/>
+  <library name="Village Builds Winter" resource-id="c6264c" version="1"/>
+  <library name="Slopes Rises Winter" resource-id="187c74" version="2"/>
+  <library name="Cliffs Winter" resource-id="fe8ec1" version="1"/>
+  <library name="Promotion Winter" resource-id="b814be" version="55"/>
+  <library name="City Builds Winter" resource-id="61212" version="1"/>
+  <library name="Concrete Walls Winter" resource-id="8fe148" version="1"/>
+</proplibs>

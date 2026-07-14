@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Terrain1" resource-id="72283f" version="1"/>
+  <library name="Passage1" resource-id="210c02" version="1"/>
+  <library name="Com Build1" resource-id="673171" version="1"/>
+  <library name="Defense1" resource-id="68fd30" version="1"/>
+  <library name="Fence" resource-id="6ee6b6" version="1"/>
+  <library name="Plants" resource-id="2494b6" version="3"/>
+</proplibs>

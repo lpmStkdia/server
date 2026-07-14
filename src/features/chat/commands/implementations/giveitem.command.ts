@@ -7,20 +7,20 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
  *  use /setmod afterwards to change it. */
 export default class GiveItemCommand implements ICommand {
     name = "giveitem";
-    description = "Dá um item a um usuário (hull/turret em m0 — ajuste com /setmod — ou pintura). Uso: /giveitem <username> <itemId>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
+    description = "Grants an item to a user (hull/turret at m0 — adjust with /setmod — or a paint). Usage: /giveitem <username> <itemId>.";
+    permissionLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<username> <itemId>";
     example = "/giveitem Joao railgun";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 2) {
-            context.reply("Uso: /giveitem <username> <itemId>.");
+            context.reply("Usage: /giveitem <username> <itemId>.");
             return;
         }
         const online = context.server.findClientByUsername(args[0]);
         const user = online?.user ?? (await context.server.userService.findUserByUsername(args[0]));
         if (!user) {
-            context.reply(`Usuário "${args[0]}" não encontrado.`);
+            context.reply(`User "${args[0]}" not found.`);
             return;
         }
         const itemId = args[1].toLowerCase();
@@ -32,17 +32,17 @@ export default class GiveItemCommand implements ICommand {
         if (hull) {
             user.hulls.set(itemId, 0);
             await user.save();
-            context.reply(`${user.username} recebeu o hull "${itemId}" m0 (use /setmod para mudar).`);
+            context.reply(`${user.username} received the hull "${itemId}" m0 (use /setmod to change it).`);
         } else if (turret) {
             user.turrets.set(itemId, 0);
             await user.save();
-            context.reply(`${user.username} recebeu a torreta "${itemId}" m0 (use /setmod para mudar).`);
+            context.reply(`${user.username} received the turret "${itemId}" m0 (use /setmod to change it).`);
         } else if (paint) {
             if (!user.paints.includes(itemId)) user.paints.push(itemId);
             await user.save();
-            context.reply(`${user.username} recebeu a pintura "${itemId}".`);
+            context.reply(`${user.username} received the paint "${itemId}".`);
         } else {
-            context.reply(`Item "${itemId}" não existe (hulls/turrets/pinturas do garage).`);
+            context.reply(`Item "${itemId}" does not exist (garage hulls/turrets/paints).`);
             return;
         }
 

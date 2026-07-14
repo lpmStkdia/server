@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proplibs>
+  <library name="Passage" resource-id="b4a6c7" version="6"/>
+  <library name="Terrain" resource-id="e77a11" version="1"/>
+  <library name="Com Build" resource-id="a27b0d" version="3"/>
+  <library name="Plants" resource-id="2494b6" version="3"/>
+  <library name="Defense" resource-id="34dcd5" version="3"/>
+  <library name="Fence" resource-id="6ee6b6" version="1"/>
+  <library name="Exterior" resource-id="919511" version="1"/>
+</proplibs>

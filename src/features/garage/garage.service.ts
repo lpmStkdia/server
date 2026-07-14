@@ -40,7 +40,7 @@ export class GarageService {
         const { baseId, modification: clientRefMod } = this._parseItemId(fullItemId);
         const itemBlueprint = this._findItemBlueprint(baseId);
 
-        if (!itemBlueprint) throw new Error("Item não encontrado.");
+        if (!itemBlueprint) throw new Error("Item not found.");
 
         let effectivePrice: number;
         let finalModId: number = 0;
@@ -48,58 +48,58 @@ export class GarageService {
         switch (itemBlueprint.category) {
             case "weapon":
             case "armor": {
-                if (quantity !== 1) throw new Error("Equipamentos só podem ser comprados em quantidade de 1.");
+                if (quantity !== 1) throw new Error("Equipment can only be purchased in quantity of 1.");
 
                 const inventoryMap = itemBlueprint.category === "weapon" ? user.turrets : user.hulls;
                 const currentUserMod = inventoryMap.get(baseId);
 
                 if (currentUserMod === undefined) {
-                    if (clientRefMod !== 0) throw new Error("A primeira compra de um item deve ser a modificação M0.");
+                    if (clientRefMod !== 0) throw new Error("The first purchase of an item must be modification M0.");
                     finalModId = 0;
                 } else {
-                    if (clientRefMod !== currentUserMod) throw new Error("Tentativa de upgrade para um item que não corresponde à sua modificação atual.");
+                    if (clientRefMod !== currentUserMod) throw new Error("Attempt to upgrade an item that does not match your current modification.");
                     finalModId = currentUserMod + 1;
                 }
 
                 const targetModData = itemBlueprint.modifications.find((m: any) => m.modificationID === finalModId);
-                if (!targetModData) throw new Error("A próxima modificação para este item não está disponível.");
+                if (!targetModData) throw new Error("The next modification for this item is not available.");
 
-                if (user.rank < targetModData.rank) throw new Error("Rank insuficiente para comprar esta atualização.");
+                if (user.rank < targetModData.rank) throw new Error("Insufficient rank to purchase this upgrade.");
 
                 effectivePrice = targetModData.price;
-                if (effectivePrice !== expectedPrice) throw new Error("O preço do item não confere. Tente novamente.");
-                if (user.crystals < effectivePrice) throw new Error("Cristais insuficientes.");
+                if (effectivePrice !== expectedPrice) throw new Error("Item price does not match. Please try again.");
+                if (user.crystals < effectivePrice) throw new Error("Insufficient crystals.");
 
                 user.crystals -= effectivePrice;
                 inventoryMap.set(baseId, finalModId);
                 break;
             }
             case "paint": {
-                if (quantity !== 1) throw new Error("Pinturas só podem ser compradas em quantidade de 1.");
-                if (user.rank < itemBlueprint.rank) throw new Error("Rank insuficiente para comprar este item.");
+                if (quantity !== 1) throw new Error("Paints can only be purchased in quantity of 1.");
+                if (user.rank < itemBlueprint.rank) throw new Error("Insufficient rank to purchase this item.");
 
                 effectivePrice = itemBlueprint.price;
-                if (effectivePrice !== expectedPrice) throw new Error("O preço do item não confere. Tente novamente.");
-                if (user.crystals < effectivePrice) throw new Error("Cristais insuficientes.");
+                if (effectivePrice !== expectedPrice) throw new Error("Item price does not match. Please try again.");
+                if (user.crystals < effectivePrice) throw new Error("Insufficient crystals.");
 
-                if (user.paints.includes(baseId)) throw new Error("Você já possui esta pintura.");
+                if (user.paints.includes(baseId)) throw new Error("You already own this paint.");
 
                 user.crystals -= effectivePrice;
                 user.paints.push(baseId);
                 break;
             }
             case "inventory": {
-                if (quantity < 1) throw new Error("Quantidade inválida.");
-                if (user.rank < itemBlueprint.rank) throw new Error("Rank insuficiente para comprar este item.");
+                if (quantity < 1) throw new Error("Invalid quantity.");
+                if (user.rank < itemBlueprint.rank) throw new Error("Insufficient rank to purchase this item.");
 
                 const unitPrice = itemBlueprint.price;
                 // The client may send either the unit price or the line total; accept both.
                 if (expectedPrice !== unitPrice && expectedPrice !== unitPrice * quantity) {
-                    throw new Error("O preço do item não confere. Tente novamente.");
+                    throw new Error("Item price does not match. Please try again.");
                 }
 
                 const totalCost = unitPrice * quantity;
-                if (user.crystals < totalCost) throw new Error("Cristais insuficientes.");
+                if (user.crystals < totalCost) throw new Error("Insufficient crystals.");
                 user.crystals -= totalCost;
 
                 if (itemBlueprint.instantScore) {
@@ -121,14 +121,14 @@ export class GarageService {
             }
             case "special": {
                 // Passe/assinatura: ESTENDE a data de expiração no user (não empilha item).
-                if (quantity !== 1) throw new Error("Passes só podem ser comprados em quantidade de 1.");
-                if (itemBlueprint.price < 0) throw new Error("Este passe não está à venda.");
-                if (user.rank < itemBlueprint.rank) throw new Error("Rank insuficiente para comprar este item.");
+                if (quantity !== 1) throw new Error("Passes can only be purchased in quantity of 1.");
+                if (itemBlueprint.price < 0) throw new Error("This pass is not for sale.");
+                if (user.rank < itemBlueprint.rank) throw new Error("Insufficient rank to purchase this item.");
 
                 // Preço escala pelo rank do comprador (pro_battle) quando há priceByRank.
                 effectivePrice = passPriceForRank(itemBlueprint, user.rank);
-                if (effectivePrice !== expectedPrice) throw new Error("O preço do item não confere. Tente novamente.");
-                if (user.crystals < effectivePrice) throw new Error("Cristais insuficientes.");
+                if (effectivePrice !== expectedPrice) throw new Error("Item price does not match. Please try again.");
+                if (user.crystals < effectivePrice) throw new Error("Insufficient crystals.");
 
                 user.crystals -= effectivePrice;
                 // Estende a partir do vencimento atual se ainda ativo, senão a partir de agora.
@@ -141,7 +141,7 @@ export class GarageService {
                 return { passId: baseId };
             }
             default:
-                throw new Error("Tipo de item desconhecido ou não comprável.");
+                throw new Error("Unknown or non-purchasable item type.");
         }
 
         await user.save();
@@ -152,33 +152,33 @@ export class GarageService {
         const { baseId, modification } = this._parseItemId(fullItemId);
         const itemBlueprint = this._findItemBlueprint(baseId);
 
-        if (!itemBlueprint) throw new Error("Item não encontrado.");
+        if (!itemBlueprint) throw new Error("Item not found.");
 
         switch (itemBlueprint.category) {
             case "weapon": {
                 const userMod = user.turrets.get(baseId);
-                if (userMod !== modification) throw new Error("Você não possui esta modificação para equipar.");
+                if (userMod !== modification) throw new Error("You do not own this modification to equip.");
                 user.equippedTurret = baseId;
                 break;
             }
             case "armor": {
                 const userMod = user.hulls.get(baseId);
-                if (userMod !== modification) throw new Error("Você não possui esta modificação para equipar.");
+                if (userMod !== modification) throw new Error("You do not own this modification to equip.");
                 user.equippedHull = baseId;
                 break;
             }
             case "paint": {
                 // Pinturas premium não ficam em `user.paints`: só podem ser equipadas com premium ATIVO.
                 if (PREMIUM_PAINT_IDS.has(baseId)) {
-                    if (!isPremiumActive(user)) throw new Error("Esta pintura requer assinatura premium ativa.");
+                    if (!isPremiumActive(user)) throw new Error("This paint requires an active premium subscription.");
                 } else if (!user.paints.includes(baseId)) {
-                    throw new Error("Você não possui esta pintura.");
+                    throw new Error("You do not own this paint.");
                 }
                 user.equippedPaint = baseId;
                 break;
             }
             default:
-                throw new Error("Este item não pode ser equipado.");
+                throw new Error("This item cannot be equipped.");
         }
 
         logger.info(`User ${user.username} equipped ${fullItemId}`);

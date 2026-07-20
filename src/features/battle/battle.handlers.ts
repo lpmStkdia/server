@@ -34,7 +34,7 @@ export class EnterBattleAsSpectatorHandler implements IPacketHandler<BattlePacke
             return;
         }
 
-        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.MODERATOR)) {
+        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.CANDIDATE)) {
             client.sendPacket(new SystemMessage({ text: "Somente moderadores podem entrar como espectadores." }));
             return;
         }

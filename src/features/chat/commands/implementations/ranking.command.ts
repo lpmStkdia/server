@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 export default class RankingCommand implements ICommand {
     name = "ranking";
     description = "Shows the Competitive Match ranking (your position + top 10).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const svc = context.server.rankedService;

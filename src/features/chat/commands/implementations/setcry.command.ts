@@ -8,7 +8,7 @@ const MAX_CRYSTALS = 99_999_999;
 export default class SetCrystalsCommand implements ICommand {
     name = "setcrystals";
     description = "Sets (does not add) the amount of crystals in your account. Usage: /setcrystals <amount>";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "<amount>";
     example = "/setcrystals 1000000";
 

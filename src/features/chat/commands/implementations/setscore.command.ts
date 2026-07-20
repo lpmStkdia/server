@@ -6,6 +6,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 export default class SetScoreCommand implements ICommand {
     name = "setscore";
     description = "Sets the team scores of the current battle (team modes). Usage: /setscore <red> <blue>.";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     example = "/setscore 5 3";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {

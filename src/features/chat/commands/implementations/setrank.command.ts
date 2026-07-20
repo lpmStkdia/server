@@ -9,7 +9,7 @@ import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 export default class SetRankCommand implements ICommand {
     name = "setrank";
     description = "Jumps straight to rank N (targeting another player requires Administrator). Usage: /setrank [username] <rank>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "[username] <rank>";
     example = "/setrank 15";
 

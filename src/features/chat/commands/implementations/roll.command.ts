@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 export default class RollCommand implements ICommand {
     name = "roll";
     description = "Rolls a number from 1 to max (default 100). Usage: /roll [max].";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "[max]";
     example = "/roll 6";
 

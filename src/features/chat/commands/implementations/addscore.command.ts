@@ -8,7 +8,7 @@ import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 export default class AddScoreCommand implements ICommand {
     name: string = "addscore";
     description: string = "Adds or removes experience from your account. Usage: /addscore <amount> (negative removes).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "<amount>";
     example = "/addscore 100000";
 

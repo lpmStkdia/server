@@ -38,7 +38,7 @@ export default class BonusCommand implements ICommand {
                 position = { x, y, z };
             }
             if (!position) {
-                context.reply("You are not on the field (no position).);
+                context.reply("You are not on the field (no position).");
                 return;
             }
             const id = context.server.battleService.bonus.spawnBonus(client.currentBattle, type, position);
@@ -49,7 +49,7 @@ export default class BonusCommand implements ICommand {
         // "/bonus <type> [amount]" — N drops at random points inside the map's bonus areas.
         const count = args[1] !== undefined ? Number(args[1]) : 1;
         if (!Number.isInteger(count) || count < 1 || count > 100) {
-            context.reply("Invalid amount (1 to 100). Usage: /bonus <type> [amount].);
+            context.reply("Invalid amount (1 to 100). Usage: /bonus <type> [amount].");
             return;
         }
         const dropped = context.server.battleService.bonus.spawnRandom(client.currentBattle, type, count);

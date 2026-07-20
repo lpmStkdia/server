@@ -5,7 +5,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 export default class AddCrystalsCommand implements ICommand {
     name: string = "addcrystals";
     description: string = "Adds or removes crystals from your account. Usage: /addcrystals <amount> (negative removes).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
     usage = "<amount>";
     example = "/addcrystals 50000";
 

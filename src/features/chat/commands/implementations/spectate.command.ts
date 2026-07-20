@@ -9,7 +9,7 @@ import { ChatModeratorLevel, hasModeratorPower } from "@/shared/models/enums/cha
 export default class SpectateCommand implements ICommand {
     name = "spectate";
     description = "Becomes a spectator of the match you're currently playing. Usage: /spectate.";
-    permissionLevel = ChatModeratorLevel.MODERATOR;
+    permissionLevel = ChatModeratorLevel.CANDIDATE;
 
     async execute(context: CommandContext, _args: string[]): Promise<void> {
         const client = context.executor;
@@ -19,8 +19,8 @@ export default class SpectateCommand implements ICommand {
             context.reply("You must be in a match.");
             return;
         }
-        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.MODERATOR)) {
-            context.reply("Only moderators and above can become spectators.");
+        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.CANDIDATE)) {
+            context.reply("Only candidates and above can become spectators.");
             return;
         }
         if (client.isSpectator) {

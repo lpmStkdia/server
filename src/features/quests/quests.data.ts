@@ -22,7 +22,7 @@ import { ResourceId } from "@/generated/resourceTypes";
  * ─────────────────────────────────────────────────────────────────────────────────────────────────────────
  */
 
-export type QuestType = "KILLS" | "SCORE" | "CRYSTALS" | "GOLDBOX";
+export type QuestType = "KILLS" | "SCORE" | "CRYSTALS" | "GOLDBOX" | "XT";
 export type QuestDifficulty = "easy" | "medium" | "hard";
 
 export interface IQuestDefinition {
@@ -37,21 +37,31 @@ export interface IQuestDefinition {
 // target depends only on difficulty, NOT rank — only the REWARD scales with rank). Medium kills / easy score
 // weren't captured directly, so they're interpolated (marked); refine if more ranks/slots are captured.
 export const QuestDefinitions: IQuestDefinition[] = [
-    { type: "KILLS", description: "Destrua %n inimigos", imageResource: "ui/quests/icons/kill_enemies", criteria: [30, 50, 75] }, // medium=50 interpolated
-    { type: "SCORE", description: "Ganhe %n de pontuação nas batalhas", imageResource: "ui/quests/icons/battle_score", criteria: [450, 700, 1000] }, // easy=450 interpolated
-    { type: "CRYSTALS", description: "Colete %n cristais em batalhas", imageResource: "ui/quests/icons/get_crystal", criteria: [250, 350, 500] },
+    { type: "KILLS", description: "Destroy %n enemies", imageResource: "ui/quests/icons/kill_enemies", criteria: [30, 50, 75] }, // medium=50 interpolated
+    { type: "SCORE", description: "Earn %n battle score in battles", imageResource: "ui/quests/icons/battle_score", criteria: [450, 700, 1000] }, // easy=450 interpolated
+    { type: "CRYSTALS", description: "Collect %n crystals in battles", imageResource: "ui/quests/icons/get_crystal", criteria: [250, 350, 500] },
 ];
 
 /** Gold-box objective — can roll into any slot. Uses its own icon + the "gold" prize tier. */
 export const GOLDBOX_DEFINITION: IQuestDefinition = {
     type: "GOLDBOX",
-    description: "Pegue uma Caixa de ouro",
+    description: "Pick up a Gold Box",
     imageResource: "ui/quests/icons/gold_box",
     criteria: [1, 1, 1],
 };
 
+/** Rare special mission that grants an XT weapon at M0 when claimed. Requires 1000 kills across all difficulties. */
+export const XT_DEFINITION: IQuestDefinition = {
+    type: "KILLS",
+    description: "Destroy %n enemies",
+    imageResource: "ui/quests/icons/kill_enemies",
+    criteria: [1000, 1000, 1000],
+};
+
 /** Chance a (re)roll of ANY slot produces a gold-box objective instead of a normal one. */
 export const GOLDBOX_REROLL_CHANCE = 0.25;
+/** Chance a slot becomes a rare XT reward mission instead of a normal one. */
+export const XT_MISSION_CHANCE = 0.05;
 
 // NOTE: quest ids are UNIQUE PER INSTANCE (assigned in QuestService.freshQuestId), NOT a hash of the objective.
 // Two quests with the same type+criteria must still have different ids, or changing one changes the identical
@@ -65,21 +75,37 @@ export const CRYSTAL_PRIZE_CHANCE = 0.5;
 const REPAIR_KIT_PRICE = 150;
 const CHEAP_SUPPLY_PRICE = 50;
 const CHEAP_SUPPLIES: { item: string; name: string }[] = [
-    { item: "armor", name: "Blindagem Dupla" },
-    { item: "n2o", name: "Aumento de Velocidade" },
-    { item: "double_damage", name: "Destruição Dupla" },
-    { item: "mine", name: "Mina" },
+    { item: "armor", name: "Double Armor" },
+    { item: "n2o", name: "Speed Boost" },
+    { item: "double_damage", name: "Double Damage" },
+    { item: "mine", name: "Mine" },
 ];
-const REPAIR_KIT_NAME = "Kit de Reparação";
+const REPAIR_KIT_NAME = "Repair Kit";
 
 /** Maps a prize display name back to the grantable item ("crystals" or a supply id) for completion payout. */
 export const PRIZE_ITEM_BY_NAME: Record<string, string> = {
-    Cristais: "crystals",
+    Crystals: "crystals",
     [REPAIR_KIT_NAME]: "health",
-    "Blindagem Dupla": "armor",
-    "Aumento de Velocidade": "n2o",
-    "Destruição Dupla": "double_damage",
-    Mina: "mine",
+    "Double Armor": "armor",
+    "Speed Boost": "n2o",
+    "Double Damage": "double_damage",
+    Mine: "mine",
+};
+
+export const XT_REWARD_BY_NAME: Record<string, string> = {
+    // Turrets (5 total)
+    "Vulcan XT": "machinegun_xt",
+    "Flamethrower XT": "flamethrower_xt",
+    "Railgun XT": "railgun_xt",
+    "Thunder XT": "thunder_xt",
+    "Ricochet XT": "ricochet_xt",
+    // Hulls (6 total)
+    "Mammoth XT": "mammoth_xt",
+    "Hornet XT": "hornet_xt",
+    "Viking XT": "viking_xt",
+    "Wasp XT": "wasp_xt",
+    "Titan XT": "titan_xt",
+    "Hunter XT": "hunter_xt",
 };
 
 // Supply crystal-equivalent VALUE and the max repair-kit count, per rank (rows 1-27) × slot
@@ -128,7 +154,7 @@ export interface IQuestPrize {
  */
 export function rollPrize(rank: number, slot: number): IQuestPrize[] {
     if (Math.random() < CRYSTAL_PRIZE_CHANCE) {
-        return [{ itemName: "Cristais", itemCount: slotCrystals(rank, slot) }];
+        return [{ itemName: "Crystals", itemCount: slotCrystals(rank, slot) }];
     }
     const value = clampRankRow(SLOT_SUPPLY_VALUE, rank)[slot];
     const maxKits = clampRankRow(SLOT_SUPPLY_KITS, rank)[slot];

@@ -3,6 +3,7 @@ import { DEFAULT_PORT } from "@/config/constants";
 import { DebugConsole } from "@/console/debug.console";
 import { ConfigService } from "@/core/config/config.service";
 import { connectToDatabase, disconnectFromDatabase } from "@/database";
+import { AdminServer } from "@/features/admin/admin.server";
 import { AuthService } from "@/features/authentication/auth.service";
 import { BattleService } from "@/features/battle/battle.service";
 import { ChatService } from "@/features/chat/chat.service";
@@ -18,10 +19,12 @@ import { ReferralService } from "@/features/referral/referral.service";
 import { SettingsService } from "@/features/settings/settings.service";
 import { ShopService } from "@/features/shop/shop.service";
 import { PacketHandlerService } from "@/packets/packet-handler.service";
+import { EmailService } from "@/shared/services/email.service";
 import { PacketService } from "@/packets/packet.service";
 import { RankedMatchmakingService } from "@/features/ranked/ranked.matchmaking.service";
 import { GameServer } from "@/server/game.server";
 import { ResourceServer } from "@/server/resource.server";
+import { ProfileWebServer } from "@/server/profile.web.server";
 import { RankService } from "@/shared/services/rank.service";
 import { UserService } from "@/shared/services/user.service";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
@@ -42,7 +45,8 @@ async function bootstrap() {
   const configService = new ConfigService();
   const rankService = new RankService();
   const userService = new UserService(rankService);
-  const settingsService = new SettingsService(userService);
+  const emailService = new EmailService();
+  const settingsService = new SettingsService(userService, emailService);
   const inviteService = new InviteService();
   const chatService = new ChatService(userService);
   const packetHandlerService = new PacketHandlerService();
@@ -127,12 +131,16 @@ async function bootstrap() {
 
   const rankedMatchmakingService = new RankedMatchmakingService(server);
   server.rankedService = rankedMatchmakingService;
-  const resourceServer = new ResourceServer(rankedMatchmakingService);
+  const resourceServer = new ResourceServer(rankedMatchmakingService, settingsService);
+  const profileWebServer = new ProfileWebServer();
+  const adminServer = new AdminServer(server, userService, lobbyService, battleService, garageService);
   const debugConsole = new DebugConsole(server, userService);
 
-  logger.info("Starting LeTanki and Resource servers");
+  logger.info("Starting LeTanki, Resource, Admin, and Public Profile servers");
   server.start();
   resourceServer.start();
+  profileWebServer.start();
+  adminServer.start();
   debugConsole.start();
 
   process.on("SIGTERM", async () => {
@@ -143,6 +151,12 @@ async function bootstrap() {
 
       await resourceServer.stop();
       logger.info("Resource server stopped");
+
+      await profileWebServer.stop();
+      logger.info("Public profile server stopped");
+
+      await adminServer.stop();
+      logger.info("Admin server stopped");
 
       await disconnectFromDatabase();
       logger.info("Database connection closed");

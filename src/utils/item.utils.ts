@@ -65,7 +65,8 @@ export class ItemUtils {
             const p = props.find((pr) => pr.property === name);
             return p && p.value != null ? parseFloat(p.value) : 0;
         };
-        return read(resistanceProperty) + read("ALL_RESISTANCE");
+        const specific = resistanceProperty && resistanceProperty !== "ALL_RESISTANCE" ? read(resistanceProperty) : 0;
+        return specific + read("ALL_RESISTANCE");
     }
 
     public static getHullArmor(user: UserDocument): number {

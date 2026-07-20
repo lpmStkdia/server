@@ -1,8 +1,10 @@
 import { UserDocument } from "@/shared/models/user.model";
 import logger from "@/utils/logger";
 import { ResourceManager } from "@/utils/resource.manager";
+import { ResourceId } from "@/generated/resourceTypes";
 import { itemBlueprints, supplyPreviewResources, passPreviewResources, passPriceForRank, PREMIUM_PAINT_IDS } from "./garage.data";
 import { isActive, isPremiumActive, secondsLeft } from "@/shared/models/passes";
+import { ChatModeratorLevel, hasModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 
 export class GarageService {
     private static readonly EQUIP_COOLDOWN_MS = 15 * 60 * 1000; // 15 min per equipment category (re-arm battles)
@@ -36,11 +38,59 @@ export class GarageService {
         this.equipCooldowns.delete(userId);
     }
 
-    public async purchaseItem(user: UserDocument, fullItemId: string, quantity: number, expectedPrice: number): Promise<{ newExperience: number } | { supplyId: string; newCount: number; hadSuppliesBefore: boolean } | { passId: string } | void> {
+    private _isXtItem(itemId: string): boolean {
+        return itemId.endsWith("_xt");
+    }
+
+    private _shouldShowGarageItem(itemId: string, userInventory: any): boolean {
+        if (!this._isXtItem(itemId)) return true;
+        if (itemId === "isida_xt") return false;
+
+        const level = userInventory?.chatModeratorLevel ?? ChatModeratorLevel.NONE;
+        if (hasModeratorPower(level, ChatModeratorLevel.MODERATOR)) return true;
+
+        // Check if user owns the item in turrets/hulls Maps
+        const inventoryMaps = [userInventory?.turrets, userInventory?.hulls];
+        if (inventoryMaps.some((map) => {
+            if (!map) return false;
+            if (map instanceof Map) return map.has(itemId);
+            return Object.prototype.hasOwnProperty.call(map, itemId);
+        })) return true;
+
+        // Also check if the item exists in the root object (items are spread from Maps when passed from garage.workflow/admin).
+        // When turrets/hulls are spread with Object.fromEntries, owned items appear as direct properties with their mod levels.
+        // NOTE: Must check for existence, not truthiness, because mod 0 is falsy!
+        return Object.prototype.hasOwnProperty.call(userInventory, itemId);
+    }
+
+    private _canAccessHelperPaint(userInventory: any): boolean {
+        const level = userInventory?.chatModeratorLevel ?? ChatModeratorLevel.NONE;
+        return hasModeratorPower(level, ChatModeratorLevel.CANDIDATE);
+    }
+
+    private _doesUserOwnKit(userInventory: any, kit: any): boolean {
+        if (Array.isArray(userInventory.kits)) {
+            return userInventory.kits.includes(kit.id);
+        }
+
+        if (!kit.grants) return false;
+
+        const turretMod = userInventory[kit.grants.turret] ?? 0;
+        const hullMod = userInventory[kit.grants.hull] ?? 0;
+        const paintOwned = Array.isArray(userInventory.paints) && userInventory.paints.includes(kit.grants.paint);
+
+        return turretMod >= kit.grants.turretMod && hullMod >= kit.grants.hullMod && paintOwned;
+    }
+
+    public async purchaseItem(user: UserDocument, fullItemId: string, quantity: number, expectedPrice: number): Promise<{ newExperience: number } | { supplyId: string; newCount: number; hadSuppliesBefore: boolean } | { passId: string } | { itemCategory: string } | void> {
         const { baseId, modification: clientRefMod } = this._parseItemId(fullItemId);
         const itemBlueprint = this._findItemBlueprint(baseId);
 
         if (!itemBlueprint) throw new Error("Item not found.");
+
+        if (itemBlueprint.category === "paint" && baseId === "helper" && !this._canAccessHelperPaint(user)) {
+            throw new Error("This paint is restricted to candidate-plus users.");
+        }
 
         let effectivePrice: number;
         let finalModId: number = 0;
@@ -119,6 +169,43 @@ export class GarageService {
                 logger.info(`User ${user.username} bought ${quantity}x supply ${baseId} (now ${newCount}).`);
                 return { supplyId: baseId, newCount, hadSuppliesBefore };
             }
+            case "kit": {
+                if (quantity !== 1) throw new Error("Kits can only be purchased in quantity of 1.");
+                if (user.rank < itemBlueprint.rank) throw new Error("Insufficient rank to purchase this item.");
+
+                if (Array.isArray(user.kits) && user.kits.includes(baseId)) {
+                    throw new Error("You already own this kit.");
+                }
+
+                effectivePrice = itemBlueprint.price;
+                if (effectivePrice !== expectedPrice) throw new Error("Item price does not match. Please try again.");
+                if (user.crystals < effectivePrice) throw new Error("Insufficient crystals.");
+
+                user.crystals -= effectivePrice;
+
+                const currentWaspMod = user.hulls.get("wasp") ?? -1;
+                if (currentWaspMod < 2) {
+                    user.hulls.set("wasp", 2);
+                }
+
+                const currentRailgunMod = user.turrets.get("railgun") ?? -1;
+                if (currentRailgunMod < 2) {
+                    user.turrets.set("railgun", 2);
+                }
+
+                if (!user.paints.includes("savanna")) {
+                    user.paints.push("savanna");
+                }
+
+                if (!Array.isArray(user.kits)) {
+                    user.kits = [];
+                }
+                user.kits.push(baseId);
+
+                await user.save();
+                logger.info(`User ${user.username} bought kit ${baseId} and received wasp_m2, railgun_m2, and savanna.`);
+                return { itemCategory: "kit" };
+            }
             case "special": {
                 // Passe/assinatura: ESTENDE a data de expiração no user (não empilha item).
                 if (quantity !== 1) throw new Error("Passes can only be purchased in quantity of 1.");
@@ -153,6 +240,10 @@ export class GarageService {
         const itemBlueprint = this._findItemBlueprint(baseId);
 
         if (!itemBlueprint) throw new Error("Item not found.");
+
+        if (baseId === "helper" && !this._canAccessHelperPaint(user)) {
+            throw new Error("This paint is restricted to candidate-plus users.");
+        }
 
         switch (itemBlueprint.category) {
             case "weapon": {
@@ -190,6 +281,7 @@ export class GarageService {
         const shopItems: any[] = [];
 
         const allItems = [...itemBlueprints.turrets, ...itemBlueprints.hulls];
+        const visibleItems = allItems.filter((itemBlueprint) => this._shouldShowGarageItem(itemBlueprint.id, userInventory));
 
         const formatItem = (item: any, modification: any) => ({
             id: item.id,
@@ -214,7 +306,7 @@ export class GarageService {
             object3ds: modification.object3ds(),
         });
 
-        allItems.forEach((itemBlueprint) => {
+        visibleItems.forEach((itemBlueprint) => {
             const userModification = userInventory[itemBlueprint.id] ?? -1;
             itemBlueprint.modifications.forEach((mod) => {
                 const formattedItem = formatItem(itemBlueprint, mod);
@@ -236,6 +328,10 @@ export class GarageService {
         const premiumActive = isActive(userInventory.premiumExpiresAt);
         const premiumSecs = secondsLeft(userInventory.premiumExpiresAt);
         itemBlueprints.paints.forEach((paintBlueprint) => {
+            if (paintBlueprint.id === "helper" && !this._canAccessHelperPaint(userInventory)) {
+                return;
+            }
+
             const formattedPaint = formatPaint(paintBlueprint);
             // Pintura premium: não é comprável nem fica em `user.paints`. Só aparece no DEPÓSITO enquanto o
             // premium está ativo, mostrando o tempo restante do premium; expirado, some (nem vai ao mercado).
@@ -287,6 +383,38 @@ export class GarageService {
             } else {
                 shopItems.push(formatSupply(supply));
             }
+        });
+
+        (itemBlueprints as any).kits?.forEach((kit: any) => {
+            if (this._doesUserOwnKit(userInventory, kit)) {
+                return;
+            }
+
+            const previewIdLow = typeof kit.previewResourceId === "function"
+                ? kit.previewResourceId()
+                : ResourceManager.getIdlowById(kit.previewResource as ResourceId);
+            const item = {
+                id: kit.id,
+                name: kit.name,
+                description: kit.description,
+                isInventory: false,
+                index: kit.index,
+                next_price: kit.price,
+                next_rank: kit.rank,
+                type: kit.type,
+                baseItemId: previewIdLow,
+                previewResourceId: previewIdLow,
+                rank: kit.rank,
+                category: kit.category,
+                properts: [],
+                discount: { percent: 0, timeLeftInSeconds: -1751196680, timeToStartInSeconds: -1751196680 },
+                grouped: false,
+                isForRent: false,
+                price: kit.price,
+                remainingTimeInSec: -1,
+                modificationID: 0,
+            };
+            shopItems.push(item);
         });
 
         // Passes/assinaturas (category "special", type 5): ATIVO → depósito com o tempo restante;
@@ -355,6 +483,9 @@ export class GarageService {
 
         const supply = (itemBlueprints as any).supplies.find((i: any) => i.id === baseId);
         if (supply) return { ...supply, category: "inventory" };
+
+        const kit = (itemBlueprints as any).kits?.find((i: any) => i.id === baseId);
+        if (kit) return kit;
 
         const pass = (itemBlueprints as any).passes?.find((i: any) => i.id === baseId);
         if (pass) return pass; // já traz category: "special"

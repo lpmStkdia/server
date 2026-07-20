@@ -1,0 +1,36 @@
+package §521423146292314642123423632234§
+{
+   import §521423102612310274123423632234§.§class super true§;
+   import §521423193672319380123423632234§.§package for class§;
+   import §5214232264232277123423632234§.§5214237893237906123423632234§;
+   import §catch super set§.§5214232681232694123423632234§;
+   import §implements use var§.§include while function§;
+   
+   public class §5214234019234032123423632234§ extends §5214232681232694123423632234§
+   {
+      
+      private var §521423157432315756123423632234§:§class super true§;
+      
+      public function §5214234019234032123423632234§()
+      {
+         super();
+         this.§class set function§ = 69;
+         this.§521423157432315756123423632234§ = §class super true§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(-1616861284,20194420)));
+      }
+      
+      override public function §5214235627235640123423632234§(param1:§package for class§) : void
+      {
+         switch(param1.§5214239737239750123423632234§() - 1566424318)
+         {
+            case 0:
+               this.§521423184882318501123423632234§(param1 as §521423139732313986123423632234§);
+         }
+      }
+      
+      private function §521423184882318501123423632234§(param1:§521423139732313986123423632234§) : void
+      {
+         this.§521423157432315756123423632234§.§521423184882318501123423632234§(param1.§521423155282315541123423632234§,param1.§521423169942317007123423632234§,param1.§static while false§,param1.§null set try§,param1.§521423161902316203123423632234§ as §include while function§);
+      }
+   }
+}
+

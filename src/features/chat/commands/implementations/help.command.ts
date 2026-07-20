@@ -19,6 +19,7 @@ const GROUP_LABEL: Record<ChatModeratorLevel, string> = {
     [ChatModeratorLevel.ADMINISTRATOR]: "ADMINISTRATOR",
     [ChatModeratorLevel.MODERATOR]: "MODERATOR",
     [ChatModeratorLevel.CANDIDATE]: "CANDIDATE",
+    [ChatModeratorLevel.HELPERR]: "CANDIDATE (legacy alias)",
     [ChatModeratorLevel.NONE]: "PUBLIC (all players)",
 };
 

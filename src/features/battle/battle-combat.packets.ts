@@ -17,13 +17,14 @@ export class ActivateSupplyCommandPacket extends BasePacket {
     itemId: string | null = null;
     // HOT PATH — hand-written monomorphic read (received on every supply activation; mine-spam macros fire
     // this hundreds of times/second). Byte-identical to `schema`.
-    read(buffer: Buffer): void { ActivateSupplyCommandPacket.codec.read(buffer, this); }
+    read(buffer: Buffer): void {
+        ActivateSupplyCommandPacket.codec.read(buffer, this);
+        console.log(`[ActivateSupplyCommand] received itemId=${JSON.stringify(this.itemId)}`);
+    }
     write(): Buffer { return ActivateSupplyCommandPacket.codec.write(this); }
     static getId(): number { return defs.battle.ActivateSupplyCommand.id; }
 }
 
-// S->C (to the activating client): confirms the activation so the client greys out the slot for
-// `cooldownMs` (effectTime + restSec) and decrements the count. `flag` is 1 in every observed case.
 export class ActivatedSupplyPacket extends BasePacket {
     static readonly codec = compileCodec(defs.battle.ActivatedSupply.schema!);
     itemId: string | null; cooldownMs: number; flag: number;

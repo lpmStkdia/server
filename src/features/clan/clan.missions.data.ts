@@ -35,35 +35,35 @@ export const MISSION_POINTS = 100;
 export const CLAN_MISSION_TEMPLATES: IClanMissionTemplate[] = [
     {
         metricKey: "kills",
-        description: "Destrua os inimigos",
+        description: "Destroy enemies",
         iconResource: "ui/clan/missions/kill_enemies",
         criteria: 3000,
         prizes: [
-            { item: "n2o", count: 16, name: "Aumento de Velocidade" },
-            { item: "armor", count: 5, name: "Blindagem Dupla" },
-            { item: "double_damage", count: 4, name: "Destruição Dupla" },
+            { item: "n2o", count: 16, name: "Speed Boost" },
+            { item: "armor", count: 5, name: "Double Armor" },
+            { item: "double_damage", count: 4, name: "Double Damage" },
         ],
     },
     {
         metricKey: "battleScore",
-        description: "Ganhe pontuação de batalha nas batalhas",
+        description: "Earn battle score in battles",
         iconResource: "ui/clan/missions/battle_score",
         criteria: 40000,
-        prizes: [{ item: "health", count: 20, name: "Kit de Reparação" }],
+        prizes: [{ item: "health", count: 20, name: "Repair Kit" }],
     },
     {
         metricKey: "crystals",
-        description: "Ganhe cristais em batalhas",
+        description: "Earn crystals in battles",
         iconResource: "ui/clan/missions/get_crystal",
         criteria: 20000,
-        prizes: [{ item: "mine", count: 49, name: "Mina" }],
+        prizes: [{ item: "mine", count: 49, name: "Mine" }],
     },
     {
         metricKey: "goldBox",
-        description: "Pegue uma Caixa de ouro",
+        description: "Pick up a Gold Box",
         iconResource: "ui/clan/missions/gold_box",
         criteria: 20,
-        prizes: [{ item: "crystals", count: 2653, name: "Cristais" }],
+        prizes: [{ item: "crystals", count: 2653, name: "Crystals" }],
     },
 ];
 

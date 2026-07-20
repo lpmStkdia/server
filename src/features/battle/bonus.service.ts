@@ -10,7 +10,8 @@ import { ResourceManager } from "@/utils/resource.manager";
 import logger from "@/utils/logger";
 import { Battle, BattleMode, EquipmentConstraintsMode } from "./battle.model";
 import { HEAL_DROP_EFFECT_MS, HEAL_MAX_GIVEN, SupplyService } from "./supply.service";
-import { GoldBoxComingNotificationPacket, GoldBoxTakenNotificationPacket, RemoveBonusPacket, SpawnBonusPacket, TakeBonusPacket } from "./battle.packets";
+import { BonusRegionsPacket, GoldBoxComingNotificationPacket, GoldBoxTakenNotificationPacket, RemoveBonusPacket, SpawnBonusPacket, TakeBonusPacket } from "./battle.packets";
+import { BonusType } from "./battle.types";
 
 const BONUS_FALLBACK_LIFETIME_MS = 30000; // used if a type has no lifeTimeMs in getBonusData
 // Extra time the server keeps the box AFTER its disappear time, so the client's final fade-out blink
@@ -79,7 +80,8 @@ const GOLD_THRESHOLD_STEP = 7000; // then each next = previous + STEP ± JITTER
 const GOLD_THRESHOLD_JITTER = 100;
 const GOLD_BOX_DROP_MIN_MS = 30000; // siren → drop delay (wiki: random 30-50s)
 const GOLD_BOX_DROP_MAX_MS = 50000;
-const GOLD_BOX_COMING_MESSAGE = "A caixa de ouro será deixada em breve";
+const GOLD_BOX_COMING_MESSAGE = "Gold box will arrive soon";
+const PUMPKIN_BOX_COMING_MESSAGE = "Pumpkin will arrive soon";
 const GOLD_BOX_SIREN_RESOURCE = "sounds/notifications/gold_box_siren" as ResourceId; // played with the siren toast
 
 // Maps the official bonus-type names found in the maps' <bonus-region> XML onto OUR bonus ids (the
@@ -178,22 +180,100 @@ export class BonusService {
         if (!battle.settings.withoutGoldSiren) {
             battle.broadcast(new GoldBoxComingNotificationPacket({ message: GOLD_BOX_COMING_MESSAGE, sound: ResourceManager.getIdlowById(GOLD_BOX_SIREN_RESOURCE) }));
         }
+        const position = this._getDropPosition(battle, "gold");
+        if (position && !battle.settings.withoutGoldZone) {
+            this._broadcastDropZoneMarker(battle, "gold", position);
+        }
         const delay = GOLD_BOX_DROP_MIN_MS + Math.floor(Math.random() * (GOLD_BOX_DROP_MAX_MS - GOLD_BOX_DROP_MIN_MS));
-        battle.timers.set("goldBoxDrop", delay, () => this._goldBoxDrop(battle));
+        battle.timers.set("goldBoxDrop", delay, () => this._goldBoxDrop(battle, position));
     }
 
-    /** Drops the gold box at a random `crystal_100` zone (falls back to any bonus region if the map has
-     *  none). */
-    private _goldBoxDrop(battle: Battle): void {
+    /** Drops the gold box at a random `crystal_100` zone (falls back to any bonus region if the map has none). */
+    private _goldBoxDrop(battle: Battle, position?: IVector3 | null): void {
+        const resolvedPosition = position ?? this._getDropPosition(battle, "gold");
+        if (!resolvedPosition) return;
+        this.spawnBonus(battle, "gold", resolvedPosition);
+    }
+
+    /** Admin command: announce and schedule multiple gold box drops. Each drop gets a siren notification and falls 30-50s later.
+     *  Bypasses parkour restrictions so golds can drop in any mode. */
+    public announceGoldBoxDrops(battle: Battle, count: number): void {
+        this.announceBonusDrops(battle, "gold", count);
+    }
+
+    /** Admin command: announce and schedule multiple bonus drops of any type. Each drop gets a random delay and falls at a bonus zone.
+     *  Bypasses parkour restrictions so bonuses can drop in any mode. */
+    public announceBonusDrops(battle: Battle, type: string, count: number): void {
+        if (count < 1) return;
+        const timestamp = Date.now();
+        for (let i = 0; i < count; i++) {
+            const delay = GOLD_BOX_DROP_MIN_MS + Math.floor(Math.random() * (GOLD_BOX_DROP_MAX_MS - GOLD_BOX_DROP_MIN_MS));
+            const uniqueKey = `bonusDrop:${type}:${timestamp}:${i}`;
+            const position = this._getDropPosition(battle, type);
+
+            // Broadcast the announcement for gold/pumpkin
+            if ((type === "gold" || type === "pumpkin") && !battle.settings.withoutGoldSiren) {
+                const message = type === "gold" ? GOLD_BOX_COMING_MESSAGE : PUMPKIN_BOX_COMING_MESSAGE;
+                battle.broadcast(new GoldBoxComingNotificationPacket({ message, sound: ResourceManager.getIdlowById(GOLD_BOX_SIREN_RESOURCE) }));
+            }
+            if (position && (type === "gold" || type === "pumpkin") && !battle.settings.withoutGoldZone) {
+                this._broadcastDropZoneMarker(battle, type, position);
+            }
+
+            // Schedule this specific drop with a unique timer key
+            battle.timers.set(uniqueKey, delay, () => this._bonusDropAdmin(battle, type, position));
+        }
+    }
+
+    /** Drops a bonus at a random zone matching the bonus type (falls back to any bonus region if the map has none).
+     *  This version is used by admin commands and bypasses parkour restrictions. */
+    private _bonusDropAdmin(battle: Battle, type: string, position?: IVector3 | null): void {
+        const resolvedPosition = position ?? this._getDropPosition(battle, type);
+        if (!resolvedPosition) return;
+        this._spawnBonusDirect(battle, type, resolvedPosition);
+    }
+
+    private _broadcastDropZoneMarker(battle: Battle, type: string, position: IVector3): void {
+        if (type !== "gold" && type !== "pumpkin") return;
+        const bonusMarkerResource = ResourceManager.getIdlowById("effects/bonus/drop_location_marker");
+        const bonusType = type === "gold" ? BonusType.GOLD : BonusType.PUMPKIN;
+        battle.broadcast(new BonusRegionsPacket({
+            bonusRegionResources: [
+                { bonusResource: bonusMarkerResource, bonusType: BonusType.GOLD },
+                { bonusResource: bonusMarkerResource, bonusType: BonusType.MOON },
+                { bonusResource: bonusMarkerResource, bonusType: BonusType.PUMPKIN },
+                { bonusResource: bonusMarkerResource, bonusType: BonusType.SPECIAL },
+            ],
+            bonusRegionData: [{ position, rotation: { x: 0, y: 0, z: 0 }, bonusType }],
+        }));
+    }
+
+    private _getDropPosition(battle: Battle, type: string): IVector3 | null {
         const mode = MODE_TOKEN[battle.settings.battleMode];
         const inMode = getMapBonusRegions(battle.mapResourceId).filter((r) => r.gameModes.includes(mode));
-        const goldZones = inMode.filter((r) => r.bonusType === "crystal_100");
-        const regions = goldZones.length > 0 ? goldZones : inMode;
-        if (regions.length === 0) return;
+
+        let regions = inMode;
+        if (type === "gold" || type === "pumpkin") {
+            const typedZones = inMode.filter((r) => r.bonusType === "crystal_100");
+            if (typedZones.length > 0) regions = typedZones;
+        }
+
+        if (regions.length === 0) return null;
         const region = regions[Math.floor(Math.random() * regions.length)];
         const rand = (a: number, b: number) => a + Math.random() * (b - a);
-        const position = { x: rand(region.min.x, region.max.x), y: rand(region.min.y, region.max.y), z: rand(region.min.z, region.max.z) };
-        this.spawnBonus(battle, "gold", position);
+        return { x: rand(region.min.x, region.max.x), y: rand(region.min.y, region.max.y), z: rand(region.min.z, region.max.z) };
+    }
+
+    /** Directly spawns a bonus without parkour restrictions (used by admin commands). */
+    private _spawnBonusDirect(battle: Battle, type: string, position: IVector3): string {
+        const lifeTimeMs = lifeTimeFor(type);
+        const disappearingTimeMs = lifeTimeMs - BONUS_BLINK_GRACE_MS;
+        const id = `${type}#${battle.activeBonuses.size}`;
+        const spawnedAt = Date.now();
+        battle.activeBonuses.set(id, { id, type, position, spawnedAt, lifeTimeMs });
+        battle.timers.set(id, lifeTimeMs, () => this.removeBonus(battle, id));
+        battle.broadcast(new SpawnBonusPacket({ id, position, disappearingTimeMs }));
+        return id;
     }
 
     /** Removes every active drop (e.g. on round restart) and RE-SEEDS the buff field from scratch (the
@@ -229,7 +309,8 @@ export class BonusService {
      *  each `crystal`-type zone, independently, spawn a crystal box (10) with chance 1-(1-p)^amount. Zones
      *  ignore occupancy (boxes may stack). No-op if bonuses are disabled. */
     public onFundAdded(battle: Battle, amount: number): void {
-        if (battle.settings.withoutBonuses || amount <= 0) return;
+        // Parkour battles do not spawn crystal/gold boxes from fund increments.
+        if (battle.settings.withoutBonuses || battle.settings.parkourMode || amount <= 0) return;
         const mode = MODE_TOKEN[battle.settings.battleMode];
         const zoneChance = 1 - Math.pow(1 - CRYSTAL_DROP_CHANCE, amount); // `amount` independent 1% rolls
         const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -292,6 +373,10 @@ export class BonusService {
     /** Drops a bonus of `type` at `position`. The per-type lifeTimeMs from getBonusData (sent to the
      *  client as disappearingTimeMs, blink included) is when the box disappears; the server removes it then. */
     public spawnBonus(battle: Battle, type: string, position: IVector3, regionIndex?: number): string {
+        // Do not spawn crystal/gold boxes in Parkour battles.
+        const CRYSTAL_TYPES = new Set(["crystall", "gold", "moon", "pumpkin", "special"]);
+        if (battle.settings.parkourMode && CRYSTAL_TYPES.has(type)) return "";
+
         // esport: NO box expires on the ground (any type only leaves when collected), so no removal timer.
         // Only the DROP SYSTEM differs per type (buff seeding/respawn vs crystal/gold fund-based), not the
         // lifetime — see [[bonus-drop-model]].

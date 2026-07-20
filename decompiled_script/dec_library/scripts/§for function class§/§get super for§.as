@@ -1,0 +1,15 @@
+package §for function class§
+{
+   import §5214237338237351123423632234§.§5214239746239759123423632234§;
+   
+   public interface §get super for§
+   {
+      
+      function §521423192472319260123423632234§() : void;
+      
+      function §case package do§(param1:§5214239746239759123423632234§, param2:§5214239746239759123423632234§) : void;
+      
+      function §521423151452315158123423632234§(param1:§5214239746239759123423632234§) : void;
+   }
+}
+

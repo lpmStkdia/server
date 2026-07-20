@@ -1,0 +1,25 @@
+package §package catch each§
+{
+   import §521423193672319380123423632234§.§package for class§;
+   import §5214232264232277123423632234§.§5214237893237906123423632234§;
+   import §5214236511236524123423632234§.§521423158212315834123423632234§;
+   import §catch super set§.§5214232681232694123423632234§;
+   
+   public class §function override§ extends §5214232681232694123423632234§
+   {
+      
+      private static var §521423165272316540123423632234§:§521423158212315834123423632234§;
+      
+      public function §function override§()
+      {
+         super();
+         this.§class set function§ = 17;
+         §521423165272316540123423632234§ = §521423158212315834123423632234§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(-129407920,249078121)));
+      }
+      
+      override public function §5214235627235640123423632234§(param1:§package for class§) : void
+      {
+      }
+   }
+}
+

@@ -30,6 +30,7 @@ export class CreateAccountHandler implements IPacketHandler<AuthPackets.CreateAc
             const user = await server.authService.createUser({
                 username: packet.nickname,
                 password: packet.password,
+                registeredIp: client.getRemoteAddress(),
             });
             client.user = user;
             logger.info(`Account created and auto-logged in for ${packet.nickname}`, { client: client.getRemoteAddress() });
@@ -157,9 +158,14 @@ export class RecoveryAccountSendCodeHandler implements IPacketHandler<AuthPacket
             const user = await server.userService.findUserByEmail(packet.email);
             if (user) {
                 const recoveryCode = crypto.randomBytes(16).toString("hex");
-                logger.info(`Recovery email sent to: ${packet.email}, code: ${recoveryCode}`);
                 client.recoveryEmail = packet.email;
                 client.recoveryCode = recoveryCode;
+                // Attempt to deliver the recovery code via email. Failure should not block the client flow.
+                try {
+                    await server.settingsService.sendRecoveryEmail(packet.email, recoveryCode);
+                } catch (err) {
+                    logger.warn(`Failed to send recovery email to ${packet.email}`, { error: (err as Error).message });
+                }
                 client.sendPacket(new AuthPackets.RecoveryEmailSent());
             } else {
                 logger.info(`Email not found: ${packet.email}`);

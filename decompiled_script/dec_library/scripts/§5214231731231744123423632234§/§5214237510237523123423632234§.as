@@ -1,0 +1,66 @@
+package §5214231731231744123423632234§
+{
+   import §521423165552316568123423632234§.§default var function§;
+   import §521423193672319380123423632234§.§package for class§;
+   import §5214232264232277123423632234§.§5214237893237906123423632234§;
+   import §5214236138236151123423632234§.§with catch finally§;
+   import §5214237505237518123423632234§.§5214235207235220123423632234§;
+   import §catch super set§.§5214232681232694123423632234§;
+   import §false for var§.§import catch case§;
+   import §switch set extends§.§521423139142313927123423632234§;
+   import §try super catch§.§implements catch static§;
+   
+   public class §5214237510237523123423632234§ extends §5214232681232694123423632234§
+   {
+      
+      private var §final use implements§:§5214235207235220123423632234§;
+      
+      private var §5214233362233375123423632234§:§implements catch static§;
+      
+      private var §521423182812318294123423632234§:§with catch finally§;
+      
+      private var §do finally for§:§import catch case§;
+      
+      private var §5214236170236183123423632234§:§521423139142313927123423632234§;
+      
+      public function §5214237510237523123423632234§()
+      {
+         super();
+         this.§class set function§ = 10;
+         this.§final use implements§ = §5214235207235220123423632234§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(-69241487,-998794949)));
+         this.§5214233362233375123423632234§ = §implements catch static§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(765896270,520379422)));
+         this.§521423182812318294123423632234§ = §with catch finally§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(403376202,590936613)));
+         this.§do finally for§ = §import catch case§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(-1571112238,131218437)));
+         this.§5214236170236183123423632234§ = §521423139142313927123423632234§(§default var function§.§import use include§().§5214231532231545123423632234§(§521423139142313927123423632234§));
+      }
+      
+      private function §include final§(param1:§5214237904237917123423632234§) : void
+      {
+         this.§5214233362233375123423632234§.putInitParams(param1.§521423120512312064123423632234§);
+         this.§final use implements§.§finally package break§();
+         this.§5214233362233375123423632234§.§finally package break§();
+         this.§5214233362233375123423632234§.§5214231664231677123423632234§();
+         this.§final use implements§.§5214231664231677123423632234§();
+         this.§521423182812318294123423632234§.§5214231664231677123423632234§();
+         this.§do finally for§.§5214231664231677123423632234§();
+      }
+      
+      private function §521423166852316698123423632234§(param1:§52142355723570123423632234§) : void
+      {
+         this.§5214236170236183123423632234§.§521423150302315043123423632234§().§5214232905232918123423632234§ = param1.enabled;
+      }
+      
+      override public function §5214235627235640123423632234§(param1:§package for class§) : void
+      {
+         switch(param1.§5214239737239750123423632234§())
+         {
+            case 907073245:
+               this.§include final§(param1 as §5214237904237917123423632234§);
+               break;
+            case 150222118:
+               this.§521423166852316698123423632234§(param1 as §52142355723570123423632234§);
+         }
+      }
+   }
+}
+

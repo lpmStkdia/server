@@ -1,0 +1,18 @@
+package §5214236738236751123423632234§
+{
+   import §break const get§.§5214236547236560123423632234§;
+   import §use for finally§.§5214235199235212123423632234§;
+   
+   public interface §5214238119238132123423632234§
+   {
+      
+      function §while for finally§() : void;
+      
+      function §521423191422319155123423632234§(param1:§5214236547236560123423632234§, param2:int) : void;
+      
+      function §521423184502318463123423632234§(param1:String, param2:int) : void;
+      
+      function §521423103982310411123423632234§(param1:§5214235199235212123423632234§, param2:§5214236547236560123423632234§) : void;
+   }
+}
+

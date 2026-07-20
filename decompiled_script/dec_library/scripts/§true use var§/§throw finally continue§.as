@@ -1,0 +1,46 @@
+package §true use var§
+{
+   import §521423101572310170123423632234§.§521423134722313485123423632234§;
+   import §521423101572310170123423632234§.§521423188192318832123423632234§;
+   import §521423101572310170123423632234§.§5214237009237022123423632234§;
+   import §5214232264232277123423632234§.§5214237893237906123423632234§;
+   
+   public interface §throw finally continue§
+   {
+      
+      function §else set package§(param1:§521423188192318832123423632234§) : void;
+      
+      function §var for use§(param1:int) : Class;
+      
+      function §var set dynamic§() : void;
+      
+      function §521423145032314516123423632234§() : void;
+      
+      function §52142351923532123423632234§(param1:§5214237893237906123423632234§) : void;
+      
+      function get §52142395123964123423632234§() : Vector.<§5214237009237022123423632234§>;
+      
+      function §521423115912311604123423632234§(param1:int, param2:Class) : void;
+      
+      function §use for§() : Boolean;
+      
+      function §521423126512312664123423632234§(param1:§5214237009237022123423632234§, param2:§521423134722313485123423632234§) : void;
+      
+      function §521423155302315543123423632234§() : void;
+      
+      function §include for use§(param1:§5214237893237906123423632234§) : §5214237009237022123423632234§;
+      
+      function §do var§(param1:§5214237893237906123423632234§) : Boolean;
+      
+      function §extends finally import§(param1:§5214237009237022123423632234§, param2:§521423134722313485123423632234§) : void;
+      
+      function §5214238337238350123423632234§(param1:§5214237009237022123423632234§, param2:§521423134722313485123423632234§) : void;
+      
+      function §include switch false§(param1:int) : Boolean;
+      
+      function §override catch break§(param1:§5214237009237022123423632234§) : void;
+      
+      function §5214232192232205123423632234§() : void;
+   }
+}
+

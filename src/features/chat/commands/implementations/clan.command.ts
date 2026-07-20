@@ -7,8 +7,8 @@ export default class ClanCommand implements ICommand {
     name = "clan";
     description = "Clan moderation: info <tag>, kick <username>, disband <tag>, block <tag> [reason], unblock <tag>. Usage: /clan [info/kick/disband/block/unblock] <target>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "[info/kick/disband/block/unblock] <target> [reason]";
-    example = "/clan block LGC Clan punished for cheating";
+    usage = "[info/kick/disband/block/unblock] <alvo> [motivo]";
+    example = "/clan block LGC Clã punido por trapaça";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const { server } = context;
@@ -27,8 +27,8 @@ export default class ClanCommand implements ICommand {
                 return;
             }
             context.reply(action === "block"
-                ? `Clan [${clan.tag}] blocked${reason ? ` (reason: ${reason})` : ""}.`
-                : `Clan [${clan.tag}] unblocked.`);
+                ? `Clã [${clan.tag}] bloqueado${reason ? ` (motivo: ${reason})` : ""}.`
+                : `Clã [${clan.tag}] desbloqueado.`);
             return;
         }
 

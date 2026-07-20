@@ -42,22 +42,36 @@ export class SetNotificationsHandler implements IPacketHandler<SettingsPackets.S
 
 export class UpdatePasswordHandler implements IPacketHandler<SettingsPackets.UpdatePassword> {
     public readonly packetId = SettingsPackets.UpdatePassword.getId();
+
     public async execute(client: GameClient, server: GameServer, packet: SettingsPackets.UpdatePassword): Promise<void> {
-        const originalEmail = client.recoveryEmail;
-        if (!originalEmail || !packet.password || !packet.email) {
-            client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "Dados inválidos." }));
+        if (!packet.password) {
+            client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "Invalid data." }));
             return;
         }
+
         try {
-            await server.settingsService.updatePasswordByEmail(originalEmail, packet.password, packet.email);
-            logger.info(`Password updated for user with original email ${originalEmail}`, { client: client.getRemoteAddress(), newEmail: packet.email });
-            client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: false, message: "Sua senha foi alterada com sucesso." }));
-        } catch (error: any) {
-            logger.error(`Failed to update password for ${originalEmail}`, { error: error.message });
-            if (error.message.includes("is already in use")) {
-                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "O e-mail fornecido já está em uso por outra conta." }));
+            if (client.user) {
+                const savedUser = await server.settingsService.updatePassword(client.user, packet.password);
+                client.user = savedUser;
+                logger.info(`Password updated for logged-in user ${client.user.username}`, { client: client.getRemoteAddress() });
+            } else if (client.recoveryEmail) {
+                const newEmail = packet.email?.trim() || client.recoveryEmail;
+                await server.settingsService.updatePasswordByEmail(client.recoveryEmail, packet.password, newEmail);
+                logger.info(`Password updated for user with original email ${client.recoveryEmail}`, { client: client.getRemoteAddress(), email: newEmail });
+                client.recoveryEmail = null;
+                client.recoveryCode = null;
             } else {
-                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "Ocorreu um erro ao atualizar sua senha." }));
+                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "Invalid data." }));
+                return;
+            }
+
+            client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: false, message: "Your password was successfully changed." }));
+        } catch (error: any) {
+            logger.error(`Failed to update password`, { error: error.message, client: client.getRemoteAddress() });
+            if (error.message.includes("is already in use")) {
+                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "The provided email is already in use by another account." }));
+            } else {
+                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "An error occurred while updating your password." }));
             }
         }
     }
@@ -79,6 +93,25 @@ export class RequestChangePasswordFormHandler implements IPacketHandler<Settings
     }
 }
 
+export class CheckPasswordHandler implements IPacketHandler<SettingsPackets.CheckPassword> {
+    public readonly packetId = SettingsPackets.CheckPassword.getId();
+
+    public async execute(client: GameClient, server: GameServer, packet: SettingsPackets.CheckPassword): Promise<void> {
+        if (!client.user || !packet.password) {
+            client.sendPacket(new SettingsPackets.CheckPasswordReject());
+            return;
+        }
+
+        client.user.verifyPassword(packet.password, (error, isMatch) => {
+            if (error || !isMatch) {
+                client.sendPacket(new SettingsPackets.CheckPasswordReject());
+                return;
+            }
+            client.sendPacket(new SettingsPackets.CheckPasswordAccept());
+        });
+    }
+}
+
 export class LinkEmailRequestHandler implements IPacketHandler<SettingsPackets.LinkEmailRequest> {
     public readonly packetId = SettingsPackets.LinkEmailRequest.getId();
     public async execute(client: GameClient, server: GameServer, packet: SettingsPackets.LinkEmailRequest): Promise<void> {
@@ -87,7 +120,7 @@ export class LinkEmailRequestHandler implements IPacketHandler<SettingsPackets.L
         try {
             const updatedUser = await server.settingsService.linkEmailToAccount(currentUser, packet.email);
             client.user = updatedUser;
-            client.sendPacket(new SettingsPackets.LinkAccountResultSuccess({ identifier: updatedUser.email ?? null }));
+            client.sendPacket(new SettingsPackets.LinkAccountResultSuccess({ identifier: updatedUser.pendingEmail ?? updatedUser.email ?? null }));
         } catch (error: any) {
             if (error.message === "EMAIL_IN_USE") {
                 client.sendPacket(new SettingsPackets.LinkAccountFailedAccountInUse({ method: "email" }));
@@ -96,5 +129,98 @@ export class LinkEmailRequestHandler implements IPacketHandler<SettingsPackets.L
                 client.sendPacket(new SettingsPackets.LinkAccountResultError());
             }
         }
+    }
+}
+
+export class LinkEmailWithPasswordHandler implements IPacketHandler<SettingsPackets.LinkEmailWithPassword> {
+    public readonly packetId = SettingsPackets.LinkEmailWithPassword.getId();
+
+    public async execute(client: GameClient, server: GameServer, packet: SettingsPackets.LinkEmailWithPassword): Promise<void> {
+        if (!client.user || !packet.password) {
+            client.sendPacket(new SettingsPackets.LinkAccountResultError());
+            return;
+        }
+
+        const login = packet.login?.trim() || "";
+        const password = packet.password;
+        const currentLogin = client.user.login?.toLowerCase() || "";
+        const currentEmail = client.user.email?.toLowerCase() || "";
+        const currentUsername = client.user.username?.toLowerCase() || "";
+        const normalizedLogin = login.toLowerCase();
+        const shouldFallbackToPasswordUpdate = !login
+            || normalizedLogin === currentLogin
+            || normalizedLogin === currentEmail
+            || normalizedLogin === currentUsername;
+
+        if (shouldFallbackToPasswordUpdate) {
+            // Support older/alternative client flows that reuse LinkEmailWithPassword for
+            // direct password updates. This also covers clients that send the current email
+            // or username in the login field while changing password.
+            try {
+                const savedUser = await server.settingsService.updatePassword(client.user, password);
+                client.user = savedUser;
+                logger.info(`Password updated via LinkEmailWithPassword fallback for user ${client.user.username}`, {
+                    client: client.getRemoteAddress(),
+                    loginProvided: login,
+                });
+                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: false, message: "Your password was successfully changed." }));
+            } catch (error: any) {
+                logger.error(`Failed to update password via LinkEmailWithPassword fallback`, {
+                    error: error.message,
+                    client: client.getRemoteAddress(),
+                    loginProvided: login,
+                });
+                client.sendPacket(new SettingsPackets.UpdatePasswordResult({ isError: true, message: "An error occurred while updating your password." }));
+            }
+            return;
+        }
+
+        const username = client.user.username;
+        client.user.verifyPassword(password, async (error: Error | undefined, isMatch?: boolean) => {
+            if (error || !isMatch) {
+                logger.info(`LinkEmailWithPassword password verification failed`, {
+                    client: client.getRemoteAddress(),
+                    login,
+                    username,
+                });
+                client.sendPacket(new SettingsPackets.LinkAccountResultError());
+                return;
+            }
+
+            try {
+                const updatedUser = await server.settingsService.linkEmailToAccount(client.user!, login);
+                client.user = updatedUser;
+                client.sendPacket(new SettingsPackets.LinkAccountResultSuccess({ identifier: updatedUser.pendingEmail ?? updatedUser.email ?? null }));
+            } catch (linkError: any) {
+                if (linkError.message === "EMAIL_IN_USE") {
+                    client.sendPacket(new SettingsPackets.LinkAccountFailedAccountInUse({ method: "email" }));
+                } else {
+                    logger.error(`Failed to link email via LinkEmailWithPassword`, {
+                        error: linkError.message,
+                        client: client.getRemoteAddress(),
+                        login,
+                    });
+                    client.sendPacket(new SettingsPackets.LinkAccountResultError());
+                }
+            }
+        });
+    }
+}
+
+export class RequestAccountActionEmailHandler implements IPacketHandler<SettingsPackets.RequestAccountActionEmail> {
+    public readonly packetId = SettingsPackets.RequestAccountActionEmail.getId();
+
+    public execute(client: GameClient, server: GameServer, _packet: SettingsPackets.RequestAccountActionEmail): void {
+        if (!client.user) {
+            logger.warn("RequestAccountActionEmail received from unauthenticated client.", { client: client.getRemoteAddress() });
+            return;
+        }
+
+        if (client.user.pendingEmail) {
+            client.sendPacket(new SettingsPackets.LinkAccountResultSuccess({ identifier: client.user.pendingEmail }));
+            return;
+        }
+
+        client.sendPacket(new SettingsPackets.LinkAccountResultError());
     }
 }

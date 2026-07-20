@@ -303,6 +303,7 @@ export class BattleWorkflow {
 
             client.battlePosition = spawnPoint.position;
             client.battleOrientation = spawnPoint.rotation;
+            client.getServer().battleService.mine.sweepSpawnedTankMines(client);
 
             let teamId = 2;
             if (battle.isTeamMode()) {

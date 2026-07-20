@@ -2,7 +2,7 @@ import { teleportTank } from "@/features/battle/teleport.util";
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** Teleports another player to the caller's position. Usage: /tphere <username> (case-insensitive). */
+/** Teleports another player to the caller's position. Uso: /tphere <username> (case-insensitive). */
 export default class TpHereCommand implements ICommand {
     name = "tphere";
     description = "Brings another player to your position. Usage: /tphere <username>.";

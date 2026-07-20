@@ -288,12 +288,11 @@ export class LobbyWorkflow {
                 score: user.experience,
                 serverNumber: 1,
                 nickname: user.username,
-                userProfileUrl: "http://ratings.example.com/pt_br/user/",
+                userProfileUrl: "http://skidtanks.duckdns.org/user/",
             })
         );
 
-        const maskedEmail = user.email ? FormatUtils.maskEmail(user.email) : null;
-        client.sendPacket(new EmailInfo({ email: maskedEmail, emailConfirmed: user.emailConfirmed }));
+        client.sendPacket(new EmailInfo({ email: null, emailConfirmed: false }));
 
         client.sendPacket(new ReferralInfo({ hash: user.referralHash, host: "s.pro-tanki.com" }));
     }

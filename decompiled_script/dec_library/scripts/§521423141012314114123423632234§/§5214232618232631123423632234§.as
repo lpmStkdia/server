@@ -1,0 +1,57 @@
+package §521423141012314114123423632234§
+{
+   import §5214231058231071123423632234§.§5214233248233261123423632234§;
+   import §521423163012316314123423632234§.§521423189512318964123423632234§;
+   import §521423165552316568123423632234§.§default var function§;
+   import §521423193672319380123423632234§.§package for class§;
+   import §5214232264232277123423632234§.§5214237893237906123423632234§;
+   import §5214238500238513123423632234§.§5214239434239447123423632234§;
+   import §catch super set§.§5214232681232694123423632234§;
+   
+   public class §5214232618232631123423632234§ extends §5214232681232694123423632234§
+   {
+      
+      private var §const finally return§:§521423189512318964123423632234§;
+      
+      private var §521423116652311678123423632234§:§5214233248233261123423632234§;
+      
+      public function §5214232618232631123423632234§()
+      {
+         super();
+         this.§class set function§ = 74;
+         this.§const finally return§ = §521423189512318964123423632234§(§521423100662310079123423632234§.§if function native§(§5214237893237906123423632234§.§switch try§(-1733766922,1388452832)));
+         this.§521423116652311678123423632234§ = §5214233248233261123423632234§(§default var function§.§import use include§().§5214231532231545123423632234§(§5214233248233261123423632234§));
+      }
+      
+      private function §521423101412310154123423632234§(param1:§521423176592317672123423632234§) : void
+      {
+         this.§const finally return§.§each const switch§(§521423116652311678123423632234§.§import for else§(param1.§class finally finally§));
+      }
+      
+      override public function §5214235627235640123423632234§(param1:§package for class§) : void
+      {
+         switch(param1.§5214239737239750123423632234§())
+         {
+            case -1616602030:
+               this.§with use for§(param1 as §dynamic finally true§);
+               break;
+            case 133452238:
+               this.§521423101412310154123423632234§(param1 as §521423176592317672123423632234§);
+               break;
+            case -891286317:
+               this.§521423140362314049123423632234§(param1 as §5214238835238848123423632234§);
+         }
+      }
+      
+      private function §with use for§(param1:§dynamic finally true§) : void
+      {
+         this.§const finally return§.§521423172632317276123423632234§(§521423116652311678123423632234§.§import for else§(param1.§class finally finally§));
+      }
+      
+      private function §521423140362314049123423632234§(param1:§5214238835238848123423632234§) : void
+      {
+         this.§const finally return§.§521423113072311320123423632234§(§521423116652311678123423632234§.§import for else§(param1.§class finally finally§),§5214239434239447123423632234§.§package var try§(param1.§5214239064239077123423632234§),param1.§catch package var§);
+      }
+   }
+}
+

@@ -82,15 +82,15 @@ export class CombatService {
         if (!ignoreShooterBuffs && SupplyService.hasEffect(shooterClient, SUPPLY_SLOT.DOUBLE_DAMAGE)) realDamage *= 2;
         if (SupplyService.hasEffect(targetClient, SUPPLY_SLOT.ARMOR)) realDamage *= 0.5;
 
-        // Paint resistance: the victim's equipped paint reduces damage from the SHOOTER's weapon by its
-        // RESISTANCE % (garage `properts`). The weapon defaults to the shooter's equipped turret; callers
-        // can override (a weapon id) or pass null to disable it (e.g. mines have no paint resistance).
+        // Paint resistance: the victim's equipped paint reduces incoming damage by its RESISTANCE %
+        // (garage `properts`). For turret hits we use the shooter's weapon-specific property; for non-
+        // weapon sources such as mines we still apply the universal ALL_RESISTANCE from the paint.
         // Disabled entirely in XP/BP (equipment-constraint) modes so the deterministic 2-shot matrix stays
         // pure — a resisting paint must not change the shot count there.
-        const weaponId = sourceWeapon === undefined ? shooterUser?.equippedTurret : sourceWeapon;
-        const resistProp = weaponId ? WEAPON_RESISTANCE[weaponId] : undefined;
-        if (resistProp && battle.settings.equipmentConstraintsMode === EquipmentConstraintsMode.NONE) {
-            const resistPct = ItemUtils.getPaintResistancePercent(targetUser, resistProp);
+        if (battle.settings.equipmentConstraintsMode === EquipmentConstraintsMode.NONE) {
+            const weaponId = sourceWeapon === undefined ? shooterUser?.equippedTurret : sourceWeapon;
+            const resistProp = weaponId ? WEAPON_RESISTANCE[weaponId] : undefined;
+            const resistPct = ItemUtils.getPaintResistancePercent(targetUser, resistProp ?? "ALL_RESISTANCE");
             if (resistPct > 0) realDamage *= 1 - resistPct / 100;
         }
 
@@ -227,32 +227,35 @@ export class CombatService {
         // rateio; o bônus de kill (abaixo) é separado, por cima.
         const assists = battle.isTeamMode() ? assistShares(victimClient.damageFromAttackers) : new Map<string, number>();
 
-        // No self/team-kill credit for the kill bonus.
-        if (killer.id !== victim.id) {
-            killerClient.kills++;
-            // Score pelo casco da VÍTIMA: 8 (leve: Wasp/Hornet) ou 10 (demais). Se a vítima estava
-            // CARREGANDO uma bandeira, o abate vale o DOBRO (16–20) — checado aqui, antes do emit("kill")
-            // que dropa a bandeira. O pool de assistência (15) NÃO dobra; só o bônus do abate.
-            const victimCarriesFlag = battle.flagCarrierRed?.id === victim.id || battle.flagCarrierBlue?.id === victim.id;
-            const killPoints = victimCarriesFlag ? killFlagCarrierScore(victim.equippedHull) : killScore(victim.equippedHull);
-            const killerAssist = Math.round(assists.get(killer.id) ?? 0);
-            assists.delete(killer.id); // pago junto ao abate — não repagar em _awardAssists
-            const score = killPoints + killerAssist;
-            // XP DE BATALHA (placar + métrica da partida) = base, SEM bônus de passe.
-            killerClient.battleScore += score;
-            killerClient.roundStats.xpEarned += score;
-            // XP DA CONTA (barra de progresso) = base × (1 + bônus dos passes ativos), aplicado no momento
-            // do ganho (premium/upScore/newbie). O bônus vai SÓ para a conta, nunca para a partida.
-            killer.experience += xpFromScore(killer, score);
-            // Real-time daily-quest progress (kills + battle score). Persisted by the killer.save() below; a
-            // newly-finished mission pushes the completion notification.
-            const questCompleted = advanceQuestsInMemory(killer, { kills: 1, score }).completed;
-            await killer.save();
-            killerClient.sendPacket(new ProfilePackets.UpdateScorePacket({ score: killer.experience }));
-            if (questCompleted) killerClient.sendPacket(new QuestCompletedNotification());
-            // Rank-up ao vivo pelo abate: notifica o próprio + atualiza o rank visual dos demais online.
-            await applyRankUp(killerClient.getServer(), killer);
-        }
+            // No self/team-kill credit for the kill bonus. In Parkour mode we do NOT award any score
+            // or account XP/crystals — keep gameplay (kills/deaths) but skip rewards and battleScore.
+            if (killer.id !== victim.id) {
+                killerClient.kills++;
+                if (!battle.settings.parkourMode) {
+                    // Score pelo casco da VÍTIMA: 8 (leve: Wasp/Hornet) ou 10 (demais). Se a vítima estava
+                    // CARREGANDO uma bandeira, o abate vale o DOBRO (16–20) — checado aqui, antes do emit("kill")
+                    // que dropa a bandeira. O pool de assistência (15) NÃO dobra; só o bônus do abate.
+                    const victimCarriesFlag = battle.flagCarrierRed?.id === victim.id || battle.flagCarrierBlue?.id === victim.id;
+                    const killPoints = victimCarriesFlag ? killFlagCarrierScore(victim.equippedHull) : killScore(victim.equippedHull);
+                    const killerAssist = Math.round(assists.get(killer.id) ?? 0);
+                    assists.delete(killer.id); // pago junto ao abate — não repagar em _awardAssists
+                    const score = killPoints + killerAssist;
+                    // XP DE BATALHA (placar + métrica da partida) = base, SEM bônus de passe.
+                    killerClient.battleScore += score;
+                    killerClient.roundStats.xpEarned += score;
+                    // XP DA CONTA (barra de progresso) = base × (1 + bônus dos passes ativos), aplicado no momento
+                    // do ganho (premium/upScore/newbie). O bônus vai SÓ para a conta, nunca para a partida.
+                    killer.experience += xpFromScore(killer, score);
+                    // Real-time daily-quest progress (kills + battle score). Persisted by the killer.save() below; a
+                    // newly-finished mission pushes the completion notification.
+                    const questCompleted = advanceQuestsInMemory(killer, { kills: 1, score }).completed;
+                    await killer.save();
+                    killerClient.sendPacket(new ProfilePackets.UpdateScorePacket({ score: killer.experience }));
+                    if (questCompleted) killerClient.sendPacket(new QuestCompletedNotification());
+                    // Rank-up ao vivo pelo abate: notifica o próprio + atualiza o rank visual dos demais online.
+                    await applyRankUp(killerClient.getServer(), killer);
+                }
+            }
         this._broadcastUserStat(battle, killerClient, killer);
 
         // Demais assistentes (todos que feriram a vítima, menos o abatedor já pago): Score + XP.

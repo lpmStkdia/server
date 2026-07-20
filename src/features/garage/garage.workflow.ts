@@ -36,6 +36,10 @@ export class GarageWorkflow {
             resourceIds.push(`paint/${paint.id}/preview` as ResourceId);
         });
 
+        itemBlueprints.kits?.forEach((kit) => {
+            resourceIds.push(kit.previewResource as ResourceId);
+        });
+
         // Supply preview icons (served from our own resource server, like every other resource).
         Object.values(supplyPreviewResources).forEach((resourceId) => resourceIds.push(resourceId));
         // Subscription-pass preview icons (newbie/up_score/pro_battle).
@@ -71,12 +75,22 @@ export class GarageWorkflow {
     /** Fully reloads the garage view if the client currently has it open (lobby or in-battle garage).
      *  Needed whenever the user's RANK changes with the garage open — the item lists are rank-dependent
      *  and the client does not rebuild them in place (items end up duplicated). Unloads the garage and
-     *  re-runs the load flow; the GARAGE_DATA callback then re-initializes it. No-op outside the garage. */
+     *  forces the client to reopen the garage UI so the full list is rebuilt from scratch. No-op outside the garage. */
     public static reloadGarage(client: GameClient, server: GameServer): void {
         const state = client.getState();
         if (state !== "chat_garage" && state !== "battle_garage") return;
-        logger.info(`Reloading garage for ${client.user?.username} (rank changed with the garage open).`);
+        logger.info(`Reloading garage for ${client.user?.username} (garage refresh requested).`);
         client.sendPacket(new GaragePackets.UnloadGaragePacket());
+
+        if (state === "chat_garage") {
+            client.setState("chat_garage");
+            client.sendPacket(new SetLayout({ layoutId: 1 }));
+            client.sendPacket(new UnloadBattleListPacket());
+        } else {
+            client.setState("battle_garage");
+            client.sendPacket(new SetLayout({ layoutId: 1 }));
+        }
+
         this._loadGarageDependencies(client);
     }
 
@@ -242,6 +256,7 @@ export class GarageWorkflow {
             ...Object.fromEntries(client.user.hulls),
             paints: client.user.paints,
             supplies: client.user.supplies,
+            kits: client.user.kits,
             // Expiração dos passes (para o render de assinaturas no market/depot).
             newbieExpiresAt: client.user.newbieExpiresAt,
             upScoreExpiresAt: client.user.upScoreExpiresAt,
@@ -250,6 +265,8 @@ export class GarageWorkflow {
             crystalAbonementExpiresAt: client.user.crystalAbonementExpiresAt,
             // Rank do jogador — para passes com preço que escala por rank (pro_battle).
             rank: client.user.rank,
+            // Moderator level — for XT item visibility (mods+ see all XT items in shop).
+            chatModeratorLevel: client.user.chatModeratorLevel,
         };
 
         const { garageItems, shopItems } = server.garageService.buildGarageData(userInventory);

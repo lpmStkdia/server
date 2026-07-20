@@ -11,6 +11,7 @@ import { chatModeratorPower } from "@/shared/models/enums/chat-moderator-level.e
 import { IVector3 } from "@/shared/types/geom/ivector3";
 import { ResourceId } from "@/generated/resourceTypes";
 import { ResourceManager } from "@/utils/resource.manager";
+import logger from "@/utils/logger";
 import * as crypto from "crypto";
 import { BattleTimers } from "./battle-timers";
 
@@ -203,8 +204,14 @@ export class Battle {
         this.battleId = crypto.randomBytes(8).toString("hex");
         this.settings = settings;
         const mapId = settings.mapId.replace("map_", "");
-        this.mapResourceId = ResourceManager.getMapResourceIdWithFallback(mapId, settings.mapTheme);
-        this.mapLibraryDependencies = ResourceManager.getMapResources(mapId, MapTheme[settings.mapTheme]);
+        try {
+            this.mapResourceId = ResourceManager.getMapResourceIdWithFallback(mapId, settings.mapTheme);
+            this.mapLibraryDependencies = ResourceManager.getMapResources(mapId, MapTheme[settings.mapTheme]);
+        } catch (error) {
+            logger.warn(`Using fallback map metadata for ${settings.mapId} because resources are unavailable`, { error });
+            this.mapResourceId = `map/${mapId}/${MapTheme[settings.mapTheme].toLowerCase()}/xml` as ResourceId;
+            this.mapLibraryDependencies = [];
+        }
     }
 
     public isTeamMode(): boolean {

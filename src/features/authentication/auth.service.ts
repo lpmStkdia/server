@@ -8,8 +8,8 @@ export class AuthService {
         this.userService = userService;
     }
 
-    public async createUser(attributes: UserCreationAttributes): Promise<UserDocument> {
-        return this.userService.createUser(attributes);
+    public async createUser(attributes: UserCreationAttributes & { registeredIp?: string | null }): Promise<UserDocument> {
+        return this.userService.createUser(attributes as any);
     }
 
     public async login(username: string, password: string): Promise<UserDocument> {

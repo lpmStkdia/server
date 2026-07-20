@@ -1,0 +1,27 @@
+package §finally super while§
+{
+   import §5214239320239333123423632234§.§521423117222311735123423632234§;
+   import §5214239320239333123423632234§.§521423144322314445123423632234§;
+   import §5214239320239333123423632234§.§5214232784232797123423632234§;
+   import §5214239320239333123423632234§.§5214239301239314123423632234§;
+   import §5214239320239333123423632234§.§false finally super§;
+   import §5214239320239333123423632234§.§finally const else§;
+   import §5214239320239333123423632234§.§true use case§;
+   import flash.display.BitmapData;
+   
+   public class §521423182332318246123423632234§
+   {
+      
+      public static const §super switch override§:BitmapData = new §true use case§(0,0);
+      
+      public static const §521423120142312027123423632234§:BitmapData = new §5214232784232797123423632234§(0,0);
+      
+      public static const §5214233182233195123423632234§:Vector.<BitmapData> = new <BitmapData>[null,new §521423144322314445123423632234§(0,0),new §5214239301239314123423632234§(0,0),new §521423117222311735123423632234§(0,0),new §false finally super§(0,0),new §finally const else§(0,0)];
+      
+      public function §521423182332318246123423632234§()
+      {
+         super();
+      }
+   }
+}
+

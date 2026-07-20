@@ -47,6 +47,15 @@ export type UpdatePassword = InstanceType<typeof UpdatePassword>;
 export const UpdatePasswordResult = packetClass(defs.settings.UpdatePasswordResult);
 export type UpdatePasswordResult = InstanceType<typeof UpdatePasswordResult>;
 
+export const CheckPassword = packetClass(defs.settings.CheckPassword);
+export type CheckPassword = InstanceType<typeof CheckPassword>;
+
+export const CheckPasswordAccept = packetClass(defs.settings.CheckPasswordAccept);
+export type CheckPasswordAccept = InstanceType<typeof CheckPasswordAccept>;
+
+export const CheckPasswordReject = packetClass(defs.settings.CheckPasswordReject);
+export type CheckPasswordReject = InstanceType<typeof CheckPasswordReject>;
+
 export const RequestChangePasswordForm = packetClass(defs.settings.RequestChangePasswordForm);
 export type RequestChangePasswordForm = InstanceType<typeof RequestChangePasswordForm>;
 
@@ -58,6 +67,21 @@ export type CreatePasswordForm = InstanceType<typeof CreatePasswordForm>;
 
 export const LinkEmailRequest = packetClass(defs.settings.LinkEmailRequest);
 export type LinkEmailRequest = InstanceType<typeof LinkEmailRequest>;
+
+export const LinkEmailWithPassword = packetClass(defs.settings.LinkEmailWithPassword);
+export type LinkEmailWithPassword = InstanceType<typeof LinkEmailWithPassword>;
+
+export class RequestAccountActionEmail extends BasePacket implements SettingsTypes.IRequestAccountActionEmail {
+    read(_buffer: Buffer): void {
+        // No payload.
+    }
+
+    write(): Buffer {
+        return Buffer.alloc(0);
+    }
+
+    static getId(): number { return -714487273; }
+}
 
 export const LinkAccountResultSuccess = packetClass(defs.settings.LinkAccountResultSuccess);
 export type LinkAccountResultSuccess = InstanceType<typeof LinkAccountResultSuccess>;

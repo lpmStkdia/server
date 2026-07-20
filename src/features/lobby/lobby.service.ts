@@ -11,33 +11,24 @@ export class LobbyService {
         this.createDefaultBattle();
     }
 
-    public validateName(name: string): string {
-        if (ValidationUtils.isNicknameInappropriate(name)) {
-            return "****";
-        }
-        return name;
-    }
-
     private createDefaultBattle(): void {
         const defaultBattleSettings: IBattleCreationSettings = {
-            name: "Batalha para Novatos",
+            name: "Moon Silence",
             privateBattle: false,
             proBattle: false,
-            battleMode: BattleMode.DM,
-            mapId: "map_sandbox",
-            // The client's BattlefieldModel holds tanks in a fixed Vector(60); the 61st tank
-            // overflows it with RangeError #1125. Never let a battle exceed MAX_TANKS_PER_BATTLE.
-            maxPeopleCount: 60,
+            battleMode: BattleMode.TDM,
+            mapId: "map_silence_moon",
+            maxPeopleCount: 15,
             minRank: 1,
             maxRank: 30,
-            timeLimitInSec: 600,
+            timeLimitInSec: 59940,
             scoreLimit: 20,
-            autoBalance: true,
+            autoBalance: false,
             friendlyFire: false,
-            parkourMode: false,
+            parkourMode: true,
             equipmentConstraintsMode: EquipmentConstraintsMode.NONE,
             reArmorEnabled: true,
-            mapTheme: MapTheme.SUMMER,
+            mapTheme: MapTheme.SPACE,
             withoutBonuses: false,
             withoutCrystals: false,
             withoutSupplies: false,
@@ -53,6 +44,13 @@ export class LobbyService {
             dependentCooldownEnabled: false,
         };
         this.createBattle(defaultBattleSettings);
+    }
+
+    public validateName(name: string): string {
+        if (ValidationUtils.isNicknameInappropriate(name)) {
+            return "****";
+        }
+        return name;
     }
 
     public createBattle(settings: IBattleCreationSettings, creator?: UserDocument): Battle {

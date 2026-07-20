@@ -12,6 +12,7 @@ export interface UserCreationAttributes {
     email?: string | null;
     crystals?: number;
     experience?: number;
+    registeredIp?: string | null;
 }
 
 export class UserService {
@@ -78,12 +79,37 @@ export class UserService {
         }
     }
 
+    public async findUserByEmailConfirmationToken(token: string): Promise<UserDocument | null> {
+        try {
+            return await User.findOne({
+                emailConfirmationToken: token,
+                emailConfirmationTokenExpiresAt: { $gt: new Date() },
+            });
+        } catch (error) {
+            logger.error(`Error finding user by email confirmation token`, { error });
+            throw error;
+        }
+    }
+
     public async isUsernameAvailable(username: string): Promise<boolean> {
         try {
             const user = await User.findOne({ login: username.toLowerCase() });
             return !user;
         } catch (error) {
             logger.error(`Error checking username availability for ${username}`, { error });
+            throw error;
+        }
+    }
+
+    public async findUserByPasswordResetToken(token: string): Promise<UserDocument | null> {
+        try {
+            if (!token) return null;
+            return await User.findOne({
+                passwordResetToken: token,
+                passwordResetTokenExpiresAt: { $gt: new Date() },
+            });
+        } catch (error) {
+            logger.error(`Error finding user by password reset token`, { error });
             throw error;
         }
     }
@@ -108,7 +134,7 @@ export class UserService {
         return suggestions;
     }
 
-    public async createUser(attributes: UserCreationAttributes): Promise<UserDocument> {
+    public async createUser(attributes: UserCreationAttributes & { registeredIp?: string | null } ): Promise<UserDocument> {
         try {
             const isUsernameTaken = !(await this.isUsernameAvailable(attributes.username));
             if (isUsernameTaken) {
@@ -137,6 +163,7 @@ export class UserService {
                 // Passe Iniciante concedido a toda conta nova (+50% XP + 100% cristais/batalha por 21 dias).
                 newbieExpiresAt: new Date(0),
                 referralHash: crypto.randomBytes(16).toString("hex"),
+                registeredIp: attributes.registeredIp ?? null,
             });
 
             return await user.save();
@@ -215,6 +242,13 @@ export class UserService {
         await user.save();
         logger.info(`Cargo (chatModeratorLevel) de ${user.username} definido para ${level}`);
         return user;
+    }
+
+    public async deleteUser(username: string): Promise<void> {
+        const user = await this.findUserByUsername(username);
+        if (!user) throw new Error(`Usuário "${username}" não encontrado.`);
+        await User.deleteOne({ _id: user._id });
+        logger.info(`User ${username} deleted by admin.`);
     }
 
     public async updateResources(userId: string, updates: { crystals?: number; experience?: number }): Promise<UserDocument> {

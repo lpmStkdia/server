@@ -4,12 +4,12 @@ import { UpdateRankPacket, UpdateScorePacket } from "@/features/profile/profile.
 import { ChatModeratorLevel, hasModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 
-/** Jumps straight to rank N by setting the experience to that rank's threshold. Self-use requires
- *  Moderator; targeting ANOTHER user requires Administrator (checked inside). */
+/** Jumps straight to rank N by setting the experience to that rank's threshold. Self-use is public
+ *  (sandbox server); targeting ANOTHER user requires Administrator (checked inside). */
 export default class SetRankCommand implements ICommand {
     name = "setrank";
     description = "Jumps straight to rank N (targeting another player requires Administrator). Usage: /setrank [username] <rank>.";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
     usage = "[username] <rank>";
     example = "/setrank 15";
 
@@ -31,8 +31,7 @@ export default class SetRankCommand implements ICommand {
             return;
         }
 
-        // Targeting someone else needs a higher role than self-use (which the outer permission gate
-        // already restricts to Moderator+).
+        // Targeting someone else is a staff action; self-use stays public.
         if (targetName && !hasModeratorPower(context.executor.user!.chatModeratorLevel, ChatModeratorLevel.ADMINISTRATOR)) {
             context.reply("Setting another player's rank requires Administrator role.");
             return;
@@ -61,7 +60,7 @@ export default class SetRankCommand implements ICommand {
                 // Rank-dependent garage lists don't rebuild in place — reload if they have it open.
                 GarageWorkflow.reloadGarage(online, server);
             }
-            // Updates the target's visual rank for everyone else online.
+            // Atualiza o rank visual do alvo para todos os demais online.
             broadcastPlayerRankToOthers(server, updated);
             context.reply(`${updated.username} is now rank ${updated.rank} (${rankInfo.name ?? ""}).`);
         } catch (error: any) {

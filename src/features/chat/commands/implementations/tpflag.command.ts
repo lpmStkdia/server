@@ -3,7 +3,7 @@ import { teleportTank } from "@/features/battle/teleport.util";
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** Teleports the caller to a CTF flag's current position. Usage: /tpflag <red|blue>. */
+/** Teleports the caller to a CTF flag's current position. Uso: /tpflag <red|blue>. */
 export default class TpFlagCommand implements ICommand {
     name = "tpflag";
     description = "Teleports you to the flag position. Usage: /tpflag <red|blue>.";
@@ -33,13 +33,13 @@ export default class TpFlagCommand implements ICommand {
         }
 
         const flagPosition = isRed ? battle.flagPositionRed : battle.flagPositionBlue;
-        const flagName = isRed ? "red" : "blue";
+        const flagName = isRed ? "vermelha" : "azul";
         if (!flagPosition) {
-            context.reply(`The ${flagName} flag is being carried.`);
+            context.reply(`The flag ${flagName} is being carried.`);
             return;
         }
 
         teleportTank(client, flagPosition);
-        context.reply(`Teleporting to the ${flagName} flag...`);
+        context.reply(`Teleporting to flag ${flagName}...`);
     }
 }

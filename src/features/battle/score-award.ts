@@ -29,7 +29,7 @@ export function broadcastUserStat(battle: Battle, client: GameClient): void {
  */
 export async function awardScore(battle: Battle, client: GameClient, points: number, extraQuest: { kills?: number } = {}): Promise<void> {
     const user = client.user;
-    if (!user || points <= 0) return;
+    if (!user || points <= 0 || battle.settings.parkourMode) return;
     // XP DE BATALHA (placar + métrica da partida) = base, SEM bônus de passe.
     client.battleScore += points;
     client.roundStats.xpEarned += points;

@@ -24,7 +24,7 @@ export default class FindCommand implements ICommand {
             return;
         }
         const pos = target.battlePosition;
-        const where = pos ? ` at x=${Math.round(pos.x)} y=${Math.round(pos.y)} z=${Math.round(pos.z)}` : " (off the field)";
+        const where = pos ? ` em x=${Math.round(pos.x)} y=${Math.round(pos.y)} z=${Math.round(pos.z)}` : " (fora de campo)";
         context.reply(`${target.user.username} is in match ${target.currentBattle.battleId}${target.isSpectator ? " as spectator" : ""}${where}.`);
     }
 }

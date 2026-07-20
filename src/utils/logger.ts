@@ -121,8 +121,9 @@ logger.on("finish", () => {
 
 process.on("beforeExit", (code) => {
   if (!isLoggerClosed) {
+    const exitCode = code ?? 0;
     logger.end(() => {
-      console.log(`Logger flushed and closed before exit with code: ${code}`);
+      console.log(`Logger flushed and closed before exit with code: ${exitCode}`);
     });
   }
 });

@@ -1,0 +1,15 @@
+package §521423114172311430123423632234§
+{
+   public class FriendsHelper extends PanelBubbleHelper
+   {
+      
+      public function FriendsHelper(param1:Number, param2:Number, param3:Number)
+      {
+         super(param1,param2,param3);
+         text = §521423164582316471123423632234§.§521423157602315773123423632234§("FRIENDS_MENU");
+         §5214231042231055123423632234§ = int(§521423164582316471123423632234§.§521423157602315773123423632234§("FRIENDS_MENU_ARROW_LENGTH"));
+         §521423135262313539123423632234§ = 17;
+      }
+   }
+}
+

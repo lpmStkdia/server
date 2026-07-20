@@ -1,0 +1,32 @@
+package §default package continue§
+{
+   import §521423188792318892123423632234§.§do function else§;
+   import §super return§.§dynamic function continue§;
+   
+   public class §5214239237239250123423632234§
+   {
+      
+      private var §5214234336234349123423632234§:§do function else§;
+      
+      private const §521423128732312886123423632234§:§521423165262316539123423632234§ = new §while catch final§();
+      
+      private const §override for§:§521423165262316539123423632234§ = new §while catch final§();
+      
+      private const §521423175052317518123423632234§:§521423165262316539123423632234§ = new §while catch final§();
+      
+      public function §5214239237239250123423632234§(param1:§dynamic function continue§)
+      {
+         super();
+         this.§5214234336234349123423632234§ = param1.§5214234336234349123423632234§;
+         this.§521423128732312886123423632234§.§extends function var§(param1.§5214234336234349123423632234§.x);
+         this.§override for§.§extends function var§(param1.§5214234336234349123423632234§.y);
+         this.§521423175052317518123423632234§.§extends function var§(param1.§5214234336234349123423632234§.§521423155722315585123423632234§);
+      }
+      
+      public function §switch finally final§() : Boolean
+      {
+         return this.§5214234336234349123423632234§.x != this.§521423128732312886123423632234§.§5214232584232597123423632234§() || this.§5214234336234349123423632234§.y != this.§override for§.§5214232584232597123423632234§() || this.§5214234336234349123423632234§.§521423155722315585123423632234§ != this.§521423175052317518123423632234§.§5214232584232597123423632234§();
+      }
+   }
+}
+

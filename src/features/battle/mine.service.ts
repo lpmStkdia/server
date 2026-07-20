@@ -194,16 +194,27 @@ export class MineService {
     }
 
     /** Removes every mine owned by `ownerNickname` (e.g. when they leave the battle). */
-    public removeMinesOf(battle: Battle, ownerNickname: string): void {
-        let removed = false;
+    public removeMinesOf(battle: Battle, ownerNickname: string): number {
+        let removedCount = 0;
         for (const [id, mine] of battle.activeMines) {
             if (mine.owner === ownerNickname) {
                 battle.timers.clear(`mineArm:${id}`);
                 battle.activeMines.delete(id);
-                removed = true;
+                removedCount++;
             }
         }
-        if (removed) battle.broadcast(new RemoveMinesPacket({ owner: ownerNickname }));
+        if (removedCount > 0) battle.broadcast(new RemoveMinesPacket({ owner: ownerNickname }));
+        return removedCount;
+    }
+
+    public sweepSpawnedTankMines(client: GameClient): void {
+        const { user, currentBattle: battle, battlePosition } = client;
+        if (!user || !battle || !battlePosition) return;
+
+        const previousState = client.battleState;
+        client.battleState = "active";
+        this.checkTriggers(client);
+        client.battleState = previousState;
     }
 
     private _detonate(battle: Battle, id: string, victimClient: GameClient): void {

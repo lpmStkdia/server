@@ -7,7 +7,7 @@ const PLACE_CHUNK = 50;                            // mines placed per tick (thr
 const PLACE_DELAY_MS = 100;                        // ~500 mines/s — chunked so it doesn't spike clients
 
 /** Debug: drops N mines spread in a disc around you. Throttled so a big count doesn't blast everyone's client
- *  with one broadcast burst. Usage: /mine <amount> [radius]. */
+ *  with one broadcast burst. Uso: /mine <amount> [radius]. */
 export default class MineAroundCommand implements ICommand {
     name = "mine";
     description = "Places N mines around you. Usage: /mine <amount> [radius].";

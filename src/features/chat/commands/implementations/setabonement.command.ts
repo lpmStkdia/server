@@ -3,16 +3,15 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 import { isCrystalAbonementActive } from "@/shared/models/passes";
 
 /**
- * Activates (or deactivates) the Double Crystals abonement on YOUR OWN account — for testing the UI
- * (deposit card + double indicator in the shop). Sets `crystalAbonementExpiresAt`. The effect appears
- * when REOPENING the garage/shop (there is no incremental packet for it). Only doubles DONATION
- * crystals, not crystals earned in-game.
+ * Ativa (ou desativa) o abonement de Dobro de Cristais na PRÓPRIA conta — para testar a UI (card no
+ * depósito + indicador de dobro no shop). Seta `crystalAbonementExpiresAt`. O efeito aparece ao REABRIR
+ * a garagem/loja (não há pacote incremental para isso). Dobra só cristais de DOAÇÃO, não ganhos em jogo.
  */
 export default class SetAbonementCommand implements ICommand {
     name = "setabonement";
     description = "Sets Double Crystals on your account for N hours (default 24; 0 disables). Usage: /setabonement [hours].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "[hours]";
+    usage = "[horas]";
     example = "/setabonement 24";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {

@@ -17,8 +17,9 @@ import { crystalBonuses } from "@/shared/models/passes";
 import { ChangeFundPacket, EffectStoppedPacket, FinishBattlePacket, RestartRoundDmPacket, RestartRoundTeamPacket, SetCtfScorePacket, SetRoundTimePacket } from "./battle.packets";
 
 const ROUND_FINISH_PAUSE_MS = 10000; // results screen before a finished round restarts
-const FUND_PER_KILL = 10; // crystals added to the battle fund per kill (matches official ~8-11/kill from captures)
-const FUND_PER_FLAG = 10; // crystals added to the battle fund per flag capture
+const FUND_MULTIPLIER = 5;
+const FUND_PER_KILL = 10 * FUND_MULTIPLIER; // crystals added to the battle fund per kill (matches official ~8-11/kill from captures)
+const FUND_PER_FLAG = 10 * FUND_MULTIPLIER; // crystals added to the battle fund per flag capture
 
 /**
  * Round lifecycle: the per-round time/score limits, the finish→pause→restart cycle (side switch,
@@ -75,9 +76,10 @@ export class RoundService {
         this.server.rankedService?.onRoundFinished(battle);
 
         // Crystal payout from the battle fund (team-first in team modes, then per player).
-        const players = [...battle.clients].filter((c) => c.user && !c.isSpectator);
-        // Reward base do fundo + bônus de cristais dos passes (newbie +100%, premium +100%) por jogador.
-        const rewards = this._computeRewards(battle, players).map((r) => ({ ...r, ...crystalBonuses(r.client.user!, r.reward) }));
+        const players = this._resolveBattlePlayers(battle);
+        const rewards = battle.settings.parkourMode
+            ? []
+            : this._computeRewards(battle, players).map((r) => ({ ...r, ...crystalBonuses(r.client.user!, r.reward) }));
 
         // Long-term metrics: fold the fund payout into each player's earned-crystals tally now (so the
         // record reflects it); the actual stats flush is deferred until AFTER crystals are credited —
@@ -236,9 +238,37 @@ export class RoundService {
         }
     }
 
+    private _resolveBattlePlayers(battle: Battle): GameClient[] {
+        const participantClients = new Map<string, GameClient>();
+        for (const client of battle.clients) {
+            if (client.user && !client.isSpectator && client.currentBattle?.battleId === battle.battleId) {
+                participantClients.set(client.user.id, client);
+            }
+        }
+
+        const rosterUsers = battle.getAllParticipants().filter((u) => !!u.id);
+        const players: GameClient[] = [];
+        const seenUserIds = new Set<string>();
+        for (const user of rosterUsers) {
+            if (seenUserIds.has(user.id)) continue;
+            seenUserIds.add(user.id);
+
+            const client = participantClients.get(user.id) ?? this.server.findClientByUsername(user.username);
+            if (!client || !client.user || client.isSpectator || client.currentBattle?.battleId !== battle.battleId) {
+                continue;
+            }
+            players.push(client);
+        }
+
+        return players;
+    }
+
     /** Adds to the battle fund (crystal pool), broadcasts the new total, and rolls crystal-box drops
      *  (wiki: 1% per crystal zone per crystal added — see BonusService.onFundAdded). */
     private _addFund(battle: Battle, amount: number): void {
+        // Parkour battles don't change the crystal fund or trigger fund-based drops.
+        if (battle.settings.parkourMode) return;
+
         battle.fund += amount;
         battle.broadcast(new ChangeFundPacket(battle.fund));
         this.bonus.onFundAdded(battle, amount);
@@ -256,12 +286,17 @@ export class RoundService {
         const fund = battle.fund;
         if (fund <= 0 || players.length === 0) return result(new Map());
 
-        // Splits a pot among members proportional to individual score. Members who scored 0 get 0; if
-        // nobody in the group scored, the pot is lost (no even-split fallback — 0 score earns nothing).
+        // Splits a pot among members proportional to individual score. For single-player battles (or
+        // scoreless rounds), the fund should still go to the participant rather than being dropped.
         const splitByScore = (members: GameClient[], pot: number): Map<GameClient, number> => {
             const out = new Map<GameClient, number>();
             const total = members.reduce((s, c) => s + Math.max(0, c.battleScore), 0);
-            if (pot <= 0 || total <= 0) return out;
+            if (pot <= 0) return out;
+            if (members.length === 1) {
+                out.set(members[0], pot);
+                return out;
+            }
+            if (total <= 0) return out;
             for (const c of members) {
                 if (c.battleScore > 0) out.set(c, Math.floor((pot * c.battleScore) / total));
             }

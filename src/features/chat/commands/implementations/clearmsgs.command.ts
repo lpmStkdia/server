@@ -3,28 +3,19 @@ import { ChatModeratorLevel, chatModeratorPower } from "@/shared/models/enums/ch
 import { RemoveUserChatMessagesPacket } from "@/features/chat/chat.packets";
 
 /**
- * Removes ALL of a user's chat messages — from the history (DB) and from every client's screen —
- * WITHOUT muting them (they can still talk). For spam cleanup. Hierarchy guard like /mute.
- *
- * With no username: wipes the ENTIRE chat (every message from every user, DB + all clients' screens).
+ * Remove TODAS as mensagens de chat de um usuário — do histórico (DB) e das telas de todos os clientes —
+ * SEM silenciá-lo (ele continua podendo falar). Para spam/limpeza pontual. Guard de hierarquia como o /mute.
  */
 export default class ClearMessagesCommand implements ICommand {
     name = "clearmsgs";
-    description = "Removes chat messages: a specific user's (does not mute), or the whole chat if no username is given. Usage: /clearmsgs [username].";
+    description = "Removes all messages from a user's chat (does not mute). Usage: /clearmsgs <username>.";
     permissionLevel = ChatModeratorLevel.MODERATOR;
-    usage = "[username]";
+    usage = "<username>";
     example = "/clearmsgs Joao";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
-        // No username → clear the entire chat for everyone.
         if (args.length < 1) {
-            const { deletedCount, usernames } = await context.server.chatService.removeAllMessages();
-            for (const username of usernames) {
-                const clearPacket = new RemoveUserChatMessagesPacket({ nickname: username });
-                for (const c of context.server.getClients()) c.sendPacket(clearPacket);
-            }
-
-            context.reply(`Entire chat cleared (${deletedCount} message(s) from ${usernames.length} sender(s) removed).`);
+            context.reply("Usage: /clearmsgs <username>.");
             return;
         }
 

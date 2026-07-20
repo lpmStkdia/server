@@ -1,0 +1,20 @@
+package §try catch return§
+{
+   import §5214231606231619123423632234§.§class super get§;
+   import §5214234455234468123423632234§.§521423108012310814123423632234§;
+   import §5214235296235309123423632234§.§finally set try§;
+   import §5214238090238103123423632234§.§521423152812315294123423632234§;
+   import §final set§.§5214233862233875123423632234§;
+   import §in set§.§5214234365234378123423632234§;
+   
+   public class §521423150782315091123423632234§ extends §case function try§
+   {
+      
+      public function §521423150782315091123423632234§(param1:§5214234365234378123423632234§, param2:§finally set try§, param3:Number)
+      {
+         var _loc4_:§class super get§ = new §class super get§(new §5214233862233875123423632234§(param2));
+         super(new §521423152812315294123423632234§(param1,param3,_loc4_),new §521423108012310814123423632234§(param1,param3),_loc4_);
+      }
+   }
+}
+

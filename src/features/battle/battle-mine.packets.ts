@@ -1,5 +1,6 @@
+import { BasePacket } from "@/packets/base.packet";
 import { packetClass } from "@/packets/packet-class";
-import { defs } from "protanki-protocol";
+import { defs, compileCodec } from "protanki-protocol";
 
 // Mine lifecycle packets. Wire formats verified against the 2026-06-19 logs.
 // IDs e schemas em `protanki-protocol` (defs.battle.*).
@@ -8,6 +9,31 @@ import { defs } from "protanki-protocol";
 // present byte), optString owner nickname. The client hides enemies' mines until they activate.
 export const PutMinePacket = packetClass(defs.battle.PutMine);
 export type PutMinePacket = InstanceType<typeof PutMinePacket>;
+
+// C->S: the client detected a direct hull touch with a mine and reports the mine id that was hit.
+// This is intentionally tiny and fire-and-forget so it can be sent from the client immediately on
+// the same collision that the client already uses to play the explosion/visual effect.
+export class MineTouchCommandPacket extends BasePacket {
+    static readonly codec = compileCodec(defs.battle.ActivateMine.schema!);
+    mineId: string | null = null;
+
+    constructor(data?: { mineId?: string | null }) {
+        super();
+        if (data) this.mineId = data.mineId ?? null;
+    }
+
+    read(buffer: Buffer): void {
+        MineTouchCommandPacket.codec.read(buffer, this);
+    }
+
+    write(): Buffer {
+        return MineTouchCommandPacket.codec.write(this);
+    }
+
+    static getId(): number {
+        return defs.battle.ActivateMine.id;
+    }
+}
 
 // S->C: a mine becomes ARMED (sent ~1s after PutMine). Wire: optString id.
 export const ActivateMinePacket = packetClass(defs.battle.ActivateMine);

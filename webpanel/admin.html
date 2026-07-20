@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ops Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --panel: #121821;
+    --panel-2: #171f2a;
+    --panel-3: #1d2733;
+    --border: #232d3a;
+    --border-soft: #1b2430;
+    --text: #e9eef4;
+    --text-muted: #8794a3;
+    --text-faint: #566171;
+    --accent: #e8a33d;
+    --accent-soft: rgba(232, 163, 61, 0.14);
+    --accent-dim: #7a5a26;
+    --red: #ea4c53;
+    --red-soft: rgba(234, 76, 83, 0.14);
+    --blue: #4c8dff;
+    --blue-soft: rgba(76, 141, 255, 0.14);
+    --green: #34d399;
+    --green-soft: rgba(52, 211, 153, 0.14);
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(232, 163, 61, 0.05), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(76, 141, 255, 0.05), transparent 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--accent); }
+
+  button, input, select {
+    font-family: var(--sans);
+    font-size: 13.5px;
+  }
+
+  a { color: var(--accent); }
+
+  .shell { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 224px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, var(--panel), #0d1219);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .brand { padding: 20px 18px 16px; border-bottom: 1px solid var(--border-soft); }
+  .brand .mark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--text-faint); text-transform: uppercase; }
+  .brand h1 { font-size: 17px; margin: 4px 0 0; font-weight: 700; letter-spacing: -0.01em; }
+  .uplink { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-family: var(--mono); font-size: 10.5px; color: var(--green); letter-spacing: 0.06em; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); animation: pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+  .nav-item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 12px; border-radius: 8px; cursor: pointer; text-align: left; margin-bottom: 2px; transition: background 0.12s, color 0.12s, border-color 0.12s; }
+  .nav-item .label { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; }
+  .nav-item .glyph { font-family: var(--mono); font-size: 12px; color: var(--text-faint); width: 16px; text-align: center; }
+  .nav-item:hover { background: var(--panel-2); color: var(--text); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(232,163,61,0.25); }
+  .nav-item.active .glyph { color: var(--accent); }
+  .nav-count { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); background: var(--panel-3); padding: 1px 7px; border-radius: 999px; }
+  .nav-item.active .nav-count { background: rgba(232,163,61,0.2); color: var(--accent); }
+
+  .session { padding: 14px 16px 18px; border-top: 1px solid var(--border-soft); }
+  .session .who { font-size: 13px; font-weight: 600; }
+  .session .role { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em; color: var(--accent); margin-top: 2px; }
+  .session button { width: 100%; margin-top: 10px; }
+
+  .content { flex: 1; min-width: 0; padding: 26px 30px 60px; max-width: 1180px; }
+
+  .telemetry { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+  .telemetry .stat { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; min-width: 130px; }
+  .telemetry .stat .n { font-family: var(--mono); font-size: 22px; font-weight: 600; line-height: 1; }
+  .telemetry .stat .l { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-faint); text-transform: uppercase; margin-top: 6px; }
+  .telemetry .stat.accent .n { color: var(--accent); }
+  .telemetry .stat.red .n { color: var(--red); }
+  .telemetry .stat.blue .n { color: var(--blue); }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
+  .panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0 0 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+  .panel h3 .tag { font-family: var(--mono); font-size: 10px; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 999px; letter-spacing: 0.04em; }
+  .panel p.hint { color: var(--text-faint); font-size: 12px; margin: -8px 0 12px; }
+
+  .section-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .section-sub { color: var(--text-muted); font-size: 13px; margin: 0 0 22px; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+
+  input, select { padding: 9px 11px; border-radius: 7px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); outline: none; transition: border-color 0.12s; }
+  input::placeholder { color: var(--text-faint); }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  button { padding: 9px 14px; border-radius: 7px; border: 1px solid var(--accent-dim); background: var(--accent); color: #1a1305; font-weight: 600; cursor: pointer; transition: filter 0.12s, transform 0.05s; }
+  button:hover { filter: brightness(1.08); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; filter: none; }
+
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  button.ghost:hover { background: var(--panel-2); }
+
+  button.danger { background: var(--red); border-color: #7a1f22; color: #fff; }
+  button.warn { background: transparent; border: 1px solid var(--red); color: var(--red); }
+  button.warn:hover { background: var(--red-soft); }
+  button.link { background: transparent; border: none; color: var(--accent); padding: 4px 6px; font-weight: 500; }
+  button.small { padding: 5px 9px; font-size: 12px; }
+
+  .muted { color: var(--text-muted); }
+  .faint { color: var(--text-faint); font-size: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  tbody td { padding: 9px 10px; border-bottom: 1px solid var(--border-soft); }
+  tbody tr.clickable { cursor: pointer; transition: background 0.1s; }
+  tbody tr.clickable:hover { background: var(--panel-2); }
+  tbody tr.selected { background: var(--accent-soft); }
+
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 999px; background: var(--panel-3); color: var(--text-muted); border: 1px solid var(--border); }
+  .pill.on { color: var(--green); border-color: rgba(52,211,153,0.3); background: var(--green-soft); }
+  .pill.off { color: var(--text-faint); }
+  .pill.red { color: var(--red); border-color: rgba(234,76,83,0.3); background: var(--red-soft); }
+  .pill.blue { color: var(--blue); border-color: rgba(76,141,255,0.3); background: var(--blue-soft); }
+  .pill.accent { color: var(--accent); border-color: rgba(232,163,61,0.3); background: var(--accent-soft); }
+
+  .chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 6px 3px 12px; font-size: 12.5px; margin: 3px 4px 3px 0; }
+  .chip.red { border-color: rgba(234,76,83,0.35); }
+  .chip.blue { border-color: rgba(76,141,255,0.35); }
+  .chip button { padding: 3px 8px; font-size: 11px; border-radius: 999px; }
+
+  .subnav { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .subnav button { background: var(--panel-2); border: 1px solid var(--border); color: var(--text-muted); font-weight: 500; padding: 7px 13px; }
+  .subnav button.active { background: var(--accent-soft); border-color: rgba(232,163,61,0.3); color: var(--accent); }
+
+  .empty { color: var(--text-faint); font-size: 13px; padding: 24px 0; text-align: center; border: 1px dashed var(--border); border-radius: 8px; }
+
+  .field-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; display: block; }
+  .field { display: flex; flex-direction: column; }
+
+  .danger-zone { border: 1px solid rgba(234,76,83,0.3); background: var(--red-soft); border-radius: var(--radius); padding: 16px 18px; }
+
+  .kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px 18px; margin: 6px 0 4px; }
+  .kv .item .l { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint); }
+  .kv .item .v { font-size: 13.5px; margin-top: 2px; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  #toastRoot { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+  .toast { font-family: var(--sans); font-size: 13px; background: var(--panel-3); border: 1px solid var(--border); border-left: 3px solid var(--accent); color: var(--text); padding: 11px 16px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 220px; animation: toastIn 0.18s ease-out; }
+  .toast.error { border-left-color: var(--red); }
+  .toast.success { border-left-color: var(--green); }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  #modalRoot { position: fixed; inset: 0; z-index: 1001; display: none; align-items: center; justify-content: center; background: rgba(6,9,13,0.6); backdrop-filter: blur(2px); }
+  #modalRoot.open { display: flex; }
+  .modal { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 22px; width: 380px; max-width: 90vw; }
+  .modal h4 { margin: 0 0 10px; font-size: 15px; }
+  .modal p { color: var(--text-muted); font-size: 13.5px; margin: 0 0 18px; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 30% 20%, rgba(232,163,61,0.08), transparent 45%), radial-gradient(circle at 75% 80%, rgba(76,141,255,0.07), transparent 45%), var(--bg); }
+  .login-card { width: 360px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; }
+  .login-card .mark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--text-faint); text-transform: uppercase; }
+  .login-card h1 { font-size: 21px; margin: 6px 0 22px; }
+  .login-card .field { margin-bottom: 12px; }
+  .login-card button { width: 100%; margin-top: 6px; padding: 11px; }
+  .login-error { color: var(--red); font-size: 12.5px; margin-top: 12px; min-height: 16px; }
+
+  @media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .sidebar { position: static; width: 100%; height: auto; flex-direction: row; overflow-x: auto; }
+    .brand, .session { display: none; }
+    .nav { display: flex; padding: 10px; }
+    .content { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <div class="mark">Ops Console // Staff Access</div>
+      <h1>Sign in</h1>
+      <div class="field">
+        <span class="field-label">Username</span>
+        <input id="username" placeholder="your account username" />
+      </div>
+      <div class="field">
+        <span class="field-label">Password</span>
+        <input id="password" type="password" placeholder="********" />
+      </div>
+      <button onclick="login()">Enter console</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+
+  <div id="appScreen" class="shell" style="display:none">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="mark">Ops Console</div>
+        <h1>Server Command</h1>
+        <div class="uplink"><span class="dot"></span> UPLINK OK</div>
+      </div>
+      <nav class="nav" id="navList">
+        <button class="nav-item active" data-tab="overview" onclick="showTab('overview')">
+          <span class="label"><span class="glyph">&#9670;</span>Overview</span>
+        </button>
+        <button class="nav-item" data-tab="online" onclick="showTab('online')">
+          <span class="label"><span class="glyph">&#9679;</span>Online</span>
+          <span class="nav-count" id="navOnlineCount">0</span>
+        </button>
+        <button class="nav-item" data-tab="players" onclick="showTab('players')">
+          <span class="label"><span class="glyph">&#9635;</span>Players</span>
+        </button>
+        <button class="nav-item" data-tab="battles" onclick="showTab('battles')">
+          <span class="label"><span class="glyph">&#9650;</span>Battles</span>
+          <span class="nav-count" id="navBattleCount">0</span>
+        </button>
+        <button class="nav-item" data-tab="accounts" onclick="showTab('accounts')">
+          <span class="label"><span class="glyph">&#9638;</span>Accounts</span>
+        </button>
+        <button class="nav-item" data-tab="catalog" onclick="showTab('catalog')">
+          <span class="label"><span class="glyph">&#9671;</span>Item Reference</span>
+        </button>
+      </nav>
+      <div class="session">
+        <div class="who" id="sessionWho">-</div>
+        <div class="role" id="sessionRole">-</div>
+        <button class="ghost" onclick="logout()">Log out</button>
+      </div>
+    </aside>
+
+    <main class="content">
+
+      <section class="tab-panel active" id="tab-overview">
+        <div class="section-title">Overview</div>
+        <div class="section-sub">Live server status and fast global actions.</div>
+
+        <div class="telemetry">
+          <div class="stat accent"><div class="n" id="statOnline">0</div><div class="l">Online now</div></div>
+          <div class="stat"><div class="n" id="statBattles">0</div><div class="l">Active battles</div></div>
+          <div class="stat"><div class="n" id="statRestart">24h</div><div class="l">Auto-restart cycle</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Lobby broadcast</h3>
+          <p class="hint">Sends a system message to every player currently in the lobby.</p>
+          <div class="row">
+            <input id="broadcastMessage" placeholder="Message to all players..." style="flex:1; min-width:260px" />
+            <button onclick="broadcastMessage()">Send broadcast</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Server control <span class="tag">Admin / CM</span></h3>
+          <p class="hint">Gracefully restarts the process (5s warning to connected clients). The server also restarts itself automatically every 24 hours.</p>
+          <button class="danger" onclick="restartServer()">Restart server now</button>
+        </div>
+
+        <div class="panel">
+          <h3>Create account</h3>
+          <div class="grid">
+            <div class="field"><span class="field-label">Username</span><input id="newUser" placeholder="username" /></div>
+            <div class="field"><span class="field-label">Password</span><input id="newPass" type="password" placeholder="password" /></div>
+            <div class="field"><span class="field-label">Starting crystals</span><input id="newCrystals" placeholder="0" /></div>
+            <div class="field"><span class="field-label">Starting XP</span><input id="newExperience" placeholder="0" /></div>
+          </div>
+          <div class="row" style="margin-top:12px"><button onclick="createAccount()">Create account</button></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-online">
+        <div class="section-title">Online players</div>
+        <div class="section-sub">Everyone currently connected, live session length, and where they are.</div>
+        <div class="panel">
+          <div class="row" style="margin-bottom:12px"><button class="ghost" onclick="refreshOverview()">Refresh</button></div>
+          <div id="onlineUsersTable"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-players">
+        <div class="section-title">Players</div>
+        <div class="section-sub">Search a player to manage their moderation status, resources, garage, and location.</div>
+
+        <div class="panel">
+          <h3>Search</h3>
+          <div class="row">
+            <input id="playerQuery" placeholder="Username prefix..." style="flex:1; min-width:200px" onkeydown="if(event.key==='Enter') loadPlayers()" />
+            <button onclick="loadPlayers()">Search</button>
+          </div>
+          <div id="playerList" style="margin-top:14px"></div>
+        </div>
+
+        <div id="playerDetailWrap"></div>
+      </section>
+
+      <section class="tab-panel" id="tab-battles">
+        <div class="section-title">Battles</div>
+        <div class="section-sub">Live matches, teams, mines, bonuses, and full match control.</div>
+
+        <div class="panel">
+          <h3>Create battle</h3>
+          <div class="grid">
+            <div class="field"><span class="field-label">Name</span><input id="createBattleName" placeholder="Nova batalha" /></div>
+            <div class="field"><span class="field-label">Map</span><input id="createBattleMap" placeholder="map_sandbox" /></div>
+            <div class="field"><span class="field-label">Mode</span><select id="createBattleMode"><option value="1">TDM</option><option value="0">DM</option><option value="2">CTF</option><option value="3">CP</option></select></div>
+            <div class="field"><span class="field-label">Max players</span><input id="createBattleMaxPlayers" placeholder="16" /></div>
+            <div class="field"><span class="field-label">Min rank</span><input id="createBattleMinRank" placeholder="1" /></div>
+            <div class="field"><span class="field-label">Max rank</span><input id="createBattleMaxRank" placeholder="30" /></div>
+            <div class="field"><span class="field-label">Time limit (s)</span><input id="createBattleTimeLimit" placeholder="600" /></div>
+            <div class="field"><span class="field-label">Score limit</span><input id="createBattleScoreLimit" placeholder="20" /></div>
+            <div class="field"><span class="field-label">Private</span><select id="createBattlePrivate"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">Auto-balance</span><select id="createBattleAutoBalance"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">Friendly fire</span><select id="createBattleFriendlyFire"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">Parkour</span><select id="createBattleParkour"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">Theme</span><select id="createBattleTheme"><option value="SPACE">Space</option><option value="SUMMER">Summer</option></select></div>
+            <div class="field"><span class="field-label">No bonuses</span><select id="createBattleWithoutBonuses"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">No crystals</span><select id="createBattleWithoutCrystals"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">No supplies</span><select id="createBattleWithoutSupplies"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">No upgrades</span><select id="createBattleWithoutUpgrades"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">No mines</span><select id="createBattleWithoutMines"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field"><span class="field-label">Random gold</span><select id="createBattleRandomGold"><option value="true">Yes</option><option value="false">No</option></select></div>
+          </div>
+          <div class="row" style="margin-top:12px"><button onclick="createBattleFromAdmin()">Create battle</button></div>
+        </div>
+
+        <div class="panel">
+          <h3>Active battles</h3>
+          <div class="row">
+            <input id="battleQuery" placeholder="Filter by name or ID..." style="flex:1; min-width:200px" oninput="renderBattleListFiltered()" />
+            <button class="ghost" onclick="loadBattles()">Refresh</button>
+          </div>
+          <div id="battleList" style="margin-top:14px"></div>
+        </div>
+
+        <div id="battleDetailWrap"></div>
+      </section>
+
+      <section class="tab-panel" id="tab-accounts">
+        <div class="section-title">Registered accounts</div>
+        <div class="section-sub">Every account on the server, including the IP it registered from.</div>
+        <div class="panel">
+          <div class="row">
+            <input id="accountQuery" placeholder="Search username prefix..." style="flex:1; min-width:200px" onkeydown="if(event.key==='Enter') loadAccounts()" />
+            <button onclick="loadAccounts()">Search</button>
+          </div>
+          <div id="accountsList" style="margin-top:14px"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-catalog">
+        <div class="section-title">Item reference</div>
+        <div class="section-sub">Exact IDs to use in the garage editor.</div>
+        <div class="panel">
+          <div id="itemCatalog"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="toastRoot"></div>
+  <div id="modalRoot"><div class="modal" id="modalBox"></div></div>
+
+<script>
+  const state = { token: localStorage.getItem("adminToken") || "", role: "", username: "", selectedPlayer: null, selectedBattle: null, playerSubTab: "profile" };
+
+  async function request(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (state.token) headers["x-admin-token"] = state.token;
+    const res = await fetch(path, { ...options, headers });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "request failed");
+    return data;
+  }
+
+  function toast(message, type = "info") {
+    const root = document.getElementById("toastRoot");
+    const el = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    root.appendChild(el);
+    setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity 0.25s"; setTimeout(() => el.remove(), 250); }, 3200);
+  }
+
+  function confirmModal(title, message) {
+    return new Promise((resolve) => {
+      const root = document.getElementById("modalRoot");
+      const box = document.getElementById("modalBox");
+      box.innerHTML = `<h4>${escapeHtml(title)}</h4><p>${escapeHtml(message)}</p>
+        <div class="actions">
+          <button class="ghost" id="modalCancel">Cancel</button>
+          <button class="danger" id="modalConfirm">Confirm</button>
+        </div>`;
+      root.classList.add("open");
+      const cleanup = (result) => { root.classList.remove("open"); resolve(result); };
+      box.querySelector("#modalCancel").onclick = () => cleanup(false);
+      box.querySelector("#modalConfirm").onclick = () => cleanup(true);
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function fmtDuration(ms) {
+    if (ms === null || ms === undefined) return "-";
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m ${s}s`;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "-";
+    try { return new Date(iso).toLocaleString(); } catch (e) { return iso; }
+  }
+
+  function isCM() {
+    return (state.role || "").toUpperCase().replace(/[^A-Z]/g, "").includes("COMMUNITYMANAGER");
+  }
+
+  function showTab(tabName) {
+    document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
+    document.getElementById(`tab-${tabName}`).classList.add("active");
+    document.querySelector(`.nav-item[data-tab="${tabName}"]`)?.classList.add("active");
+    if (tabName === "players" && !document.getElementById("playerList").innerHTML) loadPlayers();
+    if (tabName === "battles") loadBattles();
+    if (tabName === "catalog") loadCatalog();
+    if (tabName === "accounts") loadAccounts();
+  }
+
+  function jumpToPlayer(username) {
+    showTab("players");
+    document.getElementById("playerQuery").value = username;
+    selectPlayer(username);
+  }
+
+  async function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const error = document.getElementById("loginError");
+    try {
+      const data = await request("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      state.token = data.token;
+      localStorage.setItem("adminToken", data.token);
+      error.textContent = "";
+      enterConsole(data.user);
+    } catch (err) {
+      error.textContent = err.message;
+    }
+  }
+
+  async function logout() {
+    try { await request("/api/admin/logout", { method: "POST" }); } catch (e) {}
+    state.token = "";
+    localStorage.removeItem("adminToken");
+    document.getElementById("appScreen").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+  }
+
+  function enterConsole(user) {
+    state.role = user.roleName;
+    state.username = user.username;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appScreen").style.display = "flex";
+    document.getElementById("sessionWho").textContent = user.username;
+    document.getElementById("sessionRole").textContent = user.roleName;
+    refreshOverview();
+    showTab("overview");
+  }
+
+  async function refreshOverview() {
+    try {
+      const overview = await request("/api/admin/overview");
+      document.getElementById("statOnline").textContent = overview.onlineCount;
+      document.getElementById("statBattles").textContent = overview.battleCount;
+      document.getElementById("navOnlineCount").textContent = overview.onlineCount;
+      document.getElementById("navBattleCount").textContent = overview.battleCount;
+      document.getElementById("onlineUsersTable").innerHTML = renderOnlineUsers(overview.onlineUsers);
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  }
+
+  function renderOnlineUsers(users) {
+    if (!users.length) return '<div class="empty">No one is online right now.</div>';
+    return `<table><thead><tr><th>Player</th><th>Role</th><th>Location</th><th>Session</th><th>Last login</th><th>IP</th><th></th></tr></thead><tbody>
+      ${users.map(u => `<tr>
+        <td><strong>${escapeHtml(u.username)}</strong></td>
+        <td><span class="pill">${escapeHtml(u.roleName)}</span></td>
+        <td>${u.battleName ? escapeHtml(u.battleName) : '<span class="muted">Lobby</span>'}</td>
+        <td class="faint">${fmtDuration(u.onlineDurationMs)}</td>
+        <td class="faint">${fmtDate(u.lastLogin)}</td>
+        <td class="faint">${escapeHtml(u.ip || '-')}</td>
+        <td>
+          <button class="small ghost" onclick="jumpToPlayer('${escapeHtml(u.username)}')">Manage</button>
+          <button class="small warn" onclick="quickKick('${escapeHtml(u.username)}')">Kick</button>
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  async function quickKick(username) {
+    const ok = await confirmModal("Kick player", `Disconnect ${username} from the game right now?`);
+    if (!ok) return;
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(username)}/kick`, { method: "POST" });
+      toast(`${username} kicked`, "success");
+      refreshOverview();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function broadcastMessage() {
+    const text = document.getElementById("broadcastMessage").value.trim();
+    if (!text) return toast("Write a message first", "error");
+    try {
+      await request("/api/admin/broadcast", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      document.getElementById("broadcastMessage").value = "";
+      toast("Broadcast sent", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function restartServer() {
+    const ok = await confirmModal("Restart server", "This restarts the process in 5 seconds and disconnects everyone. Continue?");
+    if (!ok) return;
+    try {
+      await request("/api/admin/restart", { method: "POST" });
+      toast("Restart requested - server going down in 5s", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function createAccount() {
+    const username = document.getElementById("newUser").value.trim();
+    const password = document.getElementById("newPass").value;
+    const crystals = Number(document.getElementById("newCrystals").value) || 0;
+    const experience = Number(document.getElementById("newExperience").value) || 0;
+    if (!username || !password) return toast("Username and password required", "error");
+    try {
+      const data = await request("/api/admin/accounts/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password, crystals, experience }) });
+      toast(`Account "${data.username}" created`, "success");
+      document.getElementById("newUser").value = "";
+      document.getElementById("newPass").value = "";
+      document.getElementById("newCrystals").value = "";
+      document.getElementById("newExperience").value = "";
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function createBattleFromAdmin() {
+    const body = {
+      name: document.getElementById("createBattleName").value.trim() || "Nova batalha",
+      mapId: document.getElementById("createBattleMap").value.trim() || "map_sandbox",
+      battleMode: Number(document.getElementById("createBattleMode").value),
+      maxPeopleCount: Number(document.getElementById("createBattleMaxPlayers").value) || 16,
+      minRank: Number(document.getElementById("createBattleMinRank").value) || 1,
+      maxRank: Number(document.getElementById("createBattleMaxRank").value) || 30,
+      timeLimitInSec: Number(document.getElementById("createBattleTimeLimit").value) || 600,
+      scoreLimit: Number(document.getElementById("createBattleScoreLimit").value) || 20,
+      privateBattle: document.getElementById("createBattlePrivate").value === "true",
+      autoBalance: document.getElementById("createBattleAutoBalance").value === "true",
+      friendlyFire: document.getElementById("createBattleFriendlyFire").value === "true",
+      parkourMode: document.getElementById("createBattleParkour").value === "true",
+      mapTheme: document.getElementById("createBattleTheme").value,
+      withoutBonuses: document.getElementById("createBattleWithoutBonuses").value === "true",
+      withoutCrystals: document.getElementById("createBattleWithoutCrystals").value === "true",
+      withoutSupplies: document.getElementById("createBattleWithoutSupplies").value === "true",
+      withoutUpgrades: document.getElementById("createBattleWithoutUpgrades").value === "true",
+      withoutMines: document.getElementById("createBattleWithoutMines").value === "true",
+      randomGold: document.getElementById("createBattleRandomGold").value === "true",
+    };
+    try {
+      const data = await request("/api/admin/battles/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      toast(`Battle created: ${data.name}`, "success");
+      await loadBattles();
+      selectBattle(data.battleId);
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function loadPlayers() {
+    const query = document.getElementById("playerQuery").value.trim();
+    try {
+      const users = await request(`/api/admin/players?query=${encodeURIComponent(query)}`);
+      document.getElementById("playerList").innerHTML = renderPlayerResults(users);
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  function renderPlayerResults(players) {
+    if (!players.length) return '<div class="empty">No players found.</div>';
+    return `<table><thead><tr><th>Username</th><th>Rank</th><th>Crystals</th><th>Status</th></tr></thead><tbody>
+      ${players.map(p => `<tr class="clickable ${state.selectedPlayer === p.username ? 'selected' : ''}" onclick="selectPlayer('${escapeHtml(p.username)}')">
+        <td><strong>${escapeHtml(p.username)}</strong></td>
+        <td>${p.rank}</td>
+        <td>${p.crystals}</td>
+        <td>${p.online ? '<span class="pill on">Online</span>' : '<span class="pill off">Offline</span>'}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  async function selectPlayer(username) {
+    state.selectedPlayer = username;
+    state.playerSubTab = "profile";
+    await renderPlayerDetail();
+    const rows = document.querySelectorAll('#playerList tbody tr');
+    rows.forEach((r) => r.classList.remove('selected'));
+  }
+
+  async function renderPlayerDetail() {
+    const username = state.selectedPlayer;
+    const wrap = document.getElementById("playerDetailWrap");
+    if (!username) { wrap.innerHTML = ""; return; }
+    try {
+      const [profile, garage] = await Promise.all([
+        request(`/api/admin/players/${encodeURIComponent(username)}`),
+        request(`/api/admin/accounts/${encodeURIComponent(username)}/garage`),
+      ]);
+
+      const subtabs = ["profile", "moderation", "resources", "position", "danger"];
+      const labels = { profile: "Profile", moderation: "Moderation", resources: "Resources & garage", position: "Position & teleport", danger: "Danger zone" };
+
+      wrap.innerHTML = `
+        <div class="panel">
+          <h3>${escapeHtml(profile.username)} ${profile.online ? '<span class="pill on">Online</span>' : '<span class="pill off">Offline</span>'} <span class="tag">${escapeHtml(profile.roleName)}</span></h3>
+          <div class="subnav">
+            ${subtabs.map(t => `<button class="${state.playerSubTab === t ? 'active' : ''}" onclick="setPlayerSubTab('${t}')">${labels[t]}</button>`).join('')}
+          </div>
+          <div id="playerSubtabContent"></div>
+        </div>`;
+
+      renderPlayerSubtabContent(profile, garage);
+    } catch (err) {
+      wrap.innerHTML = `<div class="panel"><div class="empty">Could not load ${escapeHtml(username)}: ${escapeHtml(err.message)}</div></div>`;
+    }
+  }
+
+  function setPlayerSubTab(tab) {
+    state.playerSubTab = tab;
+    renderPlayerDetail();
+  }
+
+  function renderPlayerSubtabContent(profile, garage) {
+    const el = document.getElementById("playerSubtabContent");
+    if (!el) return;
+    const tab = state.playerSubTab;
+
+    if (tab === "profile") {
+      const online = profile.onlineStats;
+      el.innerHTML = `
+        <div class="kv">
+          <div class="item"><div class="l">Registered IP</div><div class="v">${escapeHtml(profile.registeredIp || '-')}</div></div>
+          <div class="item"><div class="l">Created</div><div class="v">${fmtDate(profile.createdAt)}</div></div>
+          <div class="item"><div class="l">Last login</div><div class="v">${fmtDate(profile.lastLogin)}</div></div>
+          <div class="item"><div class="l">Crystals</div><div class="v">${profile.crystals}</div></div>
+          <div class="item"><div class="l">Experience</div><div class="v">${profile.experience}</div></div>
+          <div class="item"><div class="l">Rank</div><div class="v">${profile.rank}</div></div>
+          <div class="item"><div class="l">Premium until</div><div class="v">${profile.premiumExpiresAt ? fmtDate(profile.premiumExpiresAt) : 'none'}</div></div>
+          <div class="item"><div class="l">Banned</div><div class="v">${profile.isPunished ? 'Yes' : 'No'}</div></div>
+          <div class="item"><div class="l">Muted until</div><div class="v">${fmtDate(profile.mutedUntil)}</div></div>
+          <div class="item"><div class="l">Equipped</div><div class="v">Hull ${escapeHtml(String(profile.equippedHull))} - Turret ${escapeHtml(String(profile.equippedTurret))} - Paint ${escapeHtml(String(profile.equippedPaint))}</div></div>
+        </div>
+        ${online ? `<h3 style="margin-top:18px">Live session</h3>
+          <div class="kv">
+            <div class="item"><div class="l">Battle</div><div class="v">${escapeHtml(online.battleName || 'Lobby')} ${online.battleId ? `<span class="faint">(${escapeHtml(online.battleId)})</span>` : ''}</div></div>
+            <div class="item"><div class="l">Session length</div><div class="v">${fmtDuration(online.onlineDurationMs)}</div></div>
+            <div class="item"><div class="l">IP</div><div class="v">${escapeHtml(online.ip || '-')}</div></div>
+            <div class="item"><div class="l">Team</div><div class="v">${online.team ?? '-'}</div></div>
+            <div class="item"><div class="l">Kills / Deaths</div><div class="v">${online.kills ?? 0} / ${online.deaths ?? 0}</div></div>
+            <div class="item"><div class="l">Battle score</div><div class="v">${online.battleScore ?? 0}</div></div>
+          </div>` : '<p class="faint" style="margin-top:14px">Player is offline - moderation and economy actions still work.</p>'}
+      `;
+      return;
+    }
+
+    if (tab === "moderation") {
+      el.innerHTML = `
+        <div class="grid">
+          <div class="field"><span class="field-label">Set role</span>
+            <select id="pRole">
+              <option value="NONE">NONE</option>
+              <option value="HELPER">HELPER</option>
+              <option value="MODERATOR">MODERATOR</option>
+              <option value="COMMUNITY_MANAGER">COMMUNITY_MANAGER</option>
+              <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+            </select>
+          </div>
+          <div class="field" style="justify-content:flex-end"><button onclick="setPlayerRole()">Apply role</button></div>
+        </div>
+        <p class="faint">Moderator / Community Manager / Administrator roles require a Community Manager session.</p>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <div class="grid">
+          <div class="field"><span class="field-label">Ban - hours</span><input id="pBanHours" placeholder="24" /></div>
+          <div class="field"><span class="field-label">Reason</span><input id="pBanReason" placeholder="Staff action" /></div>
+          <div class="field" style="justify-content:flex-end"><button class="danger" onclick="banPlayer()">Ban</button></div>
+          <div class="field" style="justify-content:flex-end"><button class="ghost" onclick="unbanPlayer()">Unban</button></div>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          <div class="field"><span class="field-label">Mute - minutes</span><input id="pMuteMinutes" placeholder="60" /></div>
+          <div class="field"><span class="field-label">Reason</span><input id="pMuteReason" placeholder="Spamming / harassment" /></div>
+          <div class="field" style="justify-content:flex-end"><button class="warn" onclick="mutePlayer()">Mute</button></div>
+          <div class="field" style="justify-content:flex-end"><button class="ghost" onclick="unmutePlayer()">Unmute</button></div>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          <div class="field"><span class="field-label">Punish - minutes</span><input id="pPunishMinutes" placeholder="60" /></div>
+          <div class="field"><span class="field-label">Reason</span><input id="pPunishReason" placeholder="Staff action" /></div>
+          <div class="field" style="justify-content:flex-end"><button class="danger" onclick="punishPlayer()">Punish</button></div>
+        </div>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <button class="warn" onclick="kickPlayerFromGame()">Kick from game now</button>
+      `;
+      return;
+    }
+
+    if (tab === "resources") {
+      const hulls = Object.entries(garage.hulls || {}).map(([id, mod]) => `<span class="chip">${escapeHtml(id)} <span class="faint">mod ${mod}</span> <button class="small ghost" onclick="removeGarageItem('hull','${escapeHtml(id)}')">x</button></span>`).join('') || '<span class="faint">none</span>';
+      const turrets = Object.entries(garage.turrets || {}).map(([id, mod]) => `<span class="chip">${escapeHtml(id)} <span class="faint">mod ${mod}</span> <button class="small ghost" onclick="removeGarageItem('turret','${escapeHtml(id)}')">x</button></span>`).join('') || '<span class="faint">none</span>';
+      const paints = (garage.paints || []).map((id) => `<span class="chip">${escapeHtml(id)} <button class="small ghost" onclick="removeGarageItem('paint','${escapeHtml(id)}')">x</button></span>`).join('') || '<span class="faint">none</span>';
+      const supplies = Object.entries(garage.supplies || {}).map(([id, count]) => `<span class="chip">${escapeHtml(id)} <span class="faint">x${count}</span> <button class="small ghost" onclick="removeGarageItem('supply','${escapeHtml(id)}')">x</button></span>`).join('') || '<span class="faint">none</span>';
+
+      el.innerHTML = `
+        <h3 style="font-size:12px">Crystals & experience</h3>
+        <div class="grid">
+          <div class="field"><span class="field-label">Crystals</span><input id="pCrystals" placeholder="${profile.crystals}" /></div>
+          <div class="field"><span class="field-label">Experience</span><input id="pExperience" placeholder="${profile.experience}" /></div>
+          <div class="field" style="justify-content:flex-end"><button onclick="updateResources()">Update</button></div>
+        </div>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <h3 style="font-size:12px">Premium</h3>
+        <div class="row">
+          <input id="pPremiumDays" placeholder="+/- days" style="width:120px" />
+          <button onclick="adjustPremium()">Adjust</button>
+          <button class="ghost" onclick="clearPremium()">Clear premium</button>
+          <span class="faint">Currently: ${profile.premiumExpiresAt ? fmtDate(profile.premiumExpiresAt) : 'none'}</span>
+        </div>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <h3 style="font-size:12px">Garage</h3>
+        <div class="grid">
+          <div class="field"><span class="field-label">Type</span>
+            <select id="pGarageType"><option value="paint">Paint</option><option value="hull">Hull</option><option value="turret">Turret</option><option value="supply">Supply</option></select>
+          </div>
+          <div class="field"><span class="field-label">Item ID</span><input id="pGarageId" placeholder="e.g. hornet" /></div>
+          <div class="field"><span class="field-label">Modification</span><input id="pGarageMod" placeholder="hull/turret only" /></div>
+          <div class="field"><span class="field-label">Count</span><input id="pGarageCount" placeholder="supply only" /></div>
+        </div>
+        <div class="row" style="margin-top:10px"><button onclick="addGarageItem()">Give item</button></div>
+        <p class="faint" style="margin-top:14px">See Item Reference for exact IDs.</p>
+        <div style="margin-top:8px"><div class="faint" style="margin-bottom:4px">Hulls</div>${hulls}</div>
+        <div style="margin-top:10px"><div class="faint" style="margin-bottom:4px">Turrets</div>${turrets}</div>
+        <div style="margin-top:10px"><div class="faint" style="margin-bottom:4px">Paints</div>${paints}</div>
+        <div style="margin-top:10px"><div class="faint" style="margin-bottom:4px">Supplies</div>${supplies}</div>
+      `;
+      return;
+    }
+
+    if (tab === "position") {
+      const online = profile.onlineStats;
+      el.innerHTML = `
+        ${online ? `<p class="faint">Currently in <strong>${escapeHtml(online.battleName || 'Lobby')}</strong>${online.battleId ? ` (${escapeHtml(online.battleId)})` : ''}</p>` : '<p class="faint">Player must be online and in a battle for teleport/position actions to work.</p>'}
+        <div class="row">
+          <button class="ghost" onclick="getPlayerPosition()">Get current position</button>
+        </div>
+        <div id="posResult" class="faint" style="margin-top:8px"></div>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <div class="grid">
+          <div class="field"><span class="field-label">X</span><input id="pTx" placeholder="x" /></div>
+          <div class="field"><span class="field-label">Y</span><input id="pTy" placeholder="y" /></div>
+          <div class="field"><span class="field-label">Z</span><input id="pTz" placeholder="z" /></div>
+          <div class="field" style="justify-content:flex-end"><button onclick="teleportCoords()">Teleport to coordinates</button></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <input id="pTeleportPlayer" placeholder="Teleport to this player's username" style="flex:1" />
+          <button onclick="teleportToPlayer()">Go</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <select id="pTeleportFlag"><option value="red">Red flag</option><option value="blue">Blue flag</option></select>
+          <button onclick="teleportToFlag()">Teleport to flag</button>
+        </div>
+        <hr style="border-color:var(--border-soft); margin:16px 0" />
+        <div class="grid">
+          <div class="field" style="justify-content:flex-end"><button class="warn" onclick="kickFromBattle()">Kick from battle</button></div>
+          <div class="field" style="justify-content:flex-end"><button class="danger" onclick="destroyInBattle()">Kill player (destroy tank)</button></div>
+        </div>
+      `;
+      return;
+    }
+
+    if (tab === "danger") {
+      el.innerHTML = `
+        <div class="danger-zone">
+          <h3 style="color:var(--red)">Delete account</h3>
+          <p class="faint">Permanently deletes this account and disconnects them if online. This cannot be undone.</p>
+          <button class="danger" onclick="deletePlayerAccount()" ${isCM() ? '' : 'disabled title="Community Manager only"'}>Delete account</button>
+          ${isCM() ? '' : '<p class="faint" style="margin-top:8px">Requires a Community Manager session.</p>'}
+        </div>
+      `;
+      return;
+    }
+  }
+
+  async function setPlayerRole() {
+    const role = document.getElementById("pRole").value;
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/role`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role }) });
+      toast("Role updated", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function banPlayer() {
+    const hours = Number(document.getElementById("pBanHours").value) || 24;
+    const reason = document.getElementById("pBanReason").value.trim() || "Staff action";
+    const ok = await confirmModal("Ban player", `Ban ${state.selectedPlayer} for ${hours} hour(s)?`);
+    if (!ok) return;
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/ban`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hours, reason }) });
+      toast("Player banned", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function unbanPlayer() {
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/unban`, { method: "POST" });
+      toast("Player unbanned", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function mutePlayer() {
+    const minutes = Number(document.getElementById("pMuteMinutes").value) || 60;
+    const reason = document.getElementById("pMuteReason").value.trim() || null;
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/mute`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ minutes, reason }) });
+      toast("Player muted", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function unmutePlayer() {
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/unmute`, { method: "POST" });
+      toast("Player unmuted", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function punishPlayer() {
+    const durationMinutes = Number(document.getElementById("pPunishMinutes").value) || 60;
+    const reason = document.getElementById("pPunishReason").value.trim() || "Staff action";
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/punish`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ durationMinutes, reason }) });
+      toast("Punishment applied", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function kickPlayerFromGame() {
+    const ok = await confirmModal("Kick player", `Disconnect ${state.selectedPlayer} right now?`);
+    if (!ok) return;
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/kick`, { method: "POST" });
+      toast("Kicked", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function updateResources() {
+    const crystals = document.getElementById("pCrystals").value.trim();
+    const experience = document.getElementById("pExperience").value.trim();
+    const body = {};
+    if (crystals) body.crystals = Number(crystals);
+    if (experience) body.experience = Number(experience);
+    if (!Object.keys(body).length) return toast("Enter crystals or experience", "error");
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/resources`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      toast("Resources updated", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function adjustPremium() {
+    const days = Number(document.getElementById("pPremiumDays").value);
+    if (!days) return toast("Enter a non-zero number of days", "error");
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/premium`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ days }) });
+      toast("Premium updated", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function clearPremium() {
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/premium`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clear: true }) });
+      toast("Premium cleared", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function addGarageItem() {
+    const type = document.getElementById("pGarageType").value;
+    const id = document.getElementById("pGarageId").value.trim();
+    const modification = document.getElementById("pGarageMod").value;
+    const count = Number(document.getElementById("pGarageCount").value) || 1;
+    if (!id) return toast("Item ID required", "error");
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/garage/add`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, id, modification, count }) });
+      toast("Item given", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function removeGarageItem(type, id) {
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}/garage/remove`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, id, count: 999999 }) });
+      toast("Item removed", "success");
+      renderPlayerDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function getPlayerPosition() {
+    try {
+      const data = await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/position`);
+      document.getElementById("posResult").textContent = data.position ? `x: ${data.position.x}, y: ${data.position.y}, z: ${data.position.z}` : "No position available";
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function teleportCoords() {
+    const x = Number(document.getElementById("pTx").value);
+    const y = Number(document.getElementById("pTy").value);
+    const z = Number(document.getElementById("pTz").value);
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/teleport`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ x, y, z }) });
+      toast("Teleported", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function teleportToPlayer() {
+    const targetUsername = document.getElementById("pTeleportPlayer").value.trim();
+    if (!targetUsername) return toast("Target username required", "error");
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/teleport`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUsername }) });
+      toast("Teleported to player", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function teleportToFlag() {
+    const toFlag = document.getElementById("pTeleportFlag").value;
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/teleport`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ toFlag }) });
+      toast("Teleported to flag", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function kickFromBattle() {
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/kick-battle`, { method: "POST" });
+      toast("Kicked from battle", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function destroyInBattle() {
+    try {
+      await request(`/api/admin/players/${encodeURIComponent(state.selectedPlayer)}/destroy`, { method: "POST" });
+      toast("Tank destroyed", "success");
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function deletePlayerAccount() {
+    const ok = await confirmModal("Delete account", `Permanently delete "${state.selectedPlayer}"? This cannot be undone.`);
+    if (!ok) return;
+    try {
+      await request(`/api/admin/accounts/${encodeURIComponent(state.selectedPlayer)}`, { method: "DELETE" });
+      toast("Account deleted", "success");
+      document.getElementById("playerDetailWrap").innerHTML = "";
+      state.selectedPlayer = null;
+      loadPlayers();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  let allBattles = [];
+
+  async function loadBattles() {
+    try {
+      allBattles = await request("/api/admin/battles");
+      renderBattleListFiltered();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  function renderBattleListFiltered() {
+    const query = (document.getElementById("battleQuery").value || "").trim().toLowerCase();
+    const filtered = allBattles.filter(b => !query || b.name.toLowerCase().includes(query) || b.battleId.toLowerCase().includes(query));
+    document.getElementById("battleList").innerHTML = renderBattleTable(filtered);
+  }
+
+  function renderBattleTable(battles) {
+    if (!battles.length) return '<div class="empty">No active battles.</div>';
+    return `<table><thead><tr><th>Name</th><th>Mode</th><th>Players</th><th>Red</th><th>Blue</th><th>Private</th></tr></thead><tbody>
+      ${battles.map(b => `<tr class="clickable ${state.selectedBattle === b.battleId ? 'selected' : ''}" onclick="selectBattle('${escapeHtml(b.battleId)}')">
+        <td><strong>${escapeHtml(b.name)}</strong> <span class="faint">${escapeHtml(b.battleId)}</span></td>
+        <td>${escapeHtml(b.modeName || String(b.mode))}</td>
+        <td>${b.players}</td>
+        <td><span class="pill red">${b.scoreRed ?? '-'}</span></td>
+        <td><span class="pill blue">${b.scoreBlue ?? '-'}</span></td>
+        <td>${b.private ? 'Yes' : 'No'}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  async function selectBattle(battleId) {
+    state.selectedBattle = battleId;
+    renderBattleListFiltered();
+    await renderBattleDetail();
+  }
+
+  async function renderBattleDetail() {
+    const battleId = state.selectedBattle;
+    const wrap = document.getElementById("battleDetailWrap");
+    if (!battleId) { wrap.innerHTML = ""; return; }
+    try {
+      const d = await request(`/api/admin/battles/${encodeURIComponent(battleId)}/details`);
+      const teamRow = (list, cls) => list.map(p => `<span class="chip ${cls}">${escapeHtml(p.username)}
+          <button class="small ghost" onclick="jumpToPlayer('${escapeHtml(p.username)}')" title="Manage">&#9635;</button>
+        </span>`).join('') || '<span class="faint">none</span>';
+      const mineOwnerRows = Object.entries(d.mineOwners || {}).map(([owner, count]) => `<tr><td>${escapeHtml(owner)}</td><td>${count}</td></tr>`).join('') || '<tr><td colspan="2" class="faint">none</td></tr>';
+
+      wrap.innerHTML = `
+        <div class="panel">
+          <h3>${escapeHtml(d.name)} <span class="tag">${escapeHtml(d.roundStateName)}</span></h3>
+          <div class="kv">
+            <div class="item"><div class="l">Creator</div><div class="v">${escapeHtml(d.creator || 'system')}</div></div>
+            <div class="item"><div class="l">Mode</div><div class="v">${escapeHtml(d.modeName || String(d.mode))}</div></div>
+            <div class="item"><div class="l">Map</div><div class="v">${escapeHtml(String(d.mapId))}</div></div>
+            <div class="item"><div class="l">Private</div><div class="v">${d.private ? 'Yes' : 'No'}</div></div>
+            <div class="item"><div class="l">Score</div><div class="v"><span class="pill red">Red ${d.scoreRed}</span> <span class="pill blue">Blue ${d.scoreBlue}</span></div></div>
+            <div class="item"><div class="l">Fund</div><div class="v">${d.fund}</div></div>
+            <div class="item"><div class="l">Players / Max</div><div class="v">${d.players} / ${d.maxPlayers}</div></div>
+            <div class="item"><div class="l">Rank range</div><div class="v">${d.minRank}-${d.maxRank}</div></div>
+            <div class="item"><div class="l">Friendly fire</div><div class="v">${d.friendlyFire ? 'Yes' : 'No'}</div></div>
+            <div class="item"><div class="l">Auto-balance</div><div class="v">${d.autoBalance ? 'Yes' : 'No'}</div></div>
+            <div class="item"><div class="l">Parkour</div><div class="v">${d.parkourMode ? 'Yes' : 'No'}</div></div>
+          </div>
+
+          <h3 style="margin-top:18px">Teams</h3>
+          <div class="faint" style="margin-bottom:4px">Red (${d.redCount})</div>${teamRow(d.participants.red, 'red')}
+          <div class="faint" style="margin:10px 0 4px">Blue (${d.blueCount})</div>${teamRow(d.participants.blue, 'blue')}
+          <div class="faint" style="margin:10px 0 4px">Neutral</div>${teamRow(d.participants.neutral, '')}
+          <div class="faint" style="margin:10px 0 4px">Spectators</div>${teamRow(d.participants.spectators, '')}
+
+          <h3 style="margin-top:18px">Mines</h3>
+          <div class="row" style="margin-bottom:10px">
+            <span class="pill">${d.activeMineCount} total</span>
+            <span class="pill red">${d.redMineCount} red</span>
+            <span class="pill blue">${d.blueMineCount} blue</span>
+          </div>
+          <table><thead><tr><th>Owner</th><th>Count</th></tr></thead><tbody>${mineOwnerRows}</tbody></table>
+          <div class="grid" style="margin-top:12px">
+            <div class="field"><span class="field-label">Owner (optional)</span><input id="bMineOwner" placeholder="username" /></div>
+            <div class="field"><span class="field-label">Team</span>
+              <select id="bMineTeam"><option value="">All</option><option value="red">Red</option><option value="blue">Blue</option></select>
+            </div>
+            <div class="field" style="justify-content:flex-end"><button class="warn" onclick="removeMines()">Remove mines</button></div>
+          </div>
+
+          <h3 style="margin-top:18px">Bonuses</h3>
+          <p class="faint">${d.activeBonusCount} bonus drop(s) currently on the map.</p>
+          <div class="grid">
+            <div class="field"><span class="field-label">Type</span><input id="bBonusType" placeholder="gold / health / armor..." /></div>
+            <div class="field"><span class="field-label">X</span><input id="bBonusX" placeholder="x" /></div>
+            <div class="field"><span class="field-label">Y</span><input id="bBonusY" placeholder="y" /></div>
+            <div class="field"><span class="field-label">Z</span><input id="bBonusZ" placeholder="z" /></div>
+          </div>
+          <div class="row" style="margin-top:10px"><button onclick="spawnBonus()">Spawn bonus</button></div>
+
+          <h3 style="margin-top:18px">Battle broadcast</h3>
+          <div class="row">
+            <input id="bBroadcastText" placeholder="Message to this battle only..." style="flex:1; min-width:220px" />
+            <button onclick="broadcastToBattle()">Send</button>
+          </div>
+
+          <h3 style="margin-top:18px">Match actions</h3>
+          <div class="row">
+            <button class="ghost" onclick="battleAction('finish')">Finish battle</button>
+            <button class="ghost" onclick="battleAction('restart')">Restart battle</button>
+            <button class="ghost" onclick="battleAction('drop-flags')">Drop flags</button>
+            <button class="danger" onclick="terminateBattle()">Terminate battle</button>
+          </div>
+
+          <h3 style="margin-top:18px">Fund</h3>
+          <div class="row">
+            <input id="bFundValue" placeholder="0" style="width:120px" />
+            <button onclick="setBattleFund()">Set fund</button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      wrap.innerHTML = `<div class="panel"><div class="empty">Could not load battle: ${escapeHtml(err.message)}</div></div>`;
+    }
+  }
+
+  async function removeMines() {
+    const owner = document.getElementById("bMineOwner").value.trim();
+    const team = document.getElementById("bMineTeam").value || null;
+    try {
+      const data = await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/remove-mines`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ owner: owner || null, team }) });
+      toast(`${data.removed} mine(s) removed`, "success");
+      renderBattleDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function setBattleFund() {
+    const value = Number(document.getElementById("bFundValue").value);
+    if (!Number.isFinite(value) || value < 0) return toast("Enter a valid fund amount", "error");
+    try {
+      await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/fund`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ value }) });
+      toast("Battle fund updated", "success");
+      renderBattleDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function spawnBonus() {
+    const type = document.getElementById("bBonusType").value.trim();
+    const x = Number(document.getElementById("bBonusX").value);
+    const y = Number(document.getElementById("bBonusY").value);
+    const z = Number(document.getElementById("bBonusZ").value);
+    if (!type) return toast("Bonus type required", "error");
+    try {
+      await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/spawn-bonus`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, x, y, z }) });
+      toast("Bonus spawned", "success");
+      renderBattleDetail();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function broadcastToBattle() {
+    const text = document.getElementById("bBroadcastText").value.trim();
+    if (!text) return toast("Message required", "error");
+    try {
+      await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/broadcast`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      toast("Sent to battle", "success");
+      document.getElementById("bBroadcastText").value = "";
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function battleAction(action) {
+    try {
+      await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/${action}`, { method: "POST" });
+      toast(`Battle ${action.replace('-', ' ')} done`, "success");
+      renderBattleDetail();
+      loadBattles();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function terminateBattle() {
+    const ok = await confirmModal("Terminate battle", "This ends the match immediately and removes it from the lobby. Continue?");
+    if (!ok) return;
+    try {
+      await request(`/api/admin/battles/${encodeURIComponent(state.selectedBattle)}/terminate`, { method: "POST" });
+      toast("Battle terminated", "success");
+      document.getElementById("battleDetailWrap").innerHTML = "";
+      state.selectedBattle = null;
+      loadBattles();
+      refreshOverview();
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  async function loadAccounts() {
+    const query = document.getElementById("accountQuery").value.trim();
+    try {
+      const data = await request(`/api/admin/users?query=${encodeURIComponent(query)}&limit=100`);
+      document.getElementById("accountsList").innerHTML = renderAccountsList(data.users, data.total);
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  function renderAccountsList(users, total) {
+    if (!users.length) return '<div class="empty">No accounts found.</div>';
+    return `<p class="faint" style="margin-bottom:8px">${total} total account(s)</p>
+      <table><thead><tr><th>Username</th><th>Role</th><th>Registered IP</th><th>Crystals</th><th>Rank</th><th>Banned</th><th>Online</th><th>Created</th></tr></thead><tbody>
+      ${users.map(u => `<tr class="clickable" onclick="jumpToPlayer('${escapeHtml(u.username)}')">
+        <td><strong>${escapeHtml(u.username)}</strong></td>
+        <td><span class="pill">${escapeHtml(u.roleName)}</span></td>
+        <td class="faint">${escapeHtml(u.registeredIp || '-')}</td>
+        <td>${u.crystals}</td>
+        <td>${u.rank}</td>
+        <td>${u.isPunished ? '<span class="pill red">Yes</span>' : 'No'}</td>
+        <td>${u.online ? '<span class="pill on">Yes</span>' : '<span class="pill off">No</span>'}</td>
+        <td class="faint">${fmtDate(u.createdAt)}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  async function loadCatalog() {
+    try {
+      const catalog = await request("/api/admin/item-catalog");
+      document.getElementById("itemCatalog").innerHTML = renderCatalog(catalog);
+    } catch (err) { toast(err.message, "error"); }
+  }
+
+  function renderCatalog(catalog) {
+    const section = (title, rows) => `<h3 style="font-size:12px; margin-top:18px">${title}</h3><div class="row">${rows}</div>`;
+    return `
+      ${section('Hulls', catalog.hulls.map(h => `<span class="chip">${escapeHtml(h.id)} <span class="faint">${escapeHtml(h.name)} - ${h.modCount} mods</span></span>`).join(''))}
+      ${section('Turrets', catalog.turrets.map(t => `<span class="chip">${escapeHtml(t.id)} <span class="faint">${escapeHtml(t.name)} - ${t.modCount} mods</span></span>`).join(''))}
+      ${section('Paints', catalog.paints.map(p => `<span class="chip">${escapeHtml(p.id)} <span class="faint">${escapeHtml(p.name)}</span></span>`).join(''))}
+      ${section('Supplies', catalog.supplies.map(s => `<span class="chip">${escapeHtml(s.id)} <span class="faint">slot ${s.slotId} - ${s.itemEffectTime}s / ${s.itemRestSec}s</span></span>`).join(''))}
+    `;
+  }
+
+  (async function init() {
+    if (!state.token) return;
+    try {
+      const me = await request("/api/admin/me");
+      enterConsole(me);
+    } catch (e) {
+      logout();
+    }
+  })();
+</script>
+</body>
+</html>

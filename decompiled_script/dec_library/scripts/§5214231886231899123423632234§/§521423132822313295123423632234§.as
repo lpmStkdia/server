@@ -1,0 +1,13 @@
+package §5214231886231899123423632234§
+{
+   import §521423122282312241123423632234§.§final while do§;
+   
+   public interface §521423132822313295123423632234§
+   {
+      
+      function haveCollision(param1:§5214231214231227123423632234§, param2:§5214231214231227123423632234§) : Boolean;
+      
+      function getContacts(param1:§5214231214231227123423632234§, param2:§5214231214231227123423632234§, param3:Vector.<§final while do§>) : void;
+   }
+}
+

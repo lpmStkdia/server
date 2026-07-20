@@ -7,40 +7,27 @@ import { broadcastPlayerRankToOthers } from "@/features/profile/rank.notify";
 
 export default class AddScoreCommand implements ICommand {
     name: string = "addscore";
-    description: string = "Adds or removes experience. Usage: /addscore <amount> [username] (negative removes).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "<amount> [username]";
-    example = "/addscore 100000 Giann";
+    description: string = "Adds or removes experience from your account. Usage: /addscore <amount> (negative removes).";
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
+    usage = "<amount>";
+    example = "/addscore 100000";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 1) {
-            context.reply("Usage: /addscore <amount> [username]");
+            context.reply("Usage: /addscore <amount>");
             return;
         }
 
         const amount = parseInt(args[0], 10);
+
         if (isNaN(amount)) {
             context.reply("Error: Amount must be a number.");
             return;
         }
 
-        // Default target is the administrator executing the command
-        let targetClient = context.executor;
-        const targetUsername = args[1];
-
-        if (targetUsername) {
-            // Find the online player by username using your server's exact method
-            const foundClient = context.server.findClientByUsername(targetUsername);
-            if (!foundClient) {
-                context.reply(`Error: User "${targetUsername}" is not online.`);
-                return;
-            }
-            targetClient = foundClient;
-        }
-
-        const user = targetClient.user;
+        const user = context.executor.user;
         if (!user) {
-            context.reply("Error: Target user data not found.");
+            context.reply("Error: User not found.");
             return;
         }
 
@@ -56,12 +43,10 @@ export default class AddScoreCommand implements ICommand {
                 experience: newScore,
             });
 
-            // Update user document on their live connection instance
-            targetClient.user = updatedUser;
+            context.executor.user = updatedUser;
 
-            // Send score packet directly to the targeted client
-            targetClient.sendPacket(new UpdateScorePacket({ score: updatedUser.experience }));
-            context.reply(`Score for ${updatedUser.username} updated to: ${updatedUser.experience}.`);
+            context.executor.sendPacket(new UpdateScorePacket({ score: updatedUser.experience }));
+            context.reply(`Score updated to: ${updatedUser.experience}.`);
 
             if (updatedUser.rank !== originalRank) {
                 const newRankInfo = context.server.rankService.getRankById(updatedUser.rank);
@@ -73,11 +58,13 @@ export default class AddScoreCommand implements ICommand {
                         nextRankScore: updatedUser.nextRankScore,
                         reward: 0,
                     });
-                    
-                    targetClient.sendPacket(rankPacket);
+                    context.executor.sendPacket(rankPacket);
+                    context.reply(`Congratulations! You reached rank: ${newRankInfo.name}.`);
                 }
-                
-                GarageWorkflow.reloadGarage(targetClient, context.server);
+                // The garage item lists are rank-dependent: a rank change (up OR down) with the garage
+                // open must fully reload it, or the client renders duplicated items.
+                GarageWorkflow.reloadGarage(context.executor, context.server);
+                // Atualiza o rank visual desse jogador para todos os demais online.
                 broadcastPlayerRankToOthers(context.server, updatedUser);
             }
         } catch (error: any) {

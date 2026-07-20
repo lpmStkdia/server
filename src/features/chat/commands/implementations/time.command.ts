@@ -4,7 +4,7 @@ import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.e
 /** Sets the current round's remaining time (re-syncs everyone's clock + the time-up trigger). */
 export default class TimeCommand implements ICommand {
     name = "time";
-    description = "Sets the current round's remaining time, in seconds. Usage: /time <seconds>.";
+    description = "Define o tempo restante do round atual, em segundos. Uso: /time <seconds>.";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
     usage = "<seconds>";
     example = "/time 300";

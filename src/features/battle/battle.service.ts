@@ -233,6 +233,17 @@ export class BattleService {
                 battlePosition.z <= box.maxZ;
 
             if (isInside) {
+                // Parkour: climbing and moving sideways is the point — the tank should only die when it
+                // actually falls into the true void. Any kill/kick zone with any structure underneath
+                // (floor, ramp, wall, building, even enclosed inaccessible areas) is ignored; only
+                // falling into empty space should kill the tank.
+                if (currentBattle.settings.parkourMode) {
+                    const supported = this.collision.hasSupportBelow(
+                        currentBattle.mapResourceId, battlePosition.x, battlePosition.y, battlePosition.z,
+                    );
+                    if (supported) continue;
+                }
+
                 await this.handleSpecialGeometryAction(client, box.action);
                 break;
             }

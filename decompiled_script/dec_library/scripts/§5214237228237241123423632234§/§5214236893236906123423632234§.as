@@ -1,0 +1,53 @@
+package §5214237228237241123423632234§
+{
+   import §5214231749231762123423632234§.§521423151942315207123423632234§;
+   import alternativa.engine3d.materials.TextureMaterial;
+   import §each set default§.§5214234448234461123423632234§;
+   import flash.media.Sound;
+   
+   public class §5214236893236906123423632234§
+   {
+      
+      public var §521423157952315808123423632234§:§5214234448234461123423632234§;
+      
+      public var §521423158322315845123423632234§:Sound;
+      
+      public var §5214237805237818123423632234§:§5214234448234461123423632234§;
+      
+      public var §override var continue§:§5214234448234461123423632234§;
+      
+      public var §521423101432310156123423632234§:TextureMaterial;
+      
+      public var §521423154162315429123423632234§:Sound;
+      
+      public var §try const true§:§5214234448234461123423632234§;
+      
+      public var §override implements§:§5214234448234461123423632234§;
+      
+      public var §521423137602313773123423632234§:TextureMaterial;
+      
+      public var §null const set§:Sound;
+      
+      public var §5214239377239390123423632234§:§521423151942315207123423632234§;
+      
+      public var §function null§:§521423151942315207123423632234§;
+      
+      public var §set for super§:§521423151942315207123423632234§;
+      
+      public var §5214235738235751123423632234§:§521423151942315207123423632234§;
+      
+      public var §finally finally true§:§521423151942315207123423632234§;
+      
+      public var §try break§:§521423151942315207123423632234§;
+      
+      public var §super while break§:§521423151942315207123423632234§;
+      
+      public var §5214238565238578123423632234§:§521423151942315207123423632234§;
+      
+      public function §5214236893236906123423632234§()
+      {
+         super();
+      }
+   }
+}
+

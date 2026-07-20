@@ -8,7 +8,7 @@ import { BattleHaltPacket } from "@/features/system/halt.packets";
 import { SystemMessage } from "@/features/system/system.packets";
 import * as ProfilePackets from "@/features/profile/profile.packets";
 import { isProBattleActive, PRO_BATTLE_ENTER_PRICE } from "@/shared/models/passes";
-import { chatModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
+import { ChatModeratorLevel, chatModeratorPower, hasModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 import { LobbyWorkflow } from "@/features/lobby/lobby.workflow";
 import { GameClient } from "@/server/game.client";
 import { GameServer } from "@/server/game.server";
@@ -25,13 +25,17 @@ import { BattleWorkflow } from "./battle.workflow";
 // ReadyToPlace → Spawn was ~2280ms including ~280ms client↔server RTT, i.e. a ~2000ms server-side wait
 // (very consistent across respawns: 2278/2285/2280/2280). Replicated here (tunable).
 const SPAWN_DELAY_MS = 2000;
-
 export class EnterBattleAsSpectatorHandler implements IPacketHandler<BattlePackets.EnterBattleAsSpectatorPacket> {
     public readonly packetId = BattlePackets.EnterBattleAsSpectatorPacket.getId();
 
     public async execute(client: GameClient, server: GameServer, packet: BattlePackets.EnterBattleAsSpectatorPacket): Promise<void> {
         if (!client.user || !client.lastViewedBattleId) {
             logger.warn(`Tentativa de entrar como espectador sem batalha selecionada.`, { user: client.user?.username, client: client.getRemoteAddress() });
+            return;
+        }
+
+        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.MODERATOR)) {
+            client.sendPacket(new SystemMessage({ text: "Somente moderadores podem entrar como espectadores." }));
             return;
         }
 
@@ -200,6 +204,7 @@ export class FullMoveCommandHandler implements IPacketHandler<BattlePackets.Full
             return;
         }
 
+        client.battlePositionPrevious = client.battlePosition;
         client.battlePosition = packet.position;
         client.battleOrientation = packet.orientation;
         client.turretControl = packet.control;
@@ -230,6 +235,7 @@ export class MoveCommandHandler implements IPacketHandler<BattlePackets.MoveComm
             return;
         }
 
+        client.battlePositionPrevious = client.battlePosition;
         client.battlePosition = packet.position;
         client.battleOrientation = packet.orientation;
         client.turretControl = packet.control;
@@ -412,7 +418,9 @@ export class SendBattleChatMessageHandler implements IPacketHandler<BattlePacket
         // Staff mute: silenced users can't post battle-chat messages (commands above still work).
         if (user.mutedUntil && user.mutedUntil > new Date()) {
             const minutesLeft = Math.ceil((user.mutedUntil.getTime() - Date.now()) / 60000);
-            client.sendPacket(new BattlePackets.BattleChatMessagePacket({ nickname: null, message: `Você está silenciado por mais ${minutesLeft} minuto(s).`, team: 2 }));
+            const reason = (user as any).mutedReason || null;
+            const msg = `You are muted for ${minutesLeft} more minute(s).${reason ? ' Reason: ' + reason : ''}`;
+            client.sendPacket(new BattlePackets.BattleSystemMessagePacket({ message: msg }));
             return;
         }
 
@@ -651,6 +659,16 @@ export class MovementControlCommandHandler implements IPacketHandler<BattlePacke
         // this tank starts/stops correctly (key-release included).
         const controlPacket = new BattlePackets.MovementControlPacket({ nickname: client.user.username, control: packet.control });
         battle.broadcastRaw(controlPacket.write(), controlPacket.getId(), client.user.id);
+    }
+}
+
+export class MineTouchCommandHandler implements IPacketHandler<BattlePackets.MineTouchCommandPacket> {
+    public readonly packetId = BattlePackets.MineTouchCommandPacket.getId();
+
+    public execute(client: GameClient, server: GameServer, packet: BattlePackets.MineTouchCommandPacket): void {
+        // The client should not drive mine triggering at all. The server evaluates mine collisions from
+        // movement updates and spawn sweeps; this handler is intentionally a no-op to avoid any extra
+        // traffic or duplicated processing.
     }
 }
 

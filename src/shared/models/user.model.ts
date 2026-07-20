@@ -18,7 +18,7 @@ export interface IUserQuest {
 const UserQuestSchema = new Schema<IUserQuest>(
     {
         questId: { type: Number, required: true },
-        questType: { type: String, required: true, enum: ["KILLS", "SCORE", "CRYSTALS", "GOLDBOX"] },
+        questType: { type: String, required: true, enum: ["KILLS", "SCORE", "CRYSTALS", "GOLDBOX", "XT"] },
         difficulty: { type: String, required: true, enum: ["easy", "medium", "hard"] },
         progress: { type: Number, default: 0 },
         finishCriteria: { type: Number, required: true },
@@ -80,6 +80,11 @@ export interface UserAttributes {
     password: string;
     email?: string | null;
     emailConfirmed: boolean;
+    pendingEmail?: string | null;
+    emailConfirmationToken?: string | null;
+    emailConfirmationTokenExpiresAt?: Date | null;
+    passwordResetToken?: string | null;
+    passwordResetTokenExpiresAt?: Date | null;
     crystals: number;
     experience: number;
     clanId: import("mongoose").Types.ObjectId | null; // the clan this user belongs to (null = no clan)
@@ -90,6 +95,8 @@ export interface UserAttributes {
     punishmentReason: string | null;
     /** Chat mute (staff /mute): while in the future, chat messages are rejected (commands still work). */
     mutedUntil: Date | null;
+    /** Optional reason for current chat mute (displayed to the user) */
+    mutedReason: string | null;
     hasDoubleCrystal: boolean;
     premiumExpiresAt: Date | null;
     /** Passe Iniciante (newbie): +50% XP + 100% de cristais/batalha por ~21 dias. Concedido ao criar conta. */
@@ -126,6 +133,8 @@ export interface UserAttributes {
     unlockedAchievements: number[];
     referralHash: string;
     referredBy: mongoose.Types.ObjectId | null;
+    /** IP address used when the account was created (if available) */
+    registeredIp?: string | null;
     chatModeratorLevel: ChatModeratorLevel;
     lastMessageTimestamp: Date | null;
     notificationsEnabled: boolean;
@@ -141,6 +150,7 @@ export interface UserAttributes {
     turrets: Map<string, number>;
     paints: string[];
     supplies: Map<string, number>;
+    kits: string[];
     equippedTurret: string;
     equippedHull: string;
     equippedPaint: string;
@@ -159,6 +169,11 @@ const UserSchema = new Schema<UserDocument>({
     password: { type: String, required: true, minlength: 3 },
     email: { type: String, trim: true, lowercase: true, default: null },
     emailConfirmed: { type: Boolean, default: false },
+    pendingEmail: { type: String, trim: true, lowercase: true, default: null },
+    emailConfirmationToken: { type: String, default: null },
+    emailConfirmationTokenExpiresAt: { type: Date, default: null },
+    passwordResetToken: { type: String, default: null },
+    passwordResetTokenExpiresAt: { type: Date, default: null },
     crystals: { type: Number, default: 500, min: 0 },
     experience: { type: Number, default: 0, min: 0 },
     clanId: { type: Schema.Types.ObjectId, ref: "Clan", default: null },
@@ -168,6 +183,7 @@ const UserSchema = new Schema<UserDocument>({
     punishmentExpiresAt: { type: Date, default: null },
     punishmentReason: { type: String, default: null },
     mutedUntil: { type: Date, default: null },
+    mutedReason: { type: String, default: null },
     hasDoubleCrystal: { type: Boolean, default: false },
     premiumExpiresAt: { type: Date, default: null },
     newbieExpiresAt: { type: Date, default: null },
@@ -216,7 +232,9 @@ const UserSchema = new Schema<UserDocument>({
     unlockedAchievements: { type: [Number], default: [] },
     referralHash: { type: String, required: true, unique: true },
     referredBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
-    chatModeratorLevel: { type: Number, enum: [0, 1, 2, 3, 4], default: ChatModeratorLevel.NONE },
+    /** IP address used when the account was created (if available) */
+    registeredIp: { type: String, default: null },
+    chatModeratorLevel: { type: Number, enum: [0, 1, 2, 3, 4, 5], default: ChatModeratorLevel.NONE },
     lastMessageTimestamp: { type: Date, default: null },
     notificationsEnabled: { type: Boolean, default: true },
     dailyQuests: { type: [UserQuestSchema], default: [] },
@@ -251,6 +269,8 @@ const UserSchema = new Schema<UserDocument>({
 });
 
 UserSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { email: { $type: "string" } } });
+UserSchema.index({ emailConfirmationToken: 1 }, { partialFilterExpression: { emailConfirmationToken: { $type: "string" } } });
+UserSchema.index({ passwordResetToken: 1 }, { partialFilterExpression: { passwordResetToken: { $type: "string" } } });
 UserSchema.index({ loginToken: 1 }, { unique: true, partialFilterExpression: { loginToken: { $type: "string" } } });
 
 // Keep `login` (the unique, indexed auth key) in sync with `username`. Runs before validation so the

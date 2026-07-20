@@ -48,10 +48,10 @@ export default class RemoveItemCommand implements ICommand {
                 if (!fallback) user.paints.push("holiday");
                 user.equippedPaint = fallback ?? "holiday";
             }
-            removed = "paint";
+            removed = "pintura";
         } else if ((user.supplies.get(itemId) ?? 0) > 0) {
             user.supplies.set(itemId, 0);
-            removed = "supply (cleared)";
+            removed = "suprimento (zerado)";
         }
 
         if (!removed) {

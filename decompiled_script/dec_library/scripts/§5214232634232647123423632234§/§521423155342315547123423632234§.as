@@ -1,0 +1,13 @@
+package §5214232634232647123423632234§
+{
+   import §in set§.§5214234365234378123423632234§;
+   
+   public interface §521423155342315547123423632234§
+   {
+      
+      function §true switch class§(param1:§5214234365234378123423632234§, param2:int, param3:int, param4:int) : void;
+      
+      function §5214235631235644123423632234§(param1:§5214234365234378123423632234§) : void;
+   }
+}
+

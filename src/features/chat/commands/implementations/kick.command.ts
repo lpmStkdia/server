@@ -1,7 +1,7 @@
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel, chatModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** Drops a player's connection. Staff can't kick someone of equal/higher role. */
+/** Drops a player's connection. Staff can't kick someone of equal/higher cargo. */
 export default class KickCommand implements ICommand {
     name = "kick";
     description = "Disconnects a player. Usage: /kick <username>.";

@@ -26,8 +26,8 @@ export default class BoundsCommand implements ICommand {
         battle.boundsDisabled = arg === "off";
         context.reply(
             battle.boundsDisabled
-                ? "Map bounds DISABLED — tanks can leave the playable area."
-                : "Map bounds re-enabled."
+                ? "Limites do mapa DESATIVADOS — tanques podem sair da área jogável."
+                : "Limites do mapa reativados."
         );
     }
 }

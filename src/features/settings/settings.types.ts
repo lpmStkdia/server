@@ -35,9 +35,23 @@ export interface IRequestChangePasswordForm extends IEmpty { }
 export interface IChangePasswordForm extends IEmpty { }
 export interface ICreatePasswordForm extends IEmpty { }
 
+export interface ICheckPassword extends IPacket {
+    password: string | null;
+}
+
+export interface ICheckPasswordAccept extends IEmpty { }
+export interface ICheckPasswordReject extends IEmpty { }
+
 export interface ILinkEmailRequest extends IPacket {
     email: string | null;
 }
+
+export interface ILinkEmailWithPassword extends IPacket {
+    login: string | null;
+    password: string | null;
+}
+
+export interface IRequestAccountActionEmail extends IEmpty { }
 
 export interface ILinkAccountResultSuccess extends IPacket {
     identifier: string | null;

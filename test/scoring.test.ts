@@ -8,6 +8,7 @@ import {
     returnFlagScore,
     pointCaptureScore,
 } from "@/features/battle/scoring";
+import { xpFromScore } from "@/shared/models/passes";
 
 // ---- Kill (8/10 pelo casco da vítima) ----
 test("killScore: cascos leves rendem 8, os demais 10", () => {
@@ -78,6 +79,14 @@ test("returnFlagScore: segmento pela posição entre as bases (enemy=5)", () => 
 
 test("returnFlagScore: distância inválida → 0", () => {
     assert.equal(returnFlagScore(100, 0, 5), 0);
+});
+
+test("xpFromScore uses a 5x default multiplier and adds premium on top", () => {
+    const baseUser = { premiumExpiresAt: null, newbieExpiresAt: null, upScoreExpiresAt: null } as any;
+    const premiumUser = { premiumExpiresAt: new Date(Date.now() + 60_000), newbieExpiresAt: null, upScoreExpiresAt: null } as any;
+
+    assert.equal(xpFromScore(baseUser, 10), 50);
+    assert.equal(xpFromScore(premiumUser, 10), 75);
 });
 
 // ---- Capturar ponto CP (2 × enemy dividido entre aliados no ponto) ----

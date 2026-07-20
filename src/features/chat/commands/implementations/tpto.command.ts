@@ -2,7 +2,7 @@ import { teleportTank } from "@/features/battle/teleport.util";
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** Teleports the caller to another player's position. Usage: /tpto <username> (case-insensitive). */
+/** Teleports the caller to another player's position. Uso: /tpto <username> (case-insensitive). */
 export default class TpToCommand implements ICommand {
     name = "tpto";
     description = "Teleports you to another player's position. Usage: /tpto <username>.";

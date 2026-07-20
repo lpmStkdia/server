@@ -1,5 +1,6 @@
 export enum ChatModeratorLevel {
     NONE = 0,
+    HELPERR = 5,
     COMMUNITY_MANAGER = 1,
     ADMINISTRATOR = 2,
     MODERATOR = 3,
@@ -15,10 +16,11 @@ export enum ChatModeratorLevel {
  */
 const CHAT_MODERATOR_POWER: Record<ChatModeratorLevel, number> = {
     [ChatModeratorLevel.NONE]: 0,
-    [ChatModeratorLevel.CANDIDATE]: 1,
-    [ChatModeratorLevel.MODERATOR]: 2,
-    [ChatModeratorLevel.ADMINISTRATOR]: 3,
-    [ChatModeratorLevel.COMMUNITY_MANAGER]: 4,
+    [ChatModeratorLevel.HELPERR]: 2,
+    [ChatModeratorLevel.CANDIDATE]: 2,
+    [ChatModeratorLevel.MODERATOR]: 3,
+    [ChatModeratorLevel.ADMINISTRATOR]: 4,
+    [ChatModeratorLevel.COMMUNITY_MANAGER]: 5,
 };
 
 /** Ordinal power of a role: higher = more privileged. Regular users (NONE) are 0. */
@@ -31,6 +33,13 @@ export function hasModeratorPower(userLevel: ChatModeratorLevel, requiredLevel: 
     return chatModeratorPower(userLevel) >= chatModeratorPower(requiredLevel);
 }
 
+/** True when the role is a staff role that can access moderation/admin features. */
+export function isStaffModeratorLevel(level: ChatModeratorLevel): boolean {
+    return level === ChatModeratorLevel.MODERATOR ||
+        level === ChatModeratorLevel.ADMINISTRATOR ||
+        level === ChatModeratorLevel.COMMUNITY_MANAGER;
+}
+
 /**
  * Parses a human-friendly cargo name (or the raw enum number) into a ChatModeratorLevel. Used by the
  * /role command and the bootstrap script. Returns null if unrecognized.
@@ -39,6 +48,8 @@ export function parseChatModeratorLevel(input: string): ChatModeratorLevel | nul
     switch (input.trim().toLowerCase()) {
         case "0": case "none": case "player":
             return ChatModeratorLevel.NONE;
+        case "5": case "helperr": case "helper":
+            return ChatModeratorLevel.CANDIDATE;
         case "1": case "cm": case "community": case "community_manager": case "communitymanager":
             return ChatModeratorLevel.COMMUNITY_MANAGER;
         case "2": case "admin": case "administrator":
@@ -56,6 +67,7 @@ export function parseChatModeratorLevel(input: string): ChatModeratorLevel | nul
 export function chatModeratorLevelName(level: ChatModeratorLevel): string {
     switch (level) {
         case ChatModeratorLevel.NONE: return "Jogador";
+        case ChatModeratorLevel.HELPERR: return "Candidato";
         case ChatModeratorLevel.COMMUNITY_MANAGER: return "Community Manager";
         case ChatModeratorLevel.ADMINISTRATOR: return "Administrador";
         case ChatModeratorLevel.MODERATOR: return "Moderador";

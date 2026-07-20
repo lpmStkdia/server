@@ -89,6 +89,9 @@ export class BuyItemHandler implements IPacketHandler<GaragePackets.BuyItemPacke
                 // depósito com o tempo restante; suas listas dependem do estado e não rebuildam in-place).
                 client.sendPacket(new ProfilePackets.UpdateCrystals({ crystals: client.user.crystals }));
                 GarageWorkflow.reloadGarage(client, server);
+            } else if (result && "itemCategory" in result && result.itemCategory === "kit") {
+                client.sendPacket(new ProfilePackets.UpdateCrystals({ crystals: client.user.crystals }));
+                GarageWorkflow.reloadGarage(client, server);
             } else if (result && "supplyId" in result) {
                 // Bought a stackable supply: keep the in-battle supply panel in sync. If the player had
                 // supplies already (panel loaded), update just this item's count; otherwise this is their

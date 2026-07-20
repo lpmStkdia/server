@@ -10,6 +10,9 @@ import {
     QuestDefinitions,
     QuestType,
     rollPrize,
+    XT_DEFINITION,
+    XT_MISSION_CHANCE,
+    XT_REWARD_BY_NAME,
 } from "./quests.data";
 import { IQuest } from "./quests.types";
 
@@ -68,7 +71,9 @@ export class QuestService {
     }
 
     private definitionFor(type: QuestType): IQuestDefinition {
-        return type === "GOLDBOX" ? GOLDBOX_DEFINITION : QuestDefinitions.find((d) => d.type === type) ?? QuestDefinitions[0];
+        if (type === "GOLDBOX") return GOLDBOX_DEFINITION;
+        if (type === "XT") return XT_DEFINITION;
+        return QuestDefinitions.find((d) => d.type === type) ?? QuestDefinitions[0];
     }
 
     /** The single free mission change is per DAY (shared across all 3): available until used, restored daily. */
@@ -120,6 +125,23 @@ export class QuestService {
         };
     }
 
+    private makeSpecialXtQuest(id: number): IUserQuest {
+        const rewardNames = Object.keys(XT_REWARD_BY_NAME);
+        const rewardName = rewardNames[Math.floor(Math.random() * rewardNames.length)] ?? "Vulcan XT";
+        // XT missions use KILLS type to track progress, but reward an XT item instead of crystals/supplies
+        // All difficulties use 1000 kills (same challenge level regardless of difficulty slot)
+        return {
+            questId: id,
+            questType: "KILLS",
+            difficulty: "hard",
+            progress: 0,
+            finishCriteria: 1000,
+            prizes: [{ itemName: rewardName, itemCount: 1 }],
+            isCompleted: false,
+            canSkipForFree: false,
+        };
+    }
+
     private randomNormalDefinition(exclude: QuestType[] = []): IQuestDefinition {
         const pool = QuestDefinitions.filter((d) => !exclude.includes(d.type));
         return pool[Math.floor(Math.random() * pool.length)] ?? QuestDefinitions[0];
@@ -134,6 +156,11 @@ export class QuestService {
             if (!usedTypes.includes("GOLDBOX") && Math.random() < GOLDBOX_REROLL_CHANCE) {
                 usedTypes.push("GOLDBOX");
                 quests.push(this.makeGoldBoxQuest(user, id));
+                continue;
+            }
+            if (!usedTypes.includes("XT") && Math.random() < XT_MISSION_CHANCE) {
+                usedTypes.push("XT");
+                quests.push(this.makeSpecialXtQuest(id));
                 continue;
             }
             const def = this.randomNormalDefinition(usedTypes);
@@ -175,24 +202,29 @@ export class QuestService {
      */
     public async rerollQuest(user: UserDocument, questIdToReplace: number, isPaid: boolean): Promise<{ oldQuestId: number; newQuest: IUserQuest }> {
         const idx = user.dailyQuests.findIndex((q) => q.questId === questIdToReplace);
-        if (idx === -1) throw new Error("Missão não encontrada.");
+        if (idx === -1) throw new Error("Mission not found.");
 
         if (isPaid) {
             const cost = changeCost(user.rank);
-            if (user.crystals < cost) throw new Error("Cristais insuficientes.");
+            if (user.crystals < cost) throw new Error("Insufficient crystals.");
             user.crystals -= cost;
         } else {
-            if (!this.freeSkipAvailable(user)) throw new Error("A troca gratuita do dia já foi usada.");
+            if (!this.freeSkipAvailable(user)) throw new Error("Today's free change has already been used.");
             user.freeQuestSkipUsedDate = new Date(); // consume the day's free change
         }
 
         // A fresh id = newest current id + 1 (monotonic; distinct from the other quests). Any slot can reroll
-        // into any objective (incl. a gold box) at a random difficulty.
+        // into any objective (incl. a gold box or XT mission) at a random difficulty.
         const id = this.nextQuestId(user.dailyQuests.map((q) => q.questId));
-        const newQuest =
-            Math.random() < GOLDBOX_REROLL_CHANCE
-                ? this.makeGoldBoxQuest(user, id)
-                : this.makeNormalQuest(user, Math.floor(Math.random() * 3), this.randomNormalDefinition(), id);
+        let newQuest;
+        
+        if (Math.random() < GOLDBOX_REROLL_CHANCE) {
+            newQuest = this.makeGoldBoxQuest(user, id);
+        } else if (Math.random() < XT_MISSION_CHANCE) {
+            newQuest = this.makeSpecialXtQuest(id);
+        } else {
+            newQuest = this.makeNormalQuest(user, Math.floor(Math.random() * 3), this.randomNormalDefinition(), id);
+        }
 
         user.dailyQuests[idx] = newQuest;
         await user.save();
@@ -231,22 +263,30 @@ export class QuestService {
         if (!q || q.isCompleted || q.progress < q.finishCriteria) return null;
 
         const supplyGrants: Record<string, number> = {};
-        const crystalsGranted = this._grantQuestPrize(user, q, supplyGrants);
+        const turretGrants: Record<string, number> = {};
+        const crystalsGranted = this._grantQuestPrize(user, q, supplyGrants, turretGrants);
         q.isCompleted = true; // = reward claimed
         this._advanceStreak(user);
 
         const inc: Record<string, number> = {};
         if (crystalsGranted > 0) inc.crystals = crystalsGranted;
         for (const [id, count] of Object.entries(supplyGrants)) inc[`supplies.${id}`] = count;
+
+        const set: Record<string, any> = {
+            dailyQuests: user.dailyQuests,
+            questStreak: user.questStreak,
+            questLevel: user.questLevel,
+            lastQuestCompletedDate: user.lastQuestCompletedDate,
+        };
+        if (Object.keys(turretGrants).length > 0) set.turrets = user.turrets;
+        // Always save hulls if any XT hull was granted
+        const xtHullsGranted = user.hulls && [...user.hulls.keys()].some((h) => h.endsWith("_xt"));
+        if (xtHullsGranted) set.hulls = user.hulls;
+
         await User.updateOne(
             { _id: user._id },
             {
-                $set: {
-                    dailyQuests: user.dailyQuests,
-                    questStreak: user.questStreak,
-                    questLevel: user.questLevel,
-                    lastQuestCompletedDate: user.lastQuestCompletedDate,
-                },
+                $set: set,
                 ...(Object.keys(inc).length ? { $inc: inc } : {}),
             }
         );
@@ -254,9 +294,32 @@ export class QuestService {
     }
 
     /** Tallies a completed quest's reward (crystals + supplies) into the in-memory user + the grant maps. */
-    private _grantQuestPrize(user: UserDocument, quest: IUserQuest, supplyGrants: Record<string, number>): number {
+    private _grantQuestPrize(user: UserDocument, quest: IUserQuest, supplyGrants: Record<string, number>, turretGrants: Record<string, number>): number {
         let crystals = 0;
         for (const prize of quest.prizes) {
+            const xtItemId = XT_REWARD_BY_NAME[prize.itemName];
+            if (xtItemId) {
+                if (xtItemId === "isida_xt") continue;
+                
+                // Determine if this XT item is a turret or a hull
+                const isTurret = xtItemId.includes("machinegun_xt") || xtItemId.includes("flamethrower_xt") || 
+                                 xtItemId.includes("railgun_xt") || xtItemId.includes("thunder_xt") || 
+                                 xtItemId.includes("ricochet_xt");
+                
+                if (isTurret) {
+                    if (!user.turrets.has(xtItemId)) {
+                        user.turrets.set(xtItemId, 0);
+                        turretGrants[xtItemId] = 0;
+                    }
+                } else {
+                    // Hull XT item
+                    if (!user.hulls.has(xtItemId)) {
+                        user.hulls.set(xtItemId, 0);
+                    }
+                }
+                continue;
+            }
+
             const item = PRIZE_ITEM_BY_NAME[prize.itemName];
             if (item === "crystals") {
                 user.crystals += prize.itemCount; // in-memory (drives the UpdateCrystals packet); persisted via $inc

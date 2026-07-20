@@ -1,0 +1,108 @@
+package §while use§
+{
+   import §521423121052312118123423632234§.§52142399952310008123423632234§;
+   import §default package continue§.§true var package§;
+   import flash.display.Bitmap;
+   import flash.display.BitmapData;
+   import flash.display.Sprite;
+   import flash.utils.Dictionary;
+   import §implements use var§.§5214232504232517123423632234§;
+   import §var switch try§.§5214235726235739123423632234§;
+   import §var switch try§.§5214238393238406123423632234§;
+   
+   public class §521423117022311715123423632234§ extends Sprite implements §5214238393238406123423632234§
+   {
+      
+      private static var §each finally dynamic§:Dictionary = new Dictionary();
+      
+      private var §521423155112315524123423632234§:Bitmap = new Bitmap();
+      
+      private var §521423181532318166123423632234§:Bitmap;
+      
+      private var §default function each§:uint;
+      
+      public function §521423117022311715123423632234§(param1:§5214232504232517123423632234§, param2:uint)
+      {
+         super();
+         this.§default function each§ = param2;
+         var _loc3_:§5214232504232517123423632234§ = param1;
+         if((_loc3_.§null set case§ & 1) != 0)
+         {
+            this.§throw use while§(param1);
+         }
+         else
+         {
+            var _loc4_:§5214232504232517123423632234§ = param1;
+            if(_loc4_.§false catch override§.§5214236765236778123423632234§)
+            {
+               param1.§extends finally import§(new §5214235726235739123423632234§(this));
+            }
+         }
+         this.§521423181532318166123423632234§ = this.§5214232889232902123423632234§(param2);
+         addChild(this.§521423155112315524123423632234§);
+         addChild(this.§521423181532318166123423632234§);
+         this.§521423181532318166123423632234§.x = (this.§521423155112315524123423632234§.width - this.§521423181532318166123423632234§.width) / 2;
+         this.§521423181532318166123423632234§.y = (this.§521423155112315524123423632234§.height - this.§521423181532318166123423632234§.height) / 2;
+      }
+      
+      private function §521423153142315327123423632234§(param1:uint) : Bitmap
+      {
+         var _loc3_:BitmapData = §true var package§.§implements while catch§(§52142399952310008123423632234§.§null var switch§,param1,0.75);
+         var _loc2_:Bitmap = new Bitmap(_loc3_);
+         _loc2_.smoothing = true;
+         return _loc2_;
+      }
+      
+      private function §throw use while§(param1:§5214232504232517123423632234§) : void
+      {
+         this.§521423155112315524123423632234§.bitmapData = param1.data;
+      }
+      
+      public function get §with switch static§() : Bitmap
+      {
+         return this.§521423155112315524123423632234§;
+      }
+      
+      public function §import finally switch§(param1:§5214232504232517123423632234§) : void
+      {
+         §throw use while§(param1);
+      }
+      
+      public function §for while implements§(param1:uint) : void
+      {
+         var _loc2_:Bitmap = null;
+         if(this.§default function each§ != param1)
+         {
+            _loc2_ = this.§5214232889232902123423632234§(param1);
+            addChild(_loc2_);
+            _loc2_.x = this.§521423181532318166123423632234§.x;
+            _loc2_.y = this.§521423181532318166123423632234§.y;
+            _loc2_.width = this.§521423181532318166123423632234§.width;
+            _loc2_.height = this.§521423181532318166123423632234§.height;
+            removeChild(this.§521423181532318166123423632234§);
+            this.§521423181532318166123423632234§ = _loc2_;
+            this.§default function each§ = param1;
+         }
+      }
+      
+      private function §5214232889232902123423632234§(param1:uint) : Bitmap
+      {
+         var _loc2_:Bitmap = §each finally dynamic§[param1];
+         if(_loc2_ == null)
+         {
+            _loc2_ = this.§521423153142315327123423632234§(param1);
+            §each finally dynamic§[param1] = _loc2_;
+         }
+         return _loc2_;
+      }
+      
+      public function §521423174512317464123423632234§(param1:Number) : void
+      {
+         this.§521423181532318166123423632234§.width = 16 * param1;
+         this.§521423181532318166123423632234§.height = 16 * param1;
+         this.§521423181532318166123423632234§.x = (this.§521423155112315524123423632234§.width - this.§521423181532318166123423632234§.width) / 2;
+         this.§521423181532318166123423632234§.y = (this.§521423155112315524123423632234§.height - this.§521423181532318166123423632234§.height) / 2;
+      }
+   }
+}
+

@@ -5,18 +5,18 @@ import { secondsLeft } from "@/shared/models/passes";
 import { ItemUtils } from "@/utils/item.utils";
 
 /**
- * Checks and SETS a player's premium in HOURS (absolute value, not incremental):
- *   /premium <username>        → shows how much premium the person has
- *   /premium <username> <hours> → sets the premium hours (0 = no premium)
- * The username is ALWAYS required — to give it to themselves, an admin provides their own nick. If the
- * target is ONLINE, sends `UpdatePremiumTime` live; setting 0 reconciles the equipped premium paint back
- * to green (see ItemUtils.reconcilePremiumEquipment). Also persists for offline targets.
+ * Consulta e DEFINE o premium de um jogador por HORAS (valor absoluto, não incremental):
+ *   /premium <usuário>        → mostra quanto de premium a pessoa tem
+ *   /premium <usuário> <horas> → define as horas de premium (0 = sem premium)
+ * O usuário é SEMPRE obrigatório — para dar a si mesmo, o admin informa o próprio nick. No alvo ONLINE
+ * envia o `UpdatePremiumTime` em tempo real; ao definir 0, a reconciliação reverte a pintura premium
+ * equipada para green (ver ItemUtils.reconcilePremiumEquipment). Persiste também para alvos offline.
  */
 export default class PremiumCommand implements ICommand {
     name = "premium";
     description = "Checks/sets a player's premium in hours (0 = no premium). Usage: /premium <username> [hours].";
     permissionLevel: ChatModeratorLevel = ChatModeratorLevel.ADMINISTRATOR;
-    usage = "<username> [hours]";
+    usage = "<usuário> [horas]";
     example = "/premium Danlino 24";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
@@ -34,7 +34,7 @@ export default class PremiumCommand implements ICommand {
             return;
         }
 
-        // No hours → check.
+        // Sem horas → consulta.
         if (args[1] === undefined) {
             const secs = secondsLeft(user.premiumExpiresAt);
             if (secs <= 0) {
@@ -47,7 +47,7 @@ export default class PremiumCommand implements ICommand {
             return;
         }
 
-        // With hours → set (absolute; minimum 0).
+        // Com horas → define (absoluto; mínimo 0).
         const hours = parseInt(args[1], 10);
         if (isNaN(hours) || hours < 0) {
             context.reply("Error: hours must be a number >= 0 (0 = no premium).");
@@ -58,18 +58,18 @@ export default class PremiumCommand implements ICommand {
             user.premiumExpiresAt = hours > 0 ? new Date(Date.now() + hours * 60 * 60 * 1000) : null;
             await user.save();
 
-            // Set to 0 → reverts the equipped premium paint to green (persists if changed).
+            // Definiu 0 → reverte a pintura premium equipada para green (persiste se mudou).
             await ItemUtils.reconcilePremiumEquipment(user);
 
-            // Online target: updates the premium time live (no relog needed).
+            // Alvo online: atualiza o tempo de premium em tempo real (sem relogar).
             if (online?.user) {
                 online.user = user;
                 online.sendPacket(new UpdatePremiumTimePacket({ timeLeft: secondsLeft(user.premiumExpiresAt) }));
             }
 
             context.reply(hours > 0
-                ? `Premium of ${user.username} set to ${hours}h.`
-                : `Premium of ${user.username} removed (0h).`);
+                ? `Premium de ${user.username} definido para ${hours}h.`
+                : `Premium de ${user.username} removido (0h).`);
         } catch (error: any) {
             context.reply(`Error: ${error.message}`);
         }

@@ -92,7 +92,9 @@ export class SendChatMessageHandler implements IPacketHandler<SendChatMessage> {
         // Staff mute: silenced users can't post chat messages (commands above still work).
         if (client.user.mutedUntil && client.user.mutedUntil > new Date()) {
             const minutesLeft = Math.ceil((client.user.mutedUntil.getTime() - Date.now()) / 60000);
-            client.sendPacket(new ChatHistory({ messages: [{ message: `You are muted for ${minutesLeft} more minute(s).`, isSystem: true, isWarning: true, source: null, target: null }] }));
+            const reason = (client.user as any).mutedReason || null;
+            const msg = `You are muted for ${minutesLeft} more minute(s).${reason ? ' Reason: ' + reason : ''}`;
+            client.sendPacket(new ChatHistory({ messages: [{ message: msg, isSystem: true, isWarning: false, source: null, target: null }] }));
             return;
         }
 

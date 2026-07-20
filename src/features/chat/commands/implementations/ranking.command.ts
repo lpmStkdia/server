@@ -1,11 +1,11 @@
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
 import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
 
-/** /ranking — shows the ranked (XP/BP) leaderboard: your position + the top 10. */
+/** /ranking — mostra a classificação da ranqueada (XP/BP): sua posição + o top 10. */
 export default class RankingCommand implements ICommand {
     name = "ranking";
     description = "Shows the Competitive Match ranking (your position + top 10).";
-    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.MODERATOR;
+    permissionLevel: ChatModeratorLevel = ChatModeratorLevel.NONE;
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         const svc = context.server.rankedService;
@@ -13,7 +13,7 @@ export default class RankingCommand implements ICommand {
             context.reply("Ranked unavailable.");
             return;
         }
-        // /ranking [1v1|2v2] — defaults to 1v1.
+        // /ranking [1v1|2v2] — padrão 1v1.
         const mode = args[0] === "2v2" ? "2v2" : "1v1";
         const userId = context.executor.user?.id;
         const [top, you] = await Promise.all([

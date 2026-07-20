@@ -47,7 +47,7 @@ export class GameClient {
   public user: UserDocument | null = null;
   public friendsCache: string[] = [];
   public isChatLoaded: boolean = false;
-  // Modal informativo da Ranqueada: mostrado UMA vez por sessão, na primeira vez que este cliente chega
+  // Modal informativo da Ranqueada: mostrado UMA vez por s¬essão, na primeira vez que este cliente chega
   // ao lobby (login→lobby OU sair da batalha→lobby). Em memória → reseta a cada nova conexão/login.
   public rankedIntroShown: boolean = false;
   public shopCountryCode: string = "BR";
@@ -125,6 +125,8 @@ export class GameClient {
   public battleOrientation: IVector3 | null = null;
   // Last solid obstacle the tank was inside (anti-clip log state), or null when in the clear.
   public insideObstacle: string | null = null;
+  // Previous frame position for swept collision detection (mine triggers on fast-moving tanks)
+  public battlePositionPrevious: IVector3 | null = null;
   public turretAngle: number = 0;
   public turretControl: number = 0;
   // Monotonic spec sequence sent in TankSpecificationPacket so the client applies the latest
@@ -261,7 +263,7 @@ export class GameClient {
     });
   }
 
-  private handleData(data: Buffer): void {
+  private async handleData(data: Buffer): Promise<void> {
     if (!data || data.length === 0) {
       logger.warn("Received empty data", { client: this.getRemoteAddress() });
       return;
@@ -385,6 +387,8 @@ export class GameClient {
     this.socket.destroy();
   }
 
+  
+
   public closeConnection(): void {
     this.socket.end();
     this.handleClose();
@@ -415,6 +419,9 @@ export class GameClient {
       this.socket.write(packetBuffer);
     } catch (error) {
       logger.error(`Error sending packet to ${this.getRemoteAddress()}`, {
+        packetId: packet.getId(),
+        packetName: packet.constructor.name,
+        userTarget: this.user?.username || "unknown",
         error,
       });
     }

@@ -1,0 +1,46 @@
+package §implements package get§
+{
+   import §521423122282312241123423632234§.§catch const break§;
+   import §521423167402316753123423632234§.§52142364223655123423632234§;
+   import §5214238500238513123423632234§.§521423175442317557123423632234§;
+   import §5214238875238888123423632234§.§switch finally§;
+   import §break const get§.§5214236547236560123423632234§;
+   
+   public class §if finally native§ implements §52142364223655123423632234§, §521423175442317557123423632234§
+   {
+      
+      private static const §for catch null§:Number = 5;
+      
+      private var §5214236100236113123423632234§:§5214236547236560123423632234§;
+      
+      private var §52142385023863123423632234§:§catch const break§;
+      
+      public function §if finally native§()
+      {
+         super();
+      }
+      
+      public function §5214235060235073123423632234§(param1:§5214236547236560123423632234§) : void
+      {
+         this.§5214236100236113123423632234§ = param1;
+      }
+      
+      public function §521423129672312980123423632234§(param1:§catch const break§) : void
+      {
+         this.§52142385023863123423632234§ = param1;
+      }
+      
+      public function §import const var§(param1:§catch const break§, param2:Number, param3:Number, param4:Number, param5:Number) : Number
+      {
+         var _loc7_:Number = NaN;
+         var _loc6_:§switch finally§ = param1.§5214238518238531123423632234§;
+         if(_loc6_.§5214235929235942123423632234§.§5214236830236843123423632234§ > 0 && !_loc6_.§521423111422311155123423632234§(this.§5214236100236113123423632234§))
+         {
+            _loc7_ = param1 == this.§52142385023863123423632234§ ? 5 : 0;
+            return 1000 - (0.65 * param2 / param4 + (1 - 0.65) * Math.abs(param3) / param5) + _loc7_;
+         }
+         return 0;
+      }
+   }
+}
+

@@ -4,8 +4,6 @@ import { IPacketHandler } from "@/shared/interfaces/ipacket-handler";
 import logger from "@/utils/logger";
 import * as ShopPackets from "./shop.packets";
 import { ShowAlertMessage } from "@/features/system/system.packets";
-import { getPackageReward } from "./shop.service";
-import { applyDonationGrant } from "./shop.donation";
 import { promoCodesData } from "@/config/promo-codes.data";
 
 export class RequestShopDataHandler implements IPacketHandler<ShopPackets.RequestShopData> {
@@ -46,21 +44,9 @@ export class PurchaseShopItemHandler implements IPacketHandler<ShopPackets.Purch
     public async execute(client: GameClient, _server: GameServer, packet: ShopPackets.PurchaseShopItem): Promise<void> {
         const user = client.user;
         if (!user) return;
-        // TESTE: sem provedor de pagamento real, confirmamos a compra COMO SE tivesse sido paga —
-        // credita o pacote (cristais + bônus + dobro se abonement) e premium, e mostra a janela de doação.
-        // (TODO tarefa 2: gerar a URL de checkout do provedor e responder OpenPaymentUrl em vez disto.)
-        const reward = packet.itemId ? getPackageReward(packet.itemId) : null;
-        if (!reward) {
-            client.sendPacket(new ShowAlertMessage({ text: "Este item ainda não está disponível para compra." }));
-            return;
-        }
-        applyDonationGrant(client, user, {
-            donatedCrystals: reward.crystals,
-            packageBonusCrystals: reward.bonusCrystals,
-            premiumDays: reward.premiumDays,
-        });
-        await user.save();
-        logger.info(`[TESTE] ${user.username} "comprou" ${packet.itemId} (${packet.paymentMethod}): +${reward.crystals}+${reward.bonusCrystals} cristais, ${reward.premiumDays}d premium.`);
+
+        client.sendPacket(new ShowAlertMessage({ text: "Shop is closed for now." }));
+        logger.info(`Blocked shop purchase for ${user.username}: ${packet.itemId} via ${packet.paymentMethod}`);
     }
 }
 
@@ -80,16 +66,7 @@ export class ActivatePromoCodeHandler implements IPacketHandler<ShopPackets.Acti
             return;
         }
 
-        // Concede como uma doação (cristais + dobro se abonement + premium em tempo real + ShowDonationAlert).
-        applyDonationGrant(client, user, {
-            donatedCrystals: reward.crystals ?? 0,
-            packageBonusCrystals: 0,
-            premiumDays: reward.premiumDays ?? 0,
-        });
-        user.usedPromoCodes.push(code);
-        await user.save();
-
-        client.sendPacket(new ShopPackets.PromoCodeValid());
-        logger.info(`User ${user.username} redeemed promo code ${code} (crystals=${reward.crystals ?? 0}, premiumDays=${reward.premiumDays ?? 0}).`);
+        client.sendPacket(new ShowAlertMessage({ text: "Shop is closed for now." }));
+        logger.info(`Blocked promo code redemption for ${user.username}: ${code}`);
     }
 }

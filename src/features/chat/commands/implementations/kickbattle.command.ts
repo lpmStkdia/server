@@ -24,8 +24,8 @@ export default class KickBattleCommand implements ICommand {
             const battleId = await context.server.battleService.kickOfflineFromBattle(args[0]);
             context.reply(
                 battleId
-                    ? `${args[0]} (offline) was removed from match ${battleId}.`
-                    : `Player "${args[0]}" is not online and not stuck in any match.`
+                    ? `${args[0]} (offline) foi removido da partida ${battleId}.`
+                    : `Jogador "${args[0]}" não está online nem preso em alguma partida.`
             );
             return;
         }

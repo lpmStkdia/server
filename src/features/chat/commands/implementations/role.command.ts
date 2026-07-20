@@ -13,10 +13,10 @@ import {
  */
 export default class RoleCommand implements ICommand {
     name = "role";
-    description = "Sets the staff role of a user. Usage: /role <username> <role>.";
+    description = "Sets the role of a user. Usage: /role <username> <role>.";
     permissionLevel = ChatModeratorLevel.COMMUNITY_MANAGER;
     usage = "<username> <none/candidate/moderator/administrator/cm>";
-    example = "/role John moderator";
+    example = "/role John candidate";
 
     async execute(context: CommandContext, args: string[]): Promise<void> {
         if (args.length < 2) {

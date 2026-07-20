@@ -27,6 +27,7 @@ export const PRO_BATTLE_ENTER_PRICE = 150;
 
 /** Percentual de bônus de XP por passe (wiki + confirmação do dono). */
 export const XP_BONUS_PERCENT = { PREMIUM: 50, UP_SCORE: 30, NEWBIE: 50 } as const;
+export const DEFAULT_XP_MULTIPLIER = 5;
 
 /**
  * Soma dos bônus de XP dos passes ativos (ex.: os três ativos → 130). TODOS os passes valem em TODOS os
@@ -38,9 +39,9 @@ export function xpBonusPercent(u: UserDocument): number {
         + (isNewbieActive(u) ? XP_BONUS_PERCENT.NEWBIE : 0);
 }
 
-/** XP da conta a partir do Score base, aplicando os multiplicadores dos passes. O Score em si não muda. */
+/** XP da conta a partir do Score base, aplicando o multiplicador padrão de 5x + bônus dos passes. */
 export function xpFromScore(u: UserDocument, baseScore: number): number {
-    return Math.round(baseScore * (1 + xpBonusPercent(u) / 100));
+    return Math.round(baseScore * DEFAULT_XP_MULTIPLIER * (1 + xpBonusPercent(u) / 100));
 }
 
 // Durações dos passes (fonte única — a garagem importa daqui para o `durationMs` da compra).

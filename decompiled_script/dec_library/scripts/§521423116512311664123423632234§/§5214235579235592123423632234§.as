@@ -1,0 +1,18 @@
+package §521423116512311664123423632234§
+{
+   import §521423148762314889123423632234§.§class set implements§;
+   import §break const get§.§5214236547236560123423632234§;
+   
+   public interface §5214235579235592123423632234§
+   {
+      
+      function §52142357323586123423632234§(param1:String, param2:§5214236547236560123423632234§) : void;
+      
+      function §class function set§(param1:§5214236547236560123423632234§, param2:String) : void;
+      
+      function §521423163412316354123423632234§(param1:§class set implements§, param2:§5214236547236560123423632234§) : void;
+      
+      function §521423128762312889123423632234§(param1:§5214236547236560123423632234§, param2:String) : void;
+   }
+}
+

@@ -1,7 +1,7 @@
 import { UnloadSpaceBattlePacket } from "@/features/battle/battle-init.packets";
 import { BattleWorkflow } from "@/features/battle/battle.workflow";
 import { CommandContext, ICommand } from "@/features/chat/commands/command.types";
-import { ChatModeratorLevel } from "@/shared/models/enums/chat-moderator-level.enum";
+import { ChatModeratorLevel, hasModeratorPower } from "@/shared/models/enums/chat-moderator-level.enum";
 
 /** Switches the caller from PLAYER to SPECTATOR of the same battle (live moderation): exits like a
  *  voluntary leave, then re-enters through the spectator flow — the same packet sequence as leaving and
@@ -17,6 +17,10 @@ export default class SpectateCommand implements ICommand {
         const battle = client.currentBattle;
         if (!client.user || !battle) {
             context.reply("You must be in a match.");
+            return;
+        }
+        if (!hasModeratorPower(client.user.chatModeratorLevel, ChatModeratorLevel.MODERATOR)) {
+            context.reply("Only moderators and above can become spectators.");
             return;
         }
         if (client.isSpectator) {

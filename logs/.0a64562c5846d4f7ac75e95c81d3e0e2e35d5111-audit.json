@@ -19,6 +19,11 @@
             "date": 1784572859097,
             "name": "/root/server/logs/rejections-2026-07-20.log",
             "hash": "af7bf5bdcb68c6a8054a5afdbdee36490851436a7b79064f5aee274a94207932"
+        },
+        {
+            "date": 1784587673764,
+            "name": "/root/server/logs/rejections-2026-07-21.log",
+            "hash": "dea89680881ef4153303d2050888bbfe41420f08d8d72c5067976d0810c9fbe7"
         }
     ],
     "hashType": "sha256"

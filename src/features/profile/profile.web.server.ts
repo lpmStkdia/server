@@ -39,13 +39,15 @@ export interface ProfileCardItem {
   previewUrl?: string;
   alphaUrl?: string;
   textureUrl?: string;
-  modelUrl?: string;
-  lightmapUrl?: string;
-  detailsUrl?: string;
-  detailsAlphaUrl?: string;
-  // NEW: live/animated paint sources ("image.tara" + "properties.json").
-  // Live paints do NOT have image.jpg — the client will try these first
-  // and fall back to textureUrl only if they 404.
+  // NEW: base *directories* (trailing slash), matching the real client's
+  // BaseLoader.loadCommon(), which appends "object.3ds", "lightmap.jpg",
+  // "details.jpg", "details_alpha.jpg", "image.jpg" itself. This replaces
+  // the old pre-built filename URLs, since the game's loader needs to own
+  // that filename convention for the alignment logic to match exactly.
+  modelBaseUrl?: string; // hull / turret only
+  colormapBaseUrl?: string; // paint only
+  // Optional "live" (animated) paint source — NOT part of the real client
+  // code available to us; best-effort addition, falls back to image.jpg.
   liveImageUrl?: string;
   livePropertiesUrl?: string;
   count?: number;
@@ -132,37 +134,24 @@ function toProfileItem(id: string, category: string, owned: boolean, equipped: b
     ? resourcePath(`/paint/${resourceId}/texture/v1/image.jpg`)
     : undefined;
 
-  // NEW: live/animated paint sources. Only relevant for paints.
+  // Base *directories* — the client appends the real filenames itself,
+  // exactly like BaseLoader.loadCommon() does in the actual game bundle.
+  const modelBaseUrl = category === "hull"
+    ? resourcePath(`/hull/${resourceId}/m${safeMod}/model/v1/`)
+    : category === "turret"
+      ? resourcePath(`/turret/${resourceId}/m${safeMod}/model/v1/`)
+      : undefined;
+
+  const colormapBaseUrl = category === "paint"
+    ? resourcePath(`/paint/${resourceId}/texture/v1/`)
+    : undefined;
+
   const liveImageUrl = category === "paint"
     ? resourcePath(`/paint/${resourceId}/texture/v1/image.tara`)
     : undefined;
   const livePropertiesUrl = category === "paint"
     ? resourcePath(`/paint/${resourceId}/texture/v1/properties.json`)
     : undefined;
-
-  const modelUrl = category === "hull"
-    ? resourcePath(`/hull/${resourceId}/m${safeMod}/model/v1/object.3ds`)
-    : category === "turret"
-      ? resourcePath(`/turret/${resourceId}/m${safeMod}/model/v1/object.3ds`)
-      : undefined;
-
-  const lightmapUrl = category === "hull"
-    ? resourcePath(`/hull/${resourceId}/m${safeMod}/model/v1/lightmap.jpg`)
-    : category === "turret"
-      ? resourcePath(`/turret/${resourceId}/m${safeMod}/model/v1/lightmap.jpg`)
-      : undefined;
-
-  const detailsUrl = category === "hull"
-    ? resourcePath(`/hull/${resourceId}/m${safeMod}/model/v1/details.jpg`)
-    : category === "turret"
-      ? resourcePath(`/turret/${resourceId}/m${safeMod}/model/v1/details.jpg`)
-      : undefined;
-
-  const detailsAlphaUrl = category === "hull"
-    ? resourcePath(`/hull/${resourceId}/m${safeMod}/model/v1/details_alpha.jpg`)
-    : category === "turret"
-      ? resourcePath(`/turret/${resourceId}/m${safeMod}/model/v1/details_alpha.jpg`)
-      : undefined;
 
   return {
     id,
@@ -175,10 +164,8 @@ function toProfileItem(id: string, category: string, owned: boolean, equipped: b
     previewUrl,
     alphaUrl,
     textureUrl,
-    modelUrl,
-    lightmapUrl,
-    detailsUrl,
-    detailsAlphaUrl,
+    modelBaseUrl,
+    colormapBaseUrl,
     liveImageUrl,
     livePropertiesUrl,
   };
@@ -270,34 +257,19 @@ export function buildProfileViewModel(user: UserDocument, rankService: RankServi
 }
 
 // ---------------------------------------------------------------------------
-// 3D viewer config: pulls exactly the URLs the client-side viewer needs out
-// of the equipped hull/turret/paint, as plain JSON embedded into the page.
+// 3D viewer config — base directories only; the client appends the real
+// filenames itself (object.3ds / lightmap.jpg / details.jpg /
+// details_alpha.jpg / image.jpg), same as the game's BaseLoader.loadCommon().
 // ---------------------------------------------------------------------------
 function buildViewerConfig(view: ProfileViewModel) {
   return {
-    hull: {
-      id: view.equippedHull.id,
-      model: view.equippedHull.modelUrl,
-      lightmap: view.equippedHull.lightmapUrl,
-      details: view.equippedHull.detailsUrl,
-      detailsAlpha: view.equippedHull.detailsAlphaUrl,
-    },
-    turret: {
-      id: view.equippedTurret.id,
-      model: view.equippedTurret.modelUrl,
-      lightmap: view.equippedTurret.lightmapUrl,
-      details: view.equippedTurret.detailsUrl,
-      detailsAlpha: view.equippedTurret.detailsAlphaUrl,
-    },
-    paint: {
-      // Static fallback (used when the live tara/properties files 404)
-      color: view.equippedPaint.textureUrl,
-      // Live/animated source — no image.jpg exists for live paints, only
-      // image.tara (raw sequential RGBA8 frames) + properties.json.
-      live: {
-        image: view.equippedPaint.liveImageUrl,
-        properties: view.equippedPaint.livePropertiesUrl,
-      },
+    hull: { baseUrl: view.equippedHull.modelBaseUrl },
+    turret: { baseUrl: view.equippedTurret.modelBaseUrl },
+    colormapUrl: view.equippedPaint.colormapBaseUrl,
+    // Best-effort live paint (not present in the real client bundle).
+    live: {
+      image: view.equippedPaint.liveImageUrl,
+      properties: view.equippedPaint.livePropertiesUrl,
     },
   };
 }
@@ -315,100 +287,11 @@ function getViewerScript(config: ReturnType<typeof buildViewerConfig>): string {
 }
 </script>
 
-<!-- Inline CSS for the Offset Tool Control Overlay -->
-<style>
-  .turret-tool-panel {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: #f8fafc;
-    font-family: monospace, system-ui, sans-serif;
-    font-size: 12px;
-    z-index: 100;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 220px;
-  }
-  .turret-tool-panel header {
-    font-weight: bold;
-    color: #38bdf8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 4px;
-  }
-  .turret-tool-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .turret-tool-panel input[type="range"] {
-    width: 100%;
-    cursor: pointer;
-    accent-color: #38bdf8;
-  }
-  .turret-tool-panel input[type="number"] {
-    width: 60px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #38bdf8;
-    border-radius: 4px;
-    padding: 2px 4px;
-    text-align: right;
-    font-family: inherit;
-  }
-  .turret-tool-panel button {
-    background: #0284c7;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: inherit;
-    transition: background 0.2s;
-  }
-  .turret-tool-panel button:hover {
-    background: #0369a1;
-  }
-  .turret-tool-panel button:active {
-    transform: scale(0.98);
-  }
-</style>
-
-<!-- Control UI HTML Container -->
-<div id="turret-tool-ui" class="turret-tool-panel" style="display: none;">
-  <header>Turret Mount Tool</header>
-  <div class="turret-tool-row">
-    <span>Hull ID:</span>
-    <strong id="tool-hull-id" style="color:#facc15;">-</strong>
-  </div>
-  <div class="turret-tool-row">
-    <span>Turret Z:</span>
-    <input type="number" id="tool-z-num" step="0.5" value="0">
-  </div>
-  <input type="range" id="tool-z-slider" min="-100" max="200" step="0.5" value="0">
-  <button id="tool-copy-btn">Copy Config Entry</button>
-</div>
-
 <script type="module">
 import * as THREE from 'three';
-import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 
 const TANK_CONFIG = ${configJson};
-
-// Flat correction applied to every turret's computed mount height.
-// (Requested: "the z is not correct, make it 18.2 less for every turret")
-const TURRET_Z_CORRECTION = 18.2;
 
 const container = document.getElementById('tank-viewer-canvas');
 const statusEl = document.getElementById('tank-viewer-status');
@@ -420,127 +303,348 @@ function logStatus(msg) {
   console.warn(msg);
 }
 
-const scene = new THREE.Scene();
-scene.background = null;
+// =============================================================================
+// 3DS PARSER — ported 1:1 from the real ProTanki client bundle's chunk reader
+// (class "za" in the compiled source), including the KEYFRAMER/PIVOT handling
+// that the old bounding-box heuristic did not use. This is what makes hull
+// origin + turret mount points line up exactly like in-game.
+// =============================================================================
+const CHUNK = {
+  MAIN: 0x4D4D, SCENE: 0x3D3D, MATERIAL: 0xAFFF, MAT_NAME: 0xA000, COLOR_24: 0x0011,
+  MAP_DIFFUSE: 0xA200, MAP_OPACITY: 0xA210, MAP_FILE: 0xA300,
+  MAP_SCALE_U: 0xA354, MAP_SCALE_V: 0xA356, MAP_OFFSET_U: 0xA358, MAP_OFFSET_V: 0xA35A, MAP_ROT: 0xA35C,
+  OBJECT: 0x4000, TRIMESH: 0x4100, VERTS: 0x4110, FACES: 0x4120, FACES_MAT: 0x4130,
+  MAPCOORDS: 0x4140, SMOOTH: 0x4150, TRANSFORM: 0x4160,
+};
+const KF_CHUNK = { KEYFRAMER: 0xB000, NODE_HDR: 0xB010, PIVOT: 0xB013 };
 
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 5000);
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-container.appendChild(renderer.domElement);
+class TDS3DSParser {
+  materials = {};
+  objects = {};
+  animPivots = [];
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-keyLight.position.set(5, 10, 7);
-scene.add(keyLight);
+  async parse(arrayBuffer, opts) {
+    const o = {
+      scale: opts?.scale ?? 1,
+      zUpToYUp: opts?.zUpToYUp ?? true,
+      flipV: opts?.flipV ?? false,
+      unityReset: opts?.unityReset ?? true,
+      mirrorX: opts?.mirrorX ?? false,
+    };
+    this.dv = new DataView(arrayBuffer);
+    this.materials = {};
+    this.objects = {};
+    this.animPivots = [];
+    this.parse3DS(0, this.dv.byteLength);
 
-// ---- Glass mirror floor ----
-// A tinted reflective plane at the tank's ground level (y = 0, since hull
-// geometry is translated so its pivot/base sits at the local origin).
-const mirrorGeometry = new THREE.CircleGeometry(1, 64);
-const mirror = new Reflector(mirrorGeometry, {
-  color: 0x33465c,
-  textureWidth: Math.max(1, Math.floor(container.clientWidth * Math.min(window.devicePixelRatio, 2))),
-  textureHeight: Math.max(1, Math.floor(container.clientHeight * Math.min(window.devicePixelRatio, 2))),
-  clipBias: 0.003,
-});
-mirror.rotation.x = -Math.PI / 2;
-mirror.position.y = 0;
-scene.add(mirror);
+    const zUpToYUp = new THREE.Matrix4().set(
+      1, 0, 0, 0,
+      0, 0, 1, 0,
+      0, -1, 0, 0,
+      0, 0, 0, 1
+    );
 
-// ---- Camera positioning & Zoom ----
-const cameraHeightFactor = 0.35;
-let cameraRadius = 200;
-let cameraHeight = cameraRadius * cameraHeightFactor;
-let cameraAngle = Math.PI / 4;
-let targetBoundsRadius = 50;
-const lookAtTarget = new THREE.Vector3(0, 0, 0);
+    let originOffset = new THREE.Vector3(0, 0, 0);
+    {
+      const first = Object.values(this.objects).find((f) => f.d !== undefined);
+      if (first) {
+        originOffset.set(first.d, first.h, first.l);
+        const firstPivot = this.animPivots[0];
+        if (!firstPivot || firstPivot.childCount === 0) originOffset.set(0, 0, 0);
+      }
+    }
 
-function updateCameraPosition() {
-  const x = Math.cos(cameraAngle) * cameraRadius;
-  const z = Math.sin(cameraAngle) * cameraRadius;
-  camera.position.set(x, cameraHeight, z);
-  camera.lookAt(lookAtTarget);
+    const pivotMap = new Map();
+    this.animPivots.forEach((p) => { if (p.pivot) pivotMap.set(p.name, p.pivot.clone()); });
+
+    const group = new THREE.Group();
+    const meshes = [];
+    const byName = {};
+
+    for (const obj of Object.values(this.objects)) {
+      if (!obj.vertices || !obj.faces) continue;
+
+      const objTransform = obj.d !== undefined ? new THREE.Vector3(obj.d, obj.h, obj.l) : new THREE.Vector3(0, 0, 0);
+      const animPivot = pivotMap.get(obj.name) ?? new THREE.Vector3(0, 0, 0);
+
+      const src = obj.vertices;
+      const out = new Float32Array(src.length);
+      const p = new THREE.Vector3();
+      for (let i = 0; i < src.length; i += 3) {
+        if (o.unityReset) {
+          p.set(
+            src[i] - (objTransform.x + animPivot.x),
+            src[i + 1] - (objTransform.y + animPivot.y),
+            src[i + 2] - (objTransform.z + animPivot.z)
+          );
+        } else {
+          p.set(src[i], src[i + 1], src[i + 2]);
+        }
+        if (o.zUpToYUp) p.applyMatrix4(zUpToYUp);
+        p.multiplyScalar(o.scale);
+        if (o.mirrorX) p.x = -p.x;
+        out[i] = p.x; out[i + 1] = p.y; out[i + 2] = p.z;
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(out, 3));
+
+      if (obj.uvs && obj.uvs.length > 0) {
+        const uv = new Float32Array(obj.uvs.length);
+        for (let i = 0; i < obj.uvs.length; i += 2) {
+          uv[i] = obj.uvs[i];
+          uv[i + 1] = o.flipV ? 1 - obj.uvs[i + 1] : obj.uvs[i + 1];
+        }
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+      }
+
+      let groups = [];
+      if (obj.surfaces && Object.keys(obj.surfaces).length > 0) {
+        for (const [matName, faceIdx] of Object.entries(obj.surfaces)) {
+          const idx = [];
+          for (const fi of faceIdx) { const w = fi * 3; idx.push(obj.faces[w], obj.faces[w + 1], obj.faces[w + 2]); }
+          groups.push({ matName, idx });
+        }
+      } else {
+        groups.push({ matName: '__default__', idx: Array.from(obj.faces) });
+      }
+
+      const indices = [];
+      const submaterials = [];
+      geometry.clearGroups();
+      for (const g of groups) {
+        const start = indices.length;
+        indices.push(...g.idx);
+        const count = g.idx.length;
+        let mat;
+        if (g.matName === '__default__') {
+          mat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+        } else {
+          mat = new THREE.MeshStandardMaterial({ color: 0xff00ff });
+        }
+        let idx = submaterials.findIndex((m) => m === mat);
+        if (idx === -1) { submaterials.push(mat); idx = submaterials.length - 1; }
+        geometry.addGroup(start, count, idx);
+      }
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      geometry.computeBoundingBox();
+      geometry.computeBoundingSphere();
+
+      const mesh = new THREE.Mesh(geometry, submaterials.length > 1 ? submaterials : submaterials[0]);
+      mesh.name = obj.name || 'object';
+
+      const worldPos = new THREE.Vector3(objTransform.x - originOffset.x, objTransform.y - originOffset.y, objTransform.z - originOffset.z);
+      if (o.zUpToYUp) worldPos.applyMatrix4(zUpToYUp);
+      worldPos.multiplyScalar(o.scale);
+      if (o.mirrorX) worldPos.x = -worldPos.x;
+      mesh.position.copy(worldPos);
+
+      meshes.push(mesh);
+      (byName[mesh.name] ??= []).push(mesh);
+      group.add(mesh);
+    }
+
+    return { group, meshes, byName };
+  }
+
+  readU16(p) { return this.dv.getUint16(p, true); }
+  readU32(p) { return this.dv.getUint32(p, true); }
+  readF32(p) { return this.dv.getFloat32(p, true); }
+  chunkAt(p) {
+    const id = this.readU16(p);
+    const size = this.readU32(p + 2);
+    return { id, size, dataPos: p + 6, nextPos: p + size, dataSize: size - 6 };
+  }
+  readZString(p) {
+    const bytes = [];
+    let n = p;
+    while (n < this.dv.byteLength) {
+      const b = this.dv.getUint8(n++);
+      if (b === 0) break;
+      bytes.push(b);
+    }
+    return { text: new TextDecoder().decode(new Uint8Array(bytes)), next: n };
+  }
+
+  parse3DS(p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    if (c.id === CHUNK.MAIN) this.parseMain(c.dataPos, c.dataSize);
+    this.parse3DS(c.nextPos, len - c.size);
+  }
+  parseMain(p, len) {
+    while (len >= 6) {
+      const c = this.chunkAt(p);
+      if (c.id === CHUNK.SCENE) this.parseScene(c.dataPos, c.dataSize);
+      else if (c.id === KF_CHUNK.KEYFRAMER) this.parseKeyframer(c.dataPos, c.dataSize);
+      p = c.nextPos; len -= c.size;
+    }
+  }
+  parseScene(p, len) {
+    while (len >= 6) {
+      const c = this.chunkAt(p);
+      if (c.id === CHUNK.MATERIAL) {
+        const mat = { name: '' };
+        this.parseMaterial(mat, c.dataPos, c.dataSize);
+        if (mat.name) this.materials[mat.name] = mat;
+      } else if (c.id === CHUNK.OBJECT) {
+        this.parseObject(c);
+      }
+      p = c.nextPos; len -= c.size;
+    }
+  }
+  parseMaterial(mat, p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    switch (c.id) {
+      case CHUNK.MAT_NAME: { const { text } = this.readZString(c.dataPos); mat.name = text; break; }
+      case CHUNK.COLOR_24: {
+        const s = c.dataPos + 6 <= c.nextPos ? c.dataPos + 6 : c.dataPos;
+        mat.color = (this.dv.getUint8(s) << 16) | (this.dv.getUint8(s + 1) << 8) | this.dv.getUint8(s + 2);
+        break;
+      }
+    }
+    this.parseMaterial(mat, c.nextPos, len - c.size);
+  }
+  parseObject(chunk) {
+    const { text, next } = this.readZString(chunk.dataPos);
+    const obj = { name: text };
+    this.objects[text] = obj;
+    const consumed = next - chunk.dataPos;
+    this.parseObjectChunk(obj, chunk.dataPos + consumed, chunk.dataSize - consumed);
+  }
+  parseObjectChunk(obj, p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    if (c.id === CHUNK.TRIMESH) this.parseMesh(obj, c.dataPos, c.dataSize);
+    this.parseObjectChunk(obj, c.nextPos, len - c.size);
+  }
+  parseMesh(obj, p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    switch (c.id) {
+      case CHUNK.VERTS: this.readVerts(obj, c.dataPos); break;
+      case CHUNK.MAPCOORDS: this.readUVs(obj, c.dataPos); break;
+      case CHUNK.TRANSFORM: this.readTransform(obj, c.dataPos); break;
+      case CHUNK.FACES: this.readFacesAndSubs(obj, c); break;
+    }
+    this.parseMesh(obj, c.nextPos, len - c.size);
+  }
+  readVerts(obj, p) {
+    const n = this.readU16(p); p += 2;
+    const out = new Array(n * 3);
+    for (let i = 0, j = 0; i < n; i++) {
+      out[j++] = this.readF32(p); p += 4;
+      out[j++] = this.readF32(p); p += 4;
+      out[j++] = this.readF32(p); p += 4;
+    }
+    obj.vertices = out;
+  }
+  readUVs(obj, p) {
+    const n = this.readU16(p); p += 2;
+    const out = new Array(n * 2);
+    for (let i = 0, j = 0; i < n; i++) {
+      out[j++] = this.readF32(p); p += 4;
+      out[j++] = this.readF32(p); p += 4;
+    }
+    obj.uvs = out;
+  }
+  readTransform(obj, p) {
+    obj.a = this.readF32(p); p += 4;
+    obj.e = this.readF32(p); p += 4;
+    obj.i = this.readF32(p); p += 4;
+    obj.b = this.readF32(p); p += 4;
+    obj.f = this.readF32(p); p += 4;
+    obj.j = this.readF32(p); p += 4;
+    obj.c = this.readF32(p); p += 4;
+    obj.g = this.readF32(p); p += 4;
+    obj.k = this.readF32(p); p += 4;
+    obj.d = this.readF32(p); p += 4;
+    obj.h = this.readF32(p); p += 4;
+    obj.l = this.readF32(p); p += 4;
+  }
+  readFacesAndSubs(obj, chunk) {
+    let p = chunk.dataPos;
+    const n = this.readU16(p); p += 2;
+    const faces = new Array(n * 3);
+    for (let i = 0, j = 0; i < n; i++) {
+      faces[j++] = this.readU16(p); p += 2;
+      faces[j++] = this.readU16(p); p += 2;
+      faces[j++] = this.readU16(p); p += 2;
+      p += 2; // face flags
+    }
+    obj.faces = faces;
+    const subP = chunk.dataPos + (2 + 8 * n);
+    const subLen = chunk.dataSize - (2 + 8 * n);
+    this.readFacesSubs(obj, subP, subLen);
+  }
+  readFacesSubs(obj, p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    if (c.id === CHUNK.FACES_MAT) {
+      obj.surfaces ??= {};
+      const { text, next } = this.readZString(c.dataPos);
+      let q = next;
+      const n = this.readU16(q); q += 2;
+      const idx = new Array(n);
+      for (let i = 0; i < n; i++) { idx[i] = this.readU16(q); q += 2; }
+      obj.surfaces[text] = idx;
+    }
+    this.readFacesSubs(obj, c.nextPos, len - c.size);
+  }
+  parseKeyframer(p, len) {
+    while (len >= 6) {
+      const c = this.chunkAt(p);
+      const node = { name: '', parentIndex: 65535, childCount: 0 };
+      this.parseKFObject(node, c.dataPos, c.dataSize);
+      if (node.name) this.animPivots.push(node);
+      p = c.nextPos; len -= c.size;
+    }
+    const childCounts = {};
+    this.animPivots.forEach((node) => {
+      if (node.parentIndex !== 65535) childCounts[node.parentIndex] = (childCounts[node.parentIndex] ?? 0) + 1;
+    });
+    this.animPivots.forEach((node, i) => { node.childCount = childCounts[i] ?? 0; });
+  }
+  parseKFObject(node, p, len) {
+    if (len < 6) return;
+    const c = this.chunkAt(p);
+    switch (c.id) {
+      case KF_CHUNK.NODE_HDR: {
+        const { text, next } = this.readZString(c.dataPos);
+        node.name = text;
+        let q = next;
+        q += 4;
+        node.parentIndex = this.readU16(q);
+        break;
+      }
+      case KF_CHUNK.PIVOT: {
+        node.pivot = new THREE.Vector3(this.readF32(c.dataPos), this.readF32(c.dataPos + 4), this.readF32(c.dataPos + 8));
+        break;
+      }
+    }
+    this.parseKFObject(node, c.nextPos, len - c.size);
+  }
 }
 
-function updateCameraDistanceForBounds() {
-  const fovRad = THREE.MathUtils.degToRad(camera.fov);
-  const horizontalFov = 2 * Math.atan(Math.tan(fovRad / 2) * camera.aspect);
-  const r = Math.max(targetBoundsRadius, 1);
-  const a = r / Math.sin(fovRad / 2);
-  const o = r / Math.sin(horizontalFov / 2);
-
-  const dist = Math.max(a, o) * 0.6;
-
-  cameraRadius = dist;
-  cameraHeight = dist * cameraHeightFactor;
-  camera.near = Math.max(dist / 100, 0.01);
-  camera.far = dist * 20;
-  camera.updateProjectionMatrix();
-}
-
-function fitCameraToObject(object3D) {
-  const box = new THREE.Box3().setFromObject(object3D);
-  if (box.isEmpty()) return;
-  const center = box.getCenter(new THREE.Vector3());
-  const sphere = new THREE.Sphere();
-  box.getBoundingSphere(sphere);
-  targetBoundsRadius = sphere.radius;
-  lookAtTarget.copy(center);
-  updateCameraDistanceForBounds();
-  updateCameraPosition();
-
-  // Resize the mirror to comfortably fit under the tank.
-  mirror.scale.setScalar(Math.max(targetBoundsRadius * 6, 20));
-}
-
-// ---- Controls ----
-const ROTATE_SPEED = 0.005;
-let dragging = false;
-let lastX = 0;
-let lastInteractionTime = performance.now();
-const idleDelay = 3000;
-const autoRotateSpeed = 0.3;
-
-renderer.domElement.addEventListener('pointerdown', (e) => {
-  dragging = true; lastX = e.clientX; lastInteractionTime = performance.now();
-  renderer.domElement.style.cursor = 'grabbing';
-});
-window.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  const dx = e.clientX - lastX; lastX = e.clientX;
-  cameraAngle += dx * ROTATE_SPEED;
-  lastInteractionTime = performance.now();
-  updateCameraPosition();
-});
-window.addEventListener('pointerup', () => {
-  dragging = false;
-  renderer.domElement.style.cursor = 'grab';
-});
-renderer.domElement.style.cursor = 'grab';
-
-renderer.domElement.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const factor = e.deltaY > 0 ? 1.08 : 1 / 1.08;
-  cameraRadius = THREE.MathUtils.clamp(cameraRadius * factor, targetBoundsRadius * 0.2, targetBoundsRadius * 10);
-  cameraHeight = cameraRadius * cameraHeightFactor;
-  lastInteractionTime = performance.now();
-  updateCameraPosition();
-}, { passive: false });
-
-// ---- Textures ----
+// =============================================================================
+// Paint texture pipeline — ported from the real client's BaseLoader +
+// details/alpha merge helper. Fragment/vertex shader *contents* are fetched
+// from external .glsl files in the real client and weren't part of the
+// bundle we have access to, so this uses a close equivalent with the same
+// uniform names (uColor/uLight/uDetails/uColorScale/uColorOffset/uExposure).
+// =============================================================================
 const textureLoader = new THREE.TextureLoader();
-// IMPORTANT: without this, cross-origin lightmap/details fetches can fail
-// silently on some resource hosts — this was one cause of turret texture bugs.
 textureLoader.setCrossOrigin('anonymous');
 
-function setSRGB(tex) {
+function setSRGB(tex, flipY = false) {
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.flipY = false;
+  tex.flipY = flipY;
   tex.needsUpdate = true;
   return tex;
 }
+
 function loadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -550,21 +654,25 @@ function loadImage(url) {
     img.src = url;
   });
 }
-async function mergeDetailsAlpha(detailsUrl, alphaUrl) {
-  const [detailsImg, alphaImg] = await Promise.all([loadImage(detailsUrl), loadImage(alphaUrl)]);
+
+// Matches the real client's details+alpha merge exactly: alpha channel of
+// the merged texture = RED channel of the alpha image.
+async function mergeDetailsAlpha(detailsImg, alphaImg) {
   const w = detailsImg.naturalWidth || detailsImg.width;
   const h = detailsImg.naturalHeight || detailsImg.height;
-  const detailsCanvas = document.createElement('canvas');
-  detailsCanvas.width = w; detailsCanvas.height = h;
-  const dCtx = detailsCanvas.getContext('2d', { willReadFrequently: true });
+  const dCanvas = document.createElement('canvas');
+  dCanvas.width = w; dCanvas.height = h;
+  const dCtx = dCanvas.getContext('2d', { willReadFrequently: true });
   dCtx.drawImage(detailsImg, 0, 0, w, h);
+
   const aw = alphaImg.naturalWidth || alphaImg.width;
   const ah = alphaImg.naturalHeight || alphaImg.height;
-  const alphaCanvas = document.createElement('canvas');
-  alphaCanvas.width = aw; alphaCanvas.height = ah;
-  const aCtx = alphaCanvas.getContext('2d', { willReadFrequently: true });
+  const aCanvas = document.createElement('canvas');
+  aCanvas.width = aw; aCanvas.height = ah;
+  const aCtx = aCanvas.getContext('2d', { willReadFrequently: true });
   aCtx.drawImage(alphaImg, 0, 0, aw, ah);
   const alphaData = aCtx.getImageData(0, 0, aw, ah).data;
+
   const detailsData = dCtx.getImageData(0, 0, w, h);
   const pixels = detailsData.data;
   const minW = Math.min(w, aw), minH = Math.min(h, ah);
@@ -576,19 +684,17 @@ async function mergeDetailsAlpha(detailsUrl, alphaUrl) {
     }
   }
   dCtx.putImageData(detailsData, 0, 0);
+
   return new Promise((resolve) => {
     const merged = new Image();
     merged.onload = () => resolve({ image: merged, rawWidth: w, rawHeight: h });
-    merged.src = detailsCanvas.toDataURL('image/png');
+    merged.src = dCanvas.toDataURL('image/png');
   });
 }
 
-// ---- Live paint (image.tara + properties.json) ----
-// Live paints have no image.jpg — only a raw animated frame sequence
-// ("image.tara") plus a properties.json describing frame size/count/fps.
-// Layout assumed: numFrames consecutive frames of raw RGBA8 pixels,
-// each frame exactly (weight * height * 4) bytes, back to back.
-async function loadLivePaintTexture(imageUrl, propsUrl) {
+// ---- Live/animated paint (image.tara + properties.json) — best-effort,
+// not part of the confirmed client source; falls back to static image.jpg.
+async function loadLivePaintFrames(imageUrl, propsUrl) {
   const propsRes = await fetch(propsUrl);
   if (!propsRes.ok) return null;
   const props = await propsRes.json();
@@ -600,47 +706,37 @@ async function loadLivePaintTexture(imageUrl, propsUrl) {
 
   const taraRes = await fetch(imageUrl);
   if (!taraRes.ok) return null;
-  const buffer = await taraRes.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
+  const bytes = new Uint8Array(await taraRes.arrayBuffer());
   const frameBytes = width * height * 4;
-  const availableFrames = Math.max(1, Math.floor(bytes.length / frameBytes));
-  const frameCount = Math.min(numFrames, availableFrames);
-  if (frameCount < 1 || bytes.length < frameBytes) {
-    logStatus('Live paint data too small for declared frame size: ' + imageUrl);
-    return null;
-  }
+  const frameCount = Math.min(numFrames, Math.max(1, Math.floor(bytes.length / frameBytes)));
+  if (bytes.length < frameBytes) { logStatus('Live paint data smaller than one frame: ' + imageUrl); return null; }
 
   const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d');
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.flipY = false;
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
-  let currentFrame = -1;
-  function setFrame(frameIndex) {
-    if (frameIndex === currentFrame) return;
-    currentFrame = frameIndex;
-    const offset = frameIndex * frameBytes;
+  let current = -1;
+  function setFrame(i) {
+    if (i === current) return;
+    current = i;
+    const offset = i * frameBytes;
     if (offset + frameBytes > bytes.length) return;
-    const frameSlice = new Uint8ClampedArray(bytes.buffer.slice(bytes.byteOffset + offset, bytes.byteOffset + offset + frameBytes));
-    const imageData = new ImageData(frameSlice, width, height);
-    ctx.putImageData(imageData, 0, 0);
+    const slice = new Uint8ClampedArray(bytes.buffer.slice(bytes.byteOffset + offset, bytes.byteOffset + offset + frameBytes));
+    ctx.putImageData(new ImageData(slice, width, height), 0, 0);
     texture.needsUpdate = true;
   }
   setFrame(0);
 
-  const frameDuration = 1000 / fps;
-  let lastTime = performance.now();
+  const frameMs = 1000 / fps;
+  let last = performance.now();
   let stopped = false;
   function tick(now) {
     if (stopped) return;
-    if (now - lastTime >= frameDuration) {
-      lastTime = now;
-      setFrame((currentFrame + 1) % frameCount);
-    }
+    if (now - last >= frameMs) { last = now; setFrame((current + 1) % frameCount); }
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
@@ -648,23 +744,23 @@ async function loadLivePaintTexture(imageUrl, propsUrl) {
   return { texture, width, height, stop: () => { stopped = true; } };
 }
 
-async function resolvePaintTextureInfo(paintCfg) {
-  if (paintCfg.live && paintCfg.live.image && paintCfg.live.properties) {
+async function resolveColormap(colormapUrl, liveCfg) {
+  if (liveCfg && liveCfg.image && liveCfg.properties) {
     try {
-      const live = await loadLivePaintTexture(paintCfg.live.image, paintCfg.live.properties);
+      const live = await loadLivePaintFrames(liveCfg.image, liveCfg.properties);
       if (live) return live;
     } catch (e) {
-      logStatus('Live paint load failed, falling back to static color: ' + (e && e.message));
+      logStatus('Live paint failed, falling back to image.jpg: ' + (e && e.message));
     }
   }
-  if (!paintCfg.color) throw new Error('No paint texture source available');
-  const img = await loadImage(paintCfg.color);
-  const tex = setSRGB(await textureLoader.loadAsync(paintCfg.color));
+  const url = colormapUrl + 'image.jpg';
+  const [tex, img] = await Promise.all([textureLoader.loadAsync(url), loadImage(url)]);
+  setSRGB(tex);
   return { texture: tex, width: img.naturalWidth || img.width, height: img.naturalHeight || img.height };
 }
 
-const vertexShader = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
-const fragmentShader = [
+const paintVertexShader = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
+const paintFragmentShader = [
   'uniform sampler2D uColor;',
   'uniform sampler2D uLight;',
   'uniform sampler2D uDetails;',
@@ -688,7 +784,9 @@ function createPaintMaterial({ texPaint, texLight, texDetails, colorScale }) {
   if ('minFilter' in texPaint) texPaint.minFilter = THREE.LinearMipmapLinearFilter;
   texPaint.magFilter = THREE.LinearFilter;
   return new THREE.ShaderMaterial({
-    vertexShader, fragmentShader, toneMapped: false,
+    vertexShader: paintVertexShader,
+    fragmentShader: paintFragmentShader,
+    toneMapped: false,
     uniforms: {
       uColor: { value: texPaint },
       uLight: { value: texLight },
@@ -700,21 +798,8 @@ function createPaintMaterial({ texPaint, texLight, texDetails, colorScale }) {
   });
 }
 
-async function loadPaintTextures(paintCfg, lightmapUrl, detailsUrl, alphaUrl) {
-  const [paintInfo, texLightRaw] = await Promise.all([
-    resolvePaintTextureInfo(paintCfg),
-    textureLoader.loadAsync(lightmapUrl),
-  ]);
-  const texPaint = paintInfo.texture;
-  const texLight = setSRGB(texLightRaw);
-  const { image: mergedImg, rawWidth, rawHeight } = await mergeDetailsAlpha(detailsUrl, alphaUrl);
-  const texDetails = new THREE.Texture(mergedImg);
-  texDetails.needsUpdate = true;
-  texDetails.colorSpace = THREE.SRGBColorSpace;
-  texDetails.flipY = false;
-  texDetails.premultiplyAlpha = true;
-  const colorScale = new THREE.Vector2(rawWidth / paintInfo.width, rawHeight / paintInfo.height);
-  return { texPaint, texLight, texDetails, colorScale };
+function fallbackMaterial() {
+  return new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.7, metalness: 0.1 });
 }
 
 function flipV(geometry) {
@@ -724,210 +809,233 @@ function flipV(geometry) {
   uv.needsUpdate = true;
 }
 
-const loader = new TDSLoader();
+// =============================================================================
+// BaseLoader.loadCommon() equivalent — fetches object.3ds + paint/lightmap/
+// details/details_alpha from the SAME base-directory convention as the real
+// client, then returns { group, meshes, byName, material }.
+// =============================================================================
+async function loadCommon(baseResourceUrl, colormapUrl, liveCfg) {
+  const [modelBuf, paintResult] = await Promise.all([
+    fetch(baseResourceUrl + 'object.3ds').then((r) => r.ok ? r.arrayBuffer() : Promise.reject(new Error('object.3ds ' + r.status))),
+    (async () => {
+      const [colormap, texLightRaw] = await Promise.all([
+        resolveColormap(colormapUrl, liveCfg),
+        textureLoader.loadAsync(baseResourceUrl + 'lightmap.jpg'),
+      ]);
+      const [detailsImg, alphaImg] = await Promise.all([
+        loadImage(baseResourceUrl + 'details.jpg'),
+        loadImage(baseResourceUrl + 'details_alpha.jpg'),
+      ]);
+      const merged = await mergeDetailsAlpha(detailsImg, alphaImg);
+      const texDetails = new THREE.Texture(merged.image);
+      texDetails.needsUpdate = true;
+      texDetails.colorSpace = THREE.SRGBColorSpace;
+      texDetails.flipY = false;
+      texDetails.premultiplyAlpha = true;
+      const colorScale = new THREE.Vector2(merged.rawWidth / colormap.width, merged.rawHeight / colormap.height);
+      return { texPaint: colormap.texture, texLight: setSRGB(texLightRaw, false), texDetails, colorScale };
+    })(),
+  ]);
 
-function parse3dsPivot(arrayBuffer) {
-  const dv = new DataView(arrayBuffer);
-  let pivot = null;
-  let firstObject = true;
+  const parser = new TDS3DSParser();
+  const { group, meshes, byName } = await parser.parse(modelBuf, { scale: 1, zUpToYUp: true, flipV: false, unityReset: true, mirrorX: false });
+  for (const m of meshes) flipV(m.geometry);
 
-  function walk(start, end) {
-    let p = start;
-    while (p + 6 <= end && !pivot) {
-      const id = dv.getUint16(p, true);
-      const len = dv.getUint32(p + 2, true);
-      if (len < 6 || p + len > end) break;
-      const body = p + 6;
-
-      if (id === 0x4d4d || id === 0x3d3d || id === 0x4100) {
-        walk(body, p + len);
-      } else if (id === 0x4000) {
-        if (!firstObject) return;
-        firstObject = false;
-        let q = body;
-        while (q < p + len && dv.getUint8(q) !== 0) q++;
-        walk(q + 1, p + len);
-      } else if (id === 0x4160) {
-        pivot = [
-          dv.getFloat32(body + 36, true),
-          dv.getFloat32(body + 40, true),
-          dv.getFloat32(body + 44, true),
-        ];
-      }
-      p += len;
-    }
-  }
-
-  walk(0, dv.byteLength);
-  return pivot;
-}
-
-async function load3ds(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error('Failed to fetch ' + url + ': ' + response.status + ' ' + response.statusText);
-  }
-
-  const arrayBuffer = await response.arrayBuffer();
-  const pivot = parse3dsPivot(arrayBuffer);
-  let object;
+  let material;
   try {
-    object = loader.parse(arrayBuffer, url);
-  } catch (err) {
-    logStatus('Failed to load ' + url);
-    throw err;
+    material = createPaintMaterial(paintResult);
+  } catch (e) {
+    logStatus('Paint material failed, using fallback: ' + (e && e.message));
+    material = fallbackMaterial();
   }
 
-  return { object, pivot };
+  return { group, meshes, byName, material };
 }
 
-function applyMaterialToMeshes(object, material) {
-  object.traverse((child) => {
-    if (child.isMesh) { child.material = material; flipV(child.geometry); }
-  });
-}
-
-// zeroXY: when true, discard the model's own X/Y pivot offsets and only use
-// its Z (ground) offset. Requested for hulls: "x,y is 0, not from the 3ds
-// model" — this keeps every hull perfectly centered regardless of how its
-// pivot was authored, while still grounding it correctly on the mirror.
-function prepareObjectForViewer(object, pivot, zeroXY) {
-  object.position.set(0, 0, 0);
-  object.rotation.set(0, 0, 0);
-  object.scale.set(1, 1, 1);
-  object.updateMatrixWorld(true);
-
-  if (!pivot) {
-    const box = new THREE.Box3().setFromObject(object);
-    if (!box.isEmpty()) {
-      pivot = [
-        (box.min.x + box.max.x) / 2,
-        (box.min.y + box.max.y) / 2,
-        box.min.z,
-      ];
+// =============================================================================
+// HullLoader — finds the mesh literally named "hull" plus a dummy mesh whose
+// name starts with "mount" (case-insensitive), matching the real HullLoader.
+// =============================================================================
+class HullLoader {
+  hull = null;
+  mountPoint = null;
+  async load(colormapUrl, baseResourceUrl) {
+    const { group, meshes, material } = await loadCommon(baseResourceUrl, colormapUrl, TANK_CONFIG.live);
+    for (const child of group.children) {
+      if (child.name?.toLowerCase?.() === 'hull') this.hull = child;
+      if (child.name?.toLowerCase?.().startsWith?.('mount')) this.mountPoint = child;
     }
+    if (!this.hull) this.hull = meshes.find((m) => !m.name.toLowerCase().startsWith('mount')) ?? meshes[0] ?? null;
+    if (!this.hull) { logStatus('HullLoader: no usable mesh found'); return; }
+    this.hull.material = material;
+    scene.add(this.hull);
   }
-
-  if (pivot) {
-    const px = zeroXY ? 0 : pivot[0];
-    const py = zeroXY ? 0 : pivot[1];
-    object.traverse((child) => {
-      if (child.isMesh && child.geometry) {
-        child.geometry.translate(-px, -py, -pivot[2]);
-      }
-    });
-  }
-
-  object.rotation.x = -Math.PI / 2;
-  object.updateMatrixWorld(true);
-
-  return new THREE.Box3().setFromObject(object);
 }
 
-const tankGroup = new THREE.Group();
-scene.add(tankGroup);
-const turretPivot = new THREE.Group();
-tankGroup.add(turretPivot);
-
-// ---- TOOL UI LOGIC ----
-function setupTurretTool(hullId, initialY) {
-  const uiEl = document.getElementById('turret-tool-ui');
-  const hullLabel = document.getElementById('tool-hull-id');
-  const slider = document.getElementById('tool-z-slider');
-  const numInput = document.getElementById('tool-z-num');
-  const copyBtn = document.getElementById('tool-copy-btn');
-
-  hullLabel.textContent = hullId || 'unknown';
-
-  const minVal = Math.floor(initialY - 100);
-  const maxVal = Math.ceil(initialY + 100);
-  slider.min = minVal;
-  slider.max = maxVal;
-
-  function updateTurretHeight(val) {
-    const yVal = parseFloat(val);
-    turretPivot.position.y = yVal;
-    slider.value = yVal;
-    numInput.value = yVal.toFixed(1);
+// =============================================================================
+// TurretLoader — takes the first mesh in the file (matching the real
+// TurretLoader), and aligns via the SAME transform as the game:
+//   local = translate(mount.position + (0,0,1)) * rotateY(yaw)
+//   world = hull.matrixWorld * local
+// =============================================================================
+class TurretLoader {
+  turret = null;
+  async load(colormapUrl, baseResourceUrl) {
+    const { group, meshes, material } = await loadCommon(baseResourceUrl, colormapUrl, TANK_CONFIG.live);
+    this.turret = meshes[0] ?? null;
+    if (!this.turret) { logStatus('TurretLoader: no mesh found'); scene.add(group); return; }
+    this.turret.material = material;
+    scene.add(this.turret);
   }
-
-  updateTurretHeight(initialY);
-
-  slider.addEventListener('input', (e) => updateTurretHeight(e.target.value));
-  numInput.addEventListener('change', (e) => updateTurretHeight(e.target.value));
-
-  copyBtn.addEventListener('click', () => {
-    const textToCopy = \`"\${hullId}": \${turretPivot.position.y.toFixed(1)},\`;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      const originalText = copyBtn.textContent;
-      copyBtn.textContent = 'Copied!';
-      copyBtn.style.background = '#16a34a';
-      setTimeout(() => {
-        copyBtn.textContent = originalText;
-        copyBtn.style.background = '#0284c7';
-      }, 1500);
-    });
-  });
-
-  uiEl.style.display = 'flex';
+  updateTransform(hullMatrixWorld, yaw, mountPoint) {
+    if (!this.turret || !mountPoint) return;
+    const m = new THREE.Matrix4()
+      .makeRotationY(yaw)
+      .setPosition(mountPoint.position.clone().add(new THREE.Vector3(0, 0, 1)));
+    m.premultiply(hullMatrixWorld);
+    const pos = new THREE.Vector3(), quat = new THREE.Quaternion(), scl = new THREE.Vector3();
+    m.decompose(pos, quat, scl);
+    this.turret.position.copy(pos);
+    this.turret.quaternion.copy(quat);
+  }
 }
 
-function fallbackMaterial() {
-  return new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.7, metalness: 0.1 });
+// =============================================================================
+// Scene setup
+// =============================================================================
+const scene = new THREE.Scene();
+scene.background = null;
+
+// Real client defaults: fov 60, near .1, far 5000, radius 2000, height/radius = .25
+const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 5000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+container.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+keyLight.position.set(5, 10, 7);
+scene.add(keyLight);
+
+// Glass mirror floor at ground level. The real client's ReflectionFragmentShader
+// content wasn't available to us; this uses the stock Reflector tint instead.
+const mirror = new Reflector(new THREE.PlaneGeometry(2000, 2000), {
+  color: 0x222222,
+  textureWidth: Math.max(1, Math.floor(container.clientWidth * Math.min(window.devicePixelRatio, 2) * 0.5)),
+  textureHeight: Math.max(1, Math.floor(container.clientHeight * Math.min(window.devicePixelRatio, 2) * 0.5)),
+  clipBias: 0.003,
+});
+mirror.rotation.x = -Math.PI / 2;
+mirror.position.y = 0;
+mirror.renderOrder = -1;
+scene.add(mirror);
+
+const cameraHeightFactor = 500 / 2000;
+let cameraRadius = 2000;
+let cameraHeight = cameraRadius * cameraHeightFactor;
+let cameraAngle = Math.PI / 4;
+let targetBoundsRadius = 50;
+const lookAtTarget = new THREE.Vector3(0, 0, 0);
+
+function updateCameraPosition() {
+  const x = Math.cos(cameraAngle) * cameraRadius;
+  const z = Math.sin(cameraAngle) * cameraRadius;
+  camera.position.set(x, cameraHeight, z);
+  camera.lookAt(lookAtTarget);
 }
 
+function updateCameraDistanceForBounds() {
+  const fovRad = THREE.MathUtils.degToRad(camera.fov);
+  const horizontalFov = 2 * Math.atan(Math.tan(fovRad / 2) * camera.aspect);
+  const r = Math.max(targetBoundsRadius, 1);
+  const a = r / Math.sin(fovRad / 2);
+  const o = r / Math.sin(horizontalFov / 2);
+  const dist = Math.max(a, o) * 0.85; // matches real client's distance multiplier
+  cameraRadius = dist;
+  cameraHeight = dist * cameraHeightFactor;
+  camera.near = Math.max(dist / 100, 0.01);
+  camera.far = dist * 20;
+  camera.updateProjectionMatrix();
+}
+
+function fitCameraToObject(object3D) {
+  const box = new THREE.Box3().setFromObject(object3D);
+  if (box.isEmpty()) return;
+  const center = box.getCenter(new THREE.Vector3());
+  const sphere = new THREE.Sphere();
+  box.getBoundingSphere(sphere);
+  targetBoundsRadius = sphere.radius;
+  lookAtTarget.copy(center);
+  updateCameraDistanceForBounds();
+  updateCameraPosition();
+}
+
+// ---- Controls ----
+const ROTATE_SPEED = 0.005;
+let dragging = false;
+let lastX = 0;
+let lastInteractionTime = performance.now();
+const idleDelay = 3000;
+const autoRotateSpeed = 0.3;
+
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  dragging = true; lastX = e.clientX; lastInteractionTime = performance.now();
+  renderer.domElement.style.cursor = 'grabbing';
+});
+window.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX; lastX = e.clientX;
+  cameraAngle += dx * ROTATE_SPEED;
+  lastInteractionTime = performance.now();
+  updateCameraPosition();
+});
+window.addEventListener('pointerup', () => { dragging = false; renderer.domElement.style.cursor = 'grab'; });
+renderer.domElement.style.cursor = 'grab';
+
+renderer.domElement.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 1.08 : 1 / 1.08;
+  cameraRadius = THREE.MathUtils.clamp(cameraRadius * factor, targetBoundsRadius * 0.2, targetBoundsRadius * 10);
+  cameraHeight = cameraRadius * cameraHeightFactor;
+  lastInteractionTime = performance.now();
+  updateCameraPosition();
+}, { passive: false });
+
+// =============================================================================
+// Init — mirrors ProfileScene.loadTankParts() + updateTransform(..., 0, mount)
+// =============================================================================
 async function init() {
   const cfg = TANK_CONFIG;
-  if (!cfg.hull.model || !cfg.turret.model) {
-    logStatus('Missing equipped hull or turret model URL — cannot render.');
+  if (!cfg.hull.baseUrl || !cfg.turret.baseUrl || !cfg.colormapUrl) {
+    logStatus('Missing equipped hull, turret, or paint base URL — cannot render.');
     return;
   }
   try {
-    // Load hull and turret paint materials independently — a bug/missing
-    // asset on one no longer prevents the other from rendering.
-    const [hullTexResult, turretTexResult] = await Promise.allSettled([
-      loadPaintTextures(cfg.paint, cfg.hull.lightmap, cfg.hull.details, cfg.hull.detailsAlpha),
-      loadPaintTextures(cfg.paint, cfg.turret.lightmap, cfg.turret.details, cfg.turret.detailsAlpha),
-    ]);
+    const hullLoader = new HullLoader();
+    const turretLoader = new TurretLoader();
 
-    let hullMaterial;
-    if (hullTexResult.status === 'fulfilled') {
-      hullMaterial = createPaintMaterial(hullTexResult.value);
-    } else {
-      logStatus('Hull paint failed to load, using fallback material: ' + hullTexResult.reason);
-      hullMaterial = fallbackMaterial();
+    await hullLoader.load(cfg.colormapUrl, cfg.hull.baseUrl);
+    await turretLoader.load(cfg.colormapUrl, cfg.turret.baseUrl);
+
+    if (hullLoader.hull) hullLoader.hull.updateMatrixWorld(true);
+    const hullMatrixWorld = hullLoader.hull ? hullLoader.hull.matrixWorld.clone() : new THREE.Matrix4();
+    turretLoader.updateTransform(hullMatrixWorld, 0, hullLoader.mountPoint);
+
+    const target = hullLoader.hull ?? turretLoader.turret;
+    if (target) {
+      const bounds = new THREE.Box3();
+      if (hullLoader.hull) bounds.expandByObject(hullLoader.hull);
+      if (turretLoader.turret) bounds.expandByObject(turretLoader.turret);
+      const helper = new THREE.Object3D();
+      scene.add(helper);
+      fitCameraToObject({ traverse: (fn) => { if (hullLoader.hull) hullLoader.hull.traverse(fn); if (turretLoader.turret) turretLoader.turret.traverse(fn); } });
+      scene.remove(helper);
     }
-
-    let turretMaterial;
-    if (turretTexResult.status === 'fulfilled') {
-      turretMaterial = createPaintMaterial(turretTexResult.value);
-    } else {
-      logStatus('Turret paint failed to load, using fallback material: ' + turretTexResult.reason);
-      turretMaterial = fallbackMaterial();
+    if (!hullLoader.mountPoint) {
+      logStatus('No "mount*" node found in hull model — turret cannot be aligned for this hull.');
     }
-
-    // 1. Hull — X/Y pivot forced to 0, only Z (ground) offset kept.
-    const { object: hullObject, pivot: hullPivot } = await load3ds(cfg.hull.model);
-    applyMaterialToMeshes(hullObject, hullMaterial);
-    const hullBox = prepareObjectForViewer(hullObject, hullPivot, true);
-    tankGroup.add(hullObject);
-
-    // 2. Turret — keeps its own model pivot (needed for correct mount offset).
-    const { object: turretObject, pivot: turretModelPivot } = await load3ds(cfg.turret.model);
-    applyMaterialToMeshes(turretObject, turretMaterial);
-    const turretBox = prepareObjectForViewer(turretObject, turretModelPivot, false);
-    turretPivot.add(turretObject);
-
-    // 3. Mount height from actual model bounds, minus the flat correction.
-    const initialY = (hullBox.max.y - turretBox.min.y) - TURRET_Z_CORRECTION;
-    turretPivot.position.set(0, initialY, 0);
-
-    // 4. Enable Tool Overlay UI
-    const hullId = cfg.hull.id || 'default';
-    setupTurretTool(hullId, initialY);
-
-    tankGroup.updateMatrixWorld(true);
-    fitCameraToObject(tankGroup);
   } catch (err) {
     logStatus('Viewer failed to initialize — see console for details.');
     console.error(err);
@@ -1006,15 +1114,10 @@ export function getProfilePageHtml(view: ProfileViewModel): string {
       .rank-meta { display:flex; flex-direction:column; gap:6px; }
       .rank-meta .rank-name { font-size:1.25rem; font-weight:800; letter-spacing:.02em; }
       .rank-meta .rank-label { color:var(--muted); font-size:1rem; }
-      .badge { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:linear-gradient(135deg, var(--accent), var(--accent2)); color:white; font-weight:700; }
       .stats-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px; margin-top:18px; }
       .metric { padding:18px; border-radius:18px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
       .metric .label { font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; }
       .metric .value { font-size:1.35rem; font-weight:800; margin-top:8px; }
-      .equip-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:16px; }
-      .equip-card { padding:16px; border-radius:18px; background:rgba(255,255,255,.05); min-height:132px; display:flex; flex-direction:column; justify-content:space-between; }
-      .equip-card .name { font-weight:700; margin-top:8px; }
-      .equip-card .sub { color:var(--muted); font-size:.9rem; }
       .panel-row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
       .list-panel { display:flex; flex-direction:column; gap:14px; }
       .list-panel h3 { margin:0 0 0; font-size:1rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
@@ -1031,24 +1134,17 @@ export function getProfilePageHtml(view: ProfileViewModel): string {
       .mini-preview { object-fit:cover; }
       .mini-preview-mask { background-size: cover; background-position: center; mask-size: cover; mask-repeat: no-repeat; -webkit-mask-size: cover; -webkit-mask-repeat: no-repeat; }
       .pill { display:inline-flex; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.1); font-size:.77rem; margin-left:6px; color:var(--text); }
-      .scroll-note { color: var(--muted); font-size:.9rem; margin-top:8px; }
       .xp-bar { margin-top:20px; }
       .xp-track { width:100%; height:16px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
       .xp-fill { height:100%; border-radius:999px; background: linear-gradient(135deg, #40b8ff, #ff6d5c); box-shadow:0 10px 30px rgba(64,184,255,.25); }
       .xp-label { margin-top:10px; color:var(--muted); font-size:.95rem; }
-      .equip-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; margin-top:22px; }
-      .equip-card { padding:18px; border-radius:22px; background:rgba(255,255,255,.05); min-height:158px; display:flex; flex-direction:column; justify-content:flex-start; gap:12px; border:1px solid rgba(255,255,255,.08); }
-      .equip-card .preview { width:100%; height:128px; object-fit:cover; border-radius:18px; background:rgba(255,255,255,.04); }
-      .equip-card .label { color:var(--muted); font-size:.82rem; text-transform:uppercase; letter-spacing:.12em; }
-      .equip-card .name { font-weight:800; font-size:1rem; }
-      .equip-card .sub { color:var(--muted); font-size:.9rem; }
       a { color: var(--accent); }
       .viewer-panel { padding:0; overflow:hidden; }
       .viewer-panel h3 { padding:24px 24px 0; }
       #tank-viewer-canvas { width:100%; height:420px; position:relative; touch-action:none; }
       #tank-viewer-status { font-size:11px; color:#ff8080; padding:0 24px 16px; font-family: monospace; }
       @media (max-width: 1100px){ .hero{grid-template-columns:1fr;} .panel-row{grid-template-columns:1fr;} }
-      @media (max-width: 900px){ .stats-grid{grid-template-columns:repeat(2, minmax(0,1fr));} .equip-grid{grid-template-columns:1fr;} .list-scroll{flex-wrap:wrap;} }
+      @media (max-width: 900px){ .stats-grid{grid-template-columns:repeat(2, minmax(0,1fr));} .list-scroll{flex-wrap:wrap;} }
     </style>
   </head>
   <body>

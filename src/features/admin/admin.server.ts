@@ -12,6 +12,7 @@ import User, { UserDocument } from "@/shared/models/user.model";
 import { UserService } from "@/shared/services/user.service";
 import logger from "@/utils/logger";
 import { ChatHistory } from "@/features/chat/chat.packets";
+import { HaltServerPacket } from "@/features/system/halt.packets";
 import cors from "cors";
 import crypto from "crypto";
 import dotenv from "dotenv";
@@ -37,6 +38,8 @@ const CM_ONLY_ROLES = new Set<ChatModeratorLevel>([
 ]);
 
 const AUTO_RESTART_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const AUTO_RESTART_WARNING_SECONDS = 30; // in-game countdown shown before the scheduled auto-restart
+const DEFAULT_MANUAL_RESTART_WARNING_SECONDS = 15; // in-game countdown for a manual admin-panel restart
 
 export class AdminServer {
   private readonly app: express.Application;
@@ -44,6 +47,10 @@ export class AdminServer {
   private readonly sessions = new Map<string, AdminSession>();
   private server: Server | null = null;
   private autoRestartTimer: NodeJS.Timeout | null = null;
+
+  // Restart scheduling state, surfaced to the panel via GET /api/admin/restart-status.
+  private nextAutoRestartAt: number = Date.now() + AUTO_RESTART_INTERVAL_MS;
+  private pendingRestartAt: number | null = null;
 
   // Best-effort "online since" tracker, keyed by username. We don't have a
   // hook into the connection-established event here, so we stamp the first
@@ -66,30 +73,50 @@ export class AdminServer {
     this.setupRoutes();
   }
 
-  private scheduleProcessRestart(delayMs = 5000): void {
-    setTimeout(() => {
-      // If a parent supervisor (start.js) is present it sets AUTO_RESTART_PARENT.
-      // In that case a SIGTERM here will be handled by the supervisor which will
-      // restart the child. Otherwise, attempt to spawn a detached replacement
-      // process with the same node args and exit.
-      if (process.env.AUTO_RESTART_PARENT === 'true') {
-        process.kill(process.pid, 'SIGTERM');
-        return;
-      }
+  /**
+   * Starts a server restart: shows every connected client the native "server restarts in N
+   * seconds" countdown (HaltServerPacket), ends any battles in progress so nobody is mid-round
+   * when the process goes down, then actually restarts the process once the countdown elapses.
+   * Used by both the manual "Restart server now" admin-panel button and the scheduled 24h
+   * auto-restart, so they share one code path.
+   */
+  private beginServerRestart(delaySeconds: number, reason: string): void {
+    const seconds = Math.max(3, Math.min(300, Math.round(delaySeconds) || DEFAULT_MANUAL_RESTART_WARNING_SECONDS));
+    logger.info("Server restart initiated", { reason, seconds });
 
-      try {
-        const { spawn } = require('child_process');
-        const args = process.execArgv.concat(process.argv.slice(1));
-        const child = spawn(process.execPath, args, { cwd: process.cwd(), detached: true, stdio: 'inherit', env: process.env });
-        child.unref();
-      } catch (err) {
-        logger.error('Failed to spawn replacement process during restart', { error: err });
-      } finally {
-        // Exit now to allow external process managers to restart, or because we've
-        // spawned a detached replacement.
-        process.exit(0);
-      }
-    }, delayMs);
+    this.gameServer.beginRestart(seconds);
+    this.gameServer.broadcastToAll(new HaltServerPacket(seconds));
+    this.battleService.endAllBattlesForRestart();
+
+    this.pendingRestartAt = Date.now() + seconds * 1000;
+
+    setTimeout(() => this.executeProcessRestart(), seconds * 1000);
+  }
+
+  /** Actually tears the process down once the in-game countdown has elapsed. */
+  private executeProcessRestart(): void {
+    // If a parent supervisor (start.js) is present it sets AUTO_RESTART_PARENT. In that case
+    // SIGUSR2 is handled by server.ts's restart-shutdown path, which exits with a code start.js
+    // recognizes as "spawn a fresh child" (as opposed to SIGTERM, which always means "shut down
+    // and stay down"). Otherwise, attempt to spawn a detached replacement process with the same
+    // node args and exit.
+    if (process.env.AUTO_RESTART_PARENT === 'true') {
+      process.kill(process.pid, 'SIGUSR2');
+      return;
+    }
+
+    try {
+      const { spawn } = require('child_process');
+      const args = process.execArgv.concat(process.argv.slice(1));
+      const child = spawn(process.execPath, args, { cwd: process.cwd(), detached: true, stdio: 'inherit', env: process.env });
+      child.unref();
+    } catch (err) {
+      logger.error('Failed to spawn replacement process during restart', { error: err });
+    } finally {
+      // Exit now to allow external process managers to restart, or because we've
+      // spawned a detached replacement.
+      process.exit(0);
+    }
   }
 
   private setupRoutes(): void {
@@ -662,18 +689,38 @@ export class AdminServer {
       res.json({ ok: true });
     });
 
-    // Restart server (graceful) — admin/CM only. Works whether this process is
-    // supervised by `start.js` or running standalone: it will either SIGTERM the
-    // child (supervised) or spawn a detached replacement and exit.
+    // Restart server (graceful) — admin/CM only. Broadcasts the in-game restart countdown to every
+    // connected client, ends running battles, then restarts the process once the countdown elapses.
+    // Works whether this process is supervised by `start.js` or running standalone.
     this.app.post("/api/admin/restart", auth, (req: Request, res: Response) => {
       const session = res.locals.session as AdminSession;
       if (session.role !== ChatModeratorLevel.ADMINISTRATOR && session.role !== ChatModeratorLevel.COMMUNITY_MANAGER) {
         res.status(403).json({ error: "requires administrator" });
         return;
       }
-      res.json({ ok: true, reason: "server restarting" });
-      // give clients 5s then restart in a robust way
-      this.scheduleProcessRestart(5000);
+      if (this.pendingRestartAt !== null) {
+        res.status(409).json({ error: "a restart is already in progress", pendingRestartAt: this.pendingRestartAt });
+        return;
+      }
+      const requestedSeconds = Number(req.body?.seconds);
+      const seconds = Number.isFinite(requestedSeconds) && requestedSeconds > 0
+        ? requestedSeconds
+        : DEFAULT_MANUAL_RESTART_WARNING_SECONDS;
+
+      this.beginServerRestart(seconds, `manual restart requested by ${session.username}`);
+      res.json({ ok: true, reason: "server restarting", seconds, restartAt: this.pendingRestartAt });
+    });
+
+    // Restart timing for the panel: when the next scheduled 24h auto-restart will fire, and
+    // (if one is in progress) how long until the current countdown finishes.
+    this.app.get("/api/admin/restart-status", auth, (_req: Request, res: Response) => {
+      res.json({
+        nextAutoRestartAt: this.nextAutoRestartAt,
+        msUntilAutoRestart: Math.max(0, this.nextAutoRestartAt - Date.now()),
+        pendingRestart: this.pendingRestartAt !== null,
+        pendingRestartAt: this.pendingRestartAt,
+        msUntilPendingRestart: this.pendingRestartAt !== null ? Math.max(0, this.pendingRestartAt - Date.now()) : null,
+      });
     });
 
     // Battle details: participants, mines, etc.
@@ -1220,11 +1267,14 @@ export class AdminServer {
       logger.info("Admin server started", { port: this.port });
     });
 
-    // Auto-restart the whole process every 24 hours to keep things healthy.
-    // Uses the same robust restart logic as the manual restart button.
+    this.nextAutoRestartAt = Date.now() + AUTO_RESTART_INTERVAL_MS;
+
+    // Auto-restart the whole process every 24 hours to keep things healthy. Uses the same
+    // in-game countdown + graceful restart path as the manual "Restart server now" button.
     this.autoRestartTimer = setInterval(() => {
       logger.info("Scheduled 24h auto-restart triggered");
-      this.scheduleProcessRestart(5000);
+      this.nextAutoRestartAt = Date.now() + AUTO_RESTART_INTERVAL_MS;
+      this.beginServerRestart(AUTO_RESTART_WARNING_SECONDS, "scheduled 24h auto-restart");
     }, AUTO_RESTART_INTERVAL_MS);
     this.autoRestartTimer.unref?.();
   }

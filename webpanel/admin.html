@@ -268,7 +268,7 @@
         <div class="telemetry">
           <div class="stat accent"><div class="n" id="statOnline">0</div><div class="l">Online now</div></div>
           <div class="stat"><div class="n" id="statBattles">0</div><div class="l">Active battles</div></div>
-          <div class="stat"><div class="n" id="statRestart">24h</div><div class="l">Auto-restart cycle</div></div>
+          <div class="stat"><div class="n" id="statRestart">-</div><div class="l" id="statRestartLabel">Next auto-restart</div></div>
         </div>
 
         <div class="panel">
@@ -282,8 +282,12 @@
 
         <div class="panel">
           <h3>Server control <span class="tag">Admin / CM</span></h3>
-          <p class="hint">Gracefully restarts the process (5s warning to connected clients). The server also restarts itself automatically every 24 hours.</p>
-          <button class="danger" onclick="restartServer()">Restart server now</button>
+          <p class="hint">Gracefully restarts the process: shows every connected player the in-game restart countdown, ends any battles in progress, then restarts. The server also restarts itself automatically every 24 hours the same way.</p>
+          <div id="restartBanner" style="display:none; margin-bottom:12px; padding:10px 12px; border-radius:8px; background:var(--red-soft); color:var(--red); font-weight:600;"></div>
+          <div class="row" style="align-items:center; gap:12px">
+            <button class="danger" onclick="restartServer()" id="restartBtn">Restart server now</button>
+            <span class="faint" id="restartWarningSeconds">15s in-game warning</span>
+          </div>
         </div>
 
         <div class="panel">
@@ -502,6 +506,7 @@
     document.getElementById("sessionWho").textContent = user.username;
     document.getElementById("sessionRole").textContent = user.roleName;
     refreshOverview();
+    refreshRestartStatus();
     showTab("overview");
   }
 
@@ -557,13 +562,66 @@
   }
 
   async function restartServer() {
-    const ok = await confirmModal("Restart server", "This restarts the process in 5 seconds and disconnects everyone. Continue?");
+    const ok = await confirmModal("Restart server", "This shows every player the in-game restart countdown, ends any battles in progress, then restarts the process. Continue?");
     if (!ok) return;
     try {
-      await request("/api/admin/restart", { method: "POST" });
-      toast("Restart requested - server going down in 5s", "success");
+      const data = await request("/api/admin/restart", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seconds: 15 }) });
+      toast(`Restart requested - server going down in ${data.seconds}s`, "success");
+      restartState.pendingRestartAt = data.restartAt;
+      renderRestartBanner();
     } catch (err) { toast(err.message, "error"); }
   }
+
+  const restartState = { nextAutoRestartAt: null, pendingRestartAt: null };
+
+  async function refreshRestartStatus() {
+    try {
+      const status = await request("/api/admin/restart-status");
+      restartState.nextAutoRestartAt = status.nextAutoRestartAt;
+      restartState.pendingRestartAt = status.pendingRestartAt;
+      renderRestartBanner();
+    } catch (err) {
+      // Non-fatal - just leave the last known countdown ticking.
+    }
+  }
+
+  function renderRestartBanner() {
+    const banner = document.getElementById("restartBanner");
+    const btn = document.getElementById("restartBtn");
+    if (!banner || !btn) return;
+    if (restartState.pendingRestartAt) {
+      const msLeft = restartState.pendingRestartAt - Date.now();
+      banner.style.display = "block";
+      banner.textContent = msLeft > 0
+        ? `Restart in progress - server going down in ${Math.ceil(msLeft / 1000)}s`
+        : "Restarting now...";
+      btn.disabled = true;
+    } else {
+      banner.style.display = "none";
+      btn.disabled = false;
+    }
+  }
+
+  function tickRestartCountdown() {
+    const statEl = document.getElementById("statRestart");
+    const labelEl = document.getElementById("statRestartLabel");
+    if (statEl && labelEl) {
+      if (restartState.pendingRestartAt) {
+        labelEl.textContent = "Restarting in";
+        statEl.textContent = fmtDuration(Math.max(0, restartState.pendingRestartAt - Date.now()));
+      } else if (restartState.nextAutoRestartAt) {
+        labelEl.textContent = "Next auto-restart";
+        statEl.textContent = fmtDuration(Math.max(0, restartState.nextAutoRestartAt - Date.now()));
+      } else {
+        labelEl.textContent = "Next auto-restart";
+        statEl.textContent = "-";
+      }
+    }
+    renderRestartBanner();
+  }
+
+  setInterval(tickRestartCountdown, 1000);
+  setInterval(refreshRestartStatus, 30000);
 
   async function createAccount() {
     const username = document.getElementById("newUser").value.trim();

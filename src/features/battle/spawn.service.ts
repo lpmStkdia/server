@@ -19,7 +19,7 @@ export class SpawnService {
         const allMapSpawns = getMapSpawns(battle.mapResourceId);
         if (!allMapSpawns || allMapSpawns.length === 0) {
             logger.warn(`No spawn points found for map ${battle.mapResourceId}. Using fallback.`);
-            return { position: { x: 0, y: 0, z: 200 }, rotation: { x: 0, y: 0, z: 0 } };
+            return { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } };
         }
 
         // Em alguns mapas os pontos de spawn azul/vermelho estão trocados em relação às bases: invertemos

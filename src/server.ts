@@ -143,8 +143,17 @@ async function bootstrap() {
   adminServer.start();
   debugConsole.start();
 
-  process.on("SIGTERM", async () => {
-    logger.info("Received SIGTERM. Initiating graceful shutdown...");
+  // Exit code used when this process is going down for a *restart* (triggered by the admin panel's
+  // "Restart server now" button, or the scheduled 24h auto-restart) rather than a real stop. `start.js`
+  // (the production supervisor, see PM2.md) checks for this exact code to decide whether to spawn a
+  // fresh child or let the whole thing stay down — keep the two values in sync if either changes.
+  const RESTART_EXIT_CODE = 75;
+
+  let shuttingDown = false;
+  async function shutdown(exitCode: number, signalName: string): Promise<void> {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logger.info(`Received ${signalName}. Initiating graceful shutdown...`);
     try {
       await server.stop();
       logger.info("LeTanki server stopped");
@@ -167,11 +176,19 @@ async function bootstrap() {
       logger.info("Flushing logs before shutdown");
       logger.on("finish", () => {
         logger.info("Logger flushed and closed");
-        process.exit(0);
+        process.exit(exitCode);
       });
       logger.end();
     }
-  });
+  }
+
+  // A real stop: sent by PM2/the OS when the service should actually go down and stay down.
+  process.on("SIGTERM", () => { void shutdown(0, "SIGTERM"); });
+
+  // A restart: sent by AdminServer (in-process) once it has broadcast the in-game countdown and
+  // ended running battles. Exits with RESTART_EXIT_CODE so a supervising start.js spawns a fresh
+  // child, instead of interpreting the exit as an intentional full shutdown.
+  process.on("SIGUSR2", () => { void shutdown(RESTART_EXIT_CODE, "SIGUSR2 (restart)"); });
 }
 
 (async () => {

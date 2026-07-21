@@ -239,6 +239,12 @@ export class GameServer {
     return this.restartAt !== null && Date.now() < this.restartAt;
   }
 
+  /** Epoch ms the current restart countdown ends at, or null if none is active. Used by the
+   *  admin panel to show a "time left" readout for an in-progress restart. */
+  public getRestartAt(): number | null {
+    return this.isRestartPending() ? this.restartAt : null;
+  }
+
   public broadcastToLobbyChat(packet: IPacket): void {
     this.clientManager.sendToLobbyChatListeners(packet);
   }

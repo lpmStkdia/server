@@ -6,16 +6,6 @@
     "auditLog": "/root/server/logs/.da83f92c13f6044e3189c42fd969cac5b109f3ec-audit.json",
     "files": [
         {
-            "date": 1783976169547,
-            "name": "/root/server/logs/exceptions-2026-07-13.log",
-            "hash": "f22c5e4ddb48c86f4931bf171c340f7f2e016cfc75a90fd9f46b21b82b65e331"
-        },
-        {
-            "date": 1783980325612,
-            "name": "/root/server/logs/exceptions-2026-07-14.log",
-            "hash": "28e8db533746299e9a2216f12487b9ceffc1b28e3ea8cae106bfd96ef7bdbd1d"
-        },
-        {
             "date": 1784572859092,
             "name": "/root/server/logs/exceptions-2026-07-20.log",
             "hash": "a083741018fb8c9d311cbe98b5bf079250e3d4b885ee11621b3f1ed1ce7605a7"
@@ -24,6 +14,41 @@
             "date": 1784587673759,
             "name": "/root/server/logs/exceptions-2026-07-21.log",
             "hash": "711128e178c55f3df41eab7a112ba9dc025586c659287660c5c98d44c78bc92f"
+        },
+        {
+            "date": 1784687377704,
+            "name": "/root/server/logs/exceptions-2026-07-22.log",
+            "hash": "59e77a98e1ebcc9fcb6d9854ce8b537b0f438a4d91287bfcc15d8bcace279588"
+        },
+        {
+            "date": 1784787207064,
+            "name": "/root/server/logs/exceptions-2026-07-23.log",
+            "hash": "480e4016a2c2173959f88ed8d4711f16fb34f2ebf226b2cc9ce1d15bc6d639b1"
+        },
+        {
+            "date": 1784948364836,
+            "name": "/root/server/logs/exceptions-2026-07-25.log",
+            "hash": "db63ef3f102030593fee44fc66eb10d0f698f9c610e670a33af4193fbf6ac056"
+        },
+        {
+            "date": 1785050509034,
+            "name": "/root/server/logs/exceptions-2026-07-26.log",
+            "hash": "1bb880c9ebbd281bbe9d317fe14c63f2397f03465fb964ff71d7ab7342a4f83e"
+        },
+        {
+            "date": 1785211818826,
+            "name": "/root/server/logs/exceptions-2026-07-28.log",
+            "hash": "f56b167cf10a4be038257c32d1160cce65a448459c87a315860428d3c03b1158"
+        },
+        {
+            "date": 1785351113882,
+            "name": "/root/server/logs/exceptions-2026-07-29.log",
+            "hash": "a3ba93608c4aa8a01faf22dae6956a7e4ad954729363df59bbd41a79ad8dcee3"
+        },
+        {
+            "date": 1785390296253,
+            "name": "/root/server/logs/exceptions-2026-07-30.log",
+            "hash": "4aaeb9e6959d9270db1d6f28dfc36f9e22b47290d82a284d296cb6d180b83bae"
         }
     ],
     "hashType": "sha256"

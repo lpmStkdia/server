@@ -6,16 +6,6 @@
     "auditLog": "/root/server/logs/.26744e3a0782d63b4c91c4ae99f9fe3fe9cf2832-audit.json",
     "files": [
         {
-            "date": 1783976169546,
-            "name": "/root/server/logs/error-2026-07-13.log",
-            "hash": "587712b9c9641feebe4164687a3effeb629ea4322734c9d4b4d9759c02540808"
-        },
-        {
-            "date": 1783980325608,
-            "name": "/root/server/logs/error-2026-07-14.log",
-            "hash": "23215375e08f6878fd76ffca51b56732e08cb2380b5fe6efeb7aa32143338a0d"
-        },
-        {
             "date": 1784572859090,
             "name": "/root/server/logs/error-2026-07-20.log",
             "hash": "a06cbfc6769587f09e9077610ef043fc630cb3dd03641aa7545f2e61be27a6d7"
@@ -24,6 +14,51 @@
             "date": 1784585635673,
             "name": "/root/server/logs/error-2026-07-21.log",
             "hash": "20cca3a759a18bf9578ef488a5ef218cc676ff0c1041178ddf28449cc3233ad6"
+        },
+        {
+            "date": 1784671297650,
+            "name": "/root/server/logs/error-2026-07-22.log",
+            "hash": "9ba2329e28e18bdf985f0689fb6db7e98284458c7e811fc3e5b3b73db8acb171"
+        },
+        {
+            "date": 1784787207055,
+            "name": "/root/server/logs/error-2026-07-23.log",
+            "hash": "75de3ce5baf0b31ff2b98bf9cda6f3539f77eb481c5e742eb08c7888ddac077b"
+        },
+        {
+            "date": 1784882014404,
+            "name": "/root/server/logs/error-2026-07-24.log",
+            "hash": "7cc5ccbf2d7ce74cba989e7c8bc40945fdda0d2bf4f52c5701832c5e8c8bd42b"
+        },
+        {
+            "date": 1784948364833,
+            "name": "/root/server/logs/error-2026-07-25.log",
+            "hash": "118ba31b0686d2bbfbf5ea4a08a9fdf6ebfbb843a29df281a9f5708aa3162df6"
+        },
+        {
+            "date": 1785023034691,
+            "name": "/root/server/logs/error-2026-07-26.log",
+            "hash": "33852c5c974609834dee085fc72fe5f36c3b4511203a6e82afe16dd5323d6e00"
+        },
+        {
+            "date": 1785135698976,
+            "name": "/root/server/logs/error-2026-07-27.log",
+            "hash": "7304b6a321f44dbb37bb706332296c9cdedf402582dac3bc32a3b6cb62ecf53c"
+        },
+        {
+            "date": 1785211818796,
+            "name": "/root/server/logs/error-2026-07-28.log",
+            "hash": "1af4674904649c502579bd959d34c0cd9a9ad851ab1816e44f60acc9ee29afe9"
+        },
+        {
+            "date": 1785294704137,
+            "name": "/root/server/logs/error-2026-07-29.log",
+            "hash": "e422c5dacccf2b5132e090d3321e41b4e436e2c62bb8cd53d4b2469de7200297"
+        },
+        {
+            "date": 1785375420524,
+            "name": "/root/server/logs/error-2026-07-30.log",
+            "hash": "9475b813b09dd71f5edca8b7f2f7be773c0ba09566fa1cd1c0b6712b1dea9684"
         }
     ],
     "hashType": "sha256"
